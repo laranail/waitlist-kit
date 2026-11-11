@@ -6,6 +6,7 @@ namespace Simtabi\Laranail\WaitlistKit\Models;
 
 use Override;
 use Illuminate\Support\Carbon;
+use Simtabi\Laranail\WaitlistKit\Data\SeoSettings;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignType;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -29,6 +30,8 @@ use Simtabi\Laranail\WaitlistKit\Database\Factories\CampaignFactory;
  * @property array<string, mixed> $theme_settings
  * @property array<string, mixed> $settings
  * @property ?Carbon $launches_at
+ * @property ?Carbon $created_at
+ * @property ?Carbon $updated_at
  */
 final class Campaign extends Model
 {
@@ -82,6 +85,35 @@ final class Campaign extends Model
         $stored = $this->settings['conversion'] ?? [];
 
         return ConversionSettings::fromArray(is_array($stored) ? $stored : []);
+    }
+
+    /** How the page presents itself to search engines and link previews, from `settings.seo`. */
+    public function seo(): SeoSettings
+    {
+        $stored = $this->settings['seo'] ?? [];
+
+        return SeoSettings::fromArray(is_array($stored) ? $stored : []);
+    }
+
+    /** Where a launched campaign's page sends visitors (`settings.pages.launch_url`), when it is an https address. */
+    public function launchUrl(): ?string
+    {
+        $pages = $this->settings['pages'] ?? [];
+        $url = is_array($pages) ? ($pages['launch_url'] ?? null) : null;
+
+        return is_string($url) && SeoSettings::isHttps($url) ? $url : null;
+    }
+
+    /** Whether search engines may index the page: live, and indexing switched on. */
+    public function indexable(): bool
+    {
+        return $this->status === CampaignStatus::Live && $this->seo()->index;
+    }
+
+    /** The language to show: $requested when the campaign has it, otherwise its first (fallback) language. */
+    public function localeFor(?string $requested): string
+    {
+        return is_string($requested) && in_array($requested, $this->locales, true) ? $requested : ($this->locales[0] ?? 'en');
     }
 
     public function acceptsSignups(): bool

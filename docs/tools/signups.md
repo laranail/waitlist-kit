@@ -6,9 +6,11 @@ How a sign-up travels from the form to the list: two routes, a request, an actio
 
 | Method and path | Name | Does |
 | --- | --- | --- |
-| `GET /{prefix}/{slug}` | `laranail-waitlist-kit.campaign.show` | The campaign's page; a campaign that is not live is a 404 |
+| `GET /{prefix}/{slug}` | `laranail-waitlist-kit.campaign.show` | The campaign's page by status: draft 404, closed or launched notice, launch redirect ([Pages](pages.md)); `?lang=` picks a language |
 | `POST /{prefix}/{slug}` | `laranail-waitlist-kit.campaign.signup` | A sign-up, in the `web` group (session and CSRF), throttled, behind the honeypot |
 | `GET /{prefix}/{slug}/confirm/{subscriber}` | `laranail-waitlist-kit.campaign.confirm` | Double opt-in confirmation; signed, expiring |
+| `POST /{prefix}/{slug}/access` | `laranail-waitlist-kit.campaign.access` | Early access: an invitation code goes on to the invite URL ([Pages](pages.md)) |
+| `GET /{prefix}/sitemap.xml` | `laranail-waitlist-kit.sitemap` | Indexable live campaigns ([Pages](pages.md)) |
 | `GET /{prefix}/{slug}/status/{code}` | `laranail-waitlist-kit.campaign.status` | A subscriber's status page |
 | `GET`, `POST /{prefix}/{slug}/unsubscribe/{subscriber}` | `laranail-waitlist-kit.campaign.unsubscribe` | Leaving the list; signed |
 | `POST /{prefix}/api/conversions` | `laranail-waitlist-kit.conversions.store` | The product reports a conversion ([Conversion](conversion.md)) |

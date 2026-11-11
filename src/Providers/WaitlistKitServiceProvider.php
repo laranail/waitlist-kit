@@ -17,6 +17,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Simtabi\Laranail\WaitlistKit\Auth\Abilities;
 use Simtabi\Laranail\WaitlistKit\Support\Tables;
 use Simtabi\Laranail\Settings\Contracts\Settings;
+use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Support\MorphMap;
 use Simtabi\Laranail\WaitlistKit\Themes\KitThemes;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
@@ -45,6 +46,11 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
     public const string SIGNUP_LIMITER = 'laranail-waitlist-kit.signups';
 
     public const string ENQUIRY_LIMITER = 'laranail-waitlist-kit.enquiries';
+
+    /** Early-access code attempts, per campaign and visitor. */
+    public const string ACCESS_LIMITER = 'laranail-waitlist-kit.access';
+
+    public const int ACCESS_PER_MINUTE = 10;
 
     public const string LOGIN_LIMITER = 'laranail-waitlist-kit.admin-login';
 
@@ -135,6 +141,12 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
         // Five sign-in attempts per address per minute, so the bundled login cannot be guessed at speed.
         RateLimiter::for(self::LOGIN_LIMITER, static fn (Request $request): Limit => Limit::perMinute(5)->by(mb_strtolower($request->string('email')->toString()) . '|' . $request->ip()));
 
+        RateLimiter::for(self::ACCESS_LIMITER, static function (Request $request): Limit {
+            $slug = $request->route('campaign');
+            $slug = $slug instanceof Campaign ? $slug->slug : (is_string($slug) ? $slug : '');
+
+            return Limit::perMinute(self::ACCESS_PER_MINUTE)->by($slug . '|' . $request->ip());
+        });
         RateLimiter::for(self::ENQUIRY_LIMITER, static fn (Request $request): Limit => Limit::perMinute($app->make(KitConfig::class)->enquiriesPerMinute())->by((string) $request->ip()));
     }
 

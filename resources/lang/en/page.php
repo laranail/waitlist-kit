@@ -24,4 +24,13 @@ return [
     'unsubscribe_body'   => 'Stop hearing about :campaign? You can join again any time.',
     'unsubscribe_button' => 'Leave the list',
     'unsubscribed'       => 'You\'ve left the :campaign list. We won\'t email you about it again.',
+    'notify'             => 'Notify me',
+    'closed_title'       => 'Sign-ups have closed',
+    'closed_body'        => 'The :campaign list is no longer taking sign-ups. Thank you for your interest.',
+    'launched_title'     => ':campaign has launched',
+    'launched_body'      => 'The wait is over: :campaign is now open.',
+    'access_title'       => 'Have an invitation?',
+    'access_label'       => 'Invitation code',
+    'access_button'      => 'Continue',
+    'access_invalid'     => 'That code isn\'t valid for this list.',
 ];

@@ -8,10 +8,12 @@ use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Simtabi\Laranail\WaitlistKit\Http\Middleware\RejectHoneypot;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\PageController;
+use Simtabi\Laranail\WaitlistKit\Http\Controllers\AccessController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\SignupController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\StatusController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\ConfirmController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\ContactController;
+use Simtabi\Laranail\WaitlistKit\Http\Controllers\SitemapController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\CampaignController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\ConversionController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\UnsubscribeController;
@@ -36,6 +38,8 @@ Route::middleware($config['middleware'] ?? ['web'])
         Route::get('pages/{page:slug}', [PageController::class, 'show'])
             ->name('page.show');
 
+        Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
+
         Route::get('{campaign:slug}', [CampaignController::class, 'show'])
             ->name('campaign.show');
 
@@ -44,6 +48,11 @@ Route::middleware($config['middleware'] ?? ['web'])
             ->middleware(ValidateSignature::class)
             ->scopeBindings()
             ->name('campaign.confirm');
+
+        // Early access: an invitation code sends its holder on to the product; throttled.
+        Route::post('{campaign:slug}/access', AccessController::class)
+            ->middleware('throttle:laranail-waitlist-kit.access')
+            ->name('campaign.access');
 
         // A subscriber's own page, keyed by their unguessable referral code; linked from the welcome mail only.
         Route::get('{campaign:slug}/status/{code}', StatusController::class)

@@ -85,6 +85,30 @@
         </div>
 
         <div class="col-12">
+            @php($seo = $campaign->seo())
+            @php($launch = is_array($campaign->settings['pages'] ?? null) ? ($campaign->settings['pages']['launch_url'] ?? null) : null)
+            <form method="post" action="{{ route('laranail-waitlist-kit.admin.campaigns.seo', $campaign) }}" class="card" id="seo" aria-labelledby="seo-title">
+                @csrf @method('PUT')
+                <input type="hidden" name="locale" value="{{ $locale }}">
+                <div class="card-header"><h2 class="card-title" id="seo-title">{{ __('laranail/waitlist-kit::admin.seo') }} <span class="badge bg-secondary-lt">{{ $locale }}</span></h2></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'title', 'label' => __('laranail/waitlist-kit::admin.seo_title'), 'value' => $seo->titles[$locale] ?? '', 'maxlength' => 70, 'hint' => __('laranail/waitlist-kit::admin.seo_title_hint')])
+                            @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'description', 'type' => 'textarea', 'rows' => 3, 'label' => __('laranail/waitlist-kit::admin.seo_description'), 'value' => $seo->descriptions[$locale] ?? ''])
+                        </div>
+                        <div class="col-md-6">
+                            @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'image', 'type' => 'url', 'label' => __('laranail/waitlist-kit::admin.seo_image'), 'value' => $seo->image, 'hint' => __('laranail/waitlist-kit::admin.seo_image_hint')])
+                            @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'launch_url', 'type' => 'url', 'label' => __('laranail/waitlist-kit::admin.launch_url'), 'value' => $launch, 'hint' => __('laranail/waitlist-kit::admin.launch_url_hint')])
+                            @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'index', 'type' => 'checkbox', 'label' => __('laranail/waitlist-kit::admin.seo_index'), 'value' => $seo->index, 'hint' => __('laranail/waitlist-kit::admin.seo_index_hint'), 'wrapperClass' => 'mb-0'])
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-end"><button type="submit" class="btn btn-primary">{{ __('laranail/waitlist-kit::admin.save') }}</button></div>
+            </form>
+        </div>
+
+        <div class="col-12">
             @include('laranail/waitlist-kit::admin.partials.blocks', ['owner' => $campaign, 'store' => route('laranail-waitlist-kit.admin.campaigns.blocks.store', $campaign), 'locales' => $campaign->locales])
         </div>
 

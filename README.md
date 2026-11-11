@@ -86,6 +86,7 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Mail](docs/tools/mail.md) — the thank-you, once, in the sign-up's language
 - [Backend](docs/tools/backend.md) — signing in, abilities, every screen, settings, accessibility
 - [Themes](docs/tools/themes.md) — two kit themes, theme packages, view fallback, settings as CSS, prebuilt assets
+- [Pages](docs/tools/pages.md) — campaign types and statuses, search and link previews, hreflang, sitemap
 - [Conversion](docs/tools/conversion.md) — double opt-in, status page, referrals, invites, conversions, unsubscribe, funnel
 - [Contact](docs/tools/contact.md) — the headless contact form: endpoint, component and rules
 - [Legal pages](docs/tools/legal-pages.md) — privacy and terms, seeded as drafts, served once published

@@ -24,4 +24,13 @@ return [
     'unsubscribe_body'   => 'Berhenti menerima kabar tentang :campaign? Anda bisa bergabung lagi kapan saja.',
     'unsubscribe_button' => 'Keluar dari daftar',
     'unsubscribed'       => 'Anda telah keluar dari daftar :campaign. Kami tidak akan mengirim email lagi tentangnya.',
+    'notify'             => 'Beri tahu saya',
+    'closed_title'       => 'Pendaftaran telah ditutup',
+    'closed_body'        => 'Daftar :campaign tidak lagi menerima pendaftaran. Terima kasih atas minat Anda.',
+    'launched_title'     => ':campaign telah diluncurkan',
+    'launched_body'      => 'Penantian berakhir: :campaign kini sudah dibuka.',
+    'access_title'       => 'Punya undangan?',
+    'access_label'       => 'Kode undangan',
+    'access_button'      => 'Lanjutkan',
+    'access_invalid'     => 'Kode itu tidak berlaku untuk daftar ini.',
 ];

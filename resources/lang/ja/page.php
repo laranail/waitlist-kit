@@ -24,4 +24,13 @@ return [
     'unsubscribe_body'   => '今後 :campaign のお知らせを受け取りませんか？いつでも再登録できます。',
     'unsubscribe_button' => 'リストから退会する',
     'unsubscribed'       => '「:campaign」のリストから退会しました。今後このリストに関するメールはお送りしません。',
+    'notify'             => '通知を受け取る',
+    'closed_title'       => '登録は終了しました',
+    'closed_body'        => ':campaign のリストは登録の受付を終了しました。ご関心をお寄せいただきありがとうございます。',
+    'launched_title'     => ':campaign がリリースされました',
+    'launched_body'      => 'お待たせしました。:campaign をご利用いただけます。',
+    'access_title'       => '招待コードをお持ちですか？',
+    'access_label'       => '招待コード',
+    'access_button'      => '続ける',
+    'access_invalid'     => 'このコードはこのリストでは無効です。',
 ];
