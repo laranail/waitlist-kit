@@ -26,7 +26,7 @@ abstract class TestCase extends Orchestra
         $config->set('app.key', 'base64:' . base64_encode(random_bytes(32)));
 
         $config->set('database.default', 'testing');
-        $config->set('database.connections.testing', self::connection());
+        $config->set('database.connections.testing', $this->connection());
     }
 
     /**
@@ -34,7 +34,7 @@ abstract class TestCase extends Orchestra
      *
      * @return array<string, mixed>
      */
-    private static function connection(): array
+    private function connection(): array
     {
         $driver = getenv('WAITLIST_KIT_TEST_DRIVER');
 
