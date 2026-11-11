@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
@@ -27,7 +28,9 @@ it('keeps one row per address per campaign', function (): void {
     $campaign = campaign();
     $campaign->subscribers()->create(['email' => 'dana@example.com']);
 
-    expect(fn () => $campaign->subscribers()->create(['email' => 'dana@example.com']))
+    // In a savepoint: on PostgreSQL a failed statement aborts the surrounding transaction (the test's own), and
+    // every later statement would fail with it. The sign-up path must do the same with a duplicate.
+    expect(fn () => DB::transaction(fn () => $campaign->subscribers()->create(['email' => 'dana@example.com'])))
         ->toThrow(UniqueConstraintViolationException::class);
 
     // The same address on another campaign is another lead.
