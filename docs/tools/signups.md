@@ -8,6 +8,10 @@ How a sign-up travels from the form to the list: two routes, a request, an actio
 | --- | --- | --- |
 | `GET /{prefix}/{slug}` | `laranail-waitlist-kit.campaign.show` | The campaign's page; a campaign that is not live is a 404 |
 | `POST /{prefix}/{slug}` | `laranail-waitlist-kit.campaign.signup` | A sign-up, in the `web` group (session and CSRF), throttled, behind the honeypot |
+| `GET /{prefix}/{slug}/confirm/{subscriber}` | `laranail-waitlist-kit.campaign.confirm` | Double opt-in confirmation; signed, expiring |
+| `GET /{prefix}/{slug}/status/{code}` | `laranail-waitlist-kit.campaign.status` | A subscriber's status page |
+| `GET`, `POST /{prefix}/{slug}/unsubscribe/{subscriber}` | `laranail-waitlist-kit.campaign.unsubscribe` | Leaving the list; signed |
+| `POST /{prefix}/api/conversions` | `laranail-waitlist-kit.conversions.store` | The product reports a conversion ([Conversion](conversion.md)) |
 
 ## A post, in order
 
@@ -28,7 +32,7 @@ The same for a new address, a repeat and a honeypot hit, so the form cannot tell
 
 | Request | Answer |
 | --- | --- |
-| `Accept: application/json` | `201` with `{"message": "..."}`; `422` with `errors` on a bad field; `429` when throttled |
+| `Accept: application/json` | `201` with `{"message": "..."}` ("check your email" under double opt-in); `422` with `errors` on a bad field; `429` when throttled |
 | A form without JavaScript | A redirect to the campaign's own page with a flash, or back there with errors in the `signup` bag (`$errors->signup`); never to a `Referer` |
 
 The language kept is the form's `locale` when the campaign is built in it, else the campaign's first. The referring
