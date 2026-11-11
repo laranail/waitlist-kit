@@ -64,6 +64,15 @@ Set both before the first migration: changing them later points the kit at table
 | `seeding.default` | `WAITLIST_KIT_SEED_DEFAULT` | `true` | Seed a starter draft campaign with `php artisan db:seed` when there is none |
 | `seeding.demo_in_production` | `WAITLIST_KIT_DEMO_IN_PRODUCTION` | `false` | Let the demo seeder run in production |
 
+## Backend
+
+| Key | Variable | Default | Meaning |
+| --- | --- | --- | --- |
+| `admin.enabled` | `WAITLIST_KIT_ADMIN` | `true` | Register the backend's routes |
+| `admin.prefix` | `WAITLIST_KIT_ADMIN_PREFIX` | `waitlist-admin` | The backend lives at `/{prefix}` |
+| `admin.middleware` | — | `['web']` | The group in front of the backend |
+| `admin.emails` | `WAITLIST_KIT_ADMIN_EMAILS` | empty | In `host` sign-in, who the kit's default abilities let in |
+
 ## Sign-in
 
 | Key | Variable | Default | Meaning |
@@ -71,8 +80,7 @@ Set both before the first migration: changing them later points the kit at table
 | `auth.mode` | `WAITLIST_KIT_AUTH` | `host` | `host` (the application's guard) or `bundled` (the kit's own admin login) |
 | `auth.guard` | `WAITLIST_KIT_AUTH_GUARD` | `web` | The guard `host` mode uses; must exist in `config/auth.php` |
 
-The backend that uses these arrives in a later release; the doctor already checks them. Mail is signed with
-`app.name`.
+See [Backend](tools/backend.md#signing-in). Mail is signed with `app.name`.
 
 ## Invalid values
 

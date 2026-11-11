@@ -78,5 +78,14 @@ Alpine.data('wkCountdown', () => ({
     },
 }));
 
+// Asks before a destructive form is sent: the form's data-message is the question.
+Alpine.data('wkConfirm', () => ({
+    check(event) {
+        if (!window.confirm(this.$el.dataset.message ?? '')) {
+            event.preventDefault();
+        }
+    },
+}));
+
 window.Alpine = Alpine;
 Alpine.start();

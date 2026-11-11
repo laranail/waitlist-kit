@@ -13,6 +13,7 @@ export default defineConfig({
             input: [
                 'resources/assets/css/themes/default.css',
                 'resources/assets/css/themes/plain.css',
+                'resources/assets/css/admin.css',
                 'resources/assets/js/kit.js',
             ],
             output: {

@@ -20,7 +20,7 @@ has read, and it does not give legal advice.
 - The sign-up form shows "By joining, you agree to the privacy notice" once published.
 - `<x-laranail-waitlist-kit::legal-links />` lists the published legal pages, unstyled, for any footer.
 
-Editing and publishing them in the backend arrives in Phase 3; until then, update the rows and blocks directly.
+Edit and publish them in the backend's Pages screen ([Backend](backend.md)).
 
 ---
 

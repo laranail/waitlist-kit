@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Simtabi\Laranail\WaitlistKit\Models\Model;
+use Simtabi\Laranail\WaitlistKit\Http\Requests\Admin\AdminRequest;
 
 /**
  * The dependency rule, enforced: the domain layers take what they need through constructors; only the provider
@@ -30,7 +31,7 @@ arch('every class is final or abstract, and strict')
     ->expect('Simtabi\Laranail\WaitlistKit')
     ->classes()
     ->toBeFinal()
-    ->ignoring(Model::class);
+    ->ignoring([Model::class, AdminRequest::class]);
 
 arch('every file declares strict types')
     ->expect('Simtabi\Laranail\WaitlistKit')

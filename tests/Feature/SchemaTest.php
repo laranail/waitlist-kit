@@ -13,7 +13,7 @@ it('creates every table under the configured prefix', function (): void {
     foreach (DoctorCommand::TABLES as $table) {
         expect(Schema::hasTable('laranail_waitlist_kit_' . $table))->toBeTrue("{$table} is missing");
     }
-    expect(DoctorCommand::TABLES)->toHaveCount(7);
+    expect(DoctorCommand::TABLES)->toHaveCount(8);
 });
 
 it('rolls every migration back', function (): void {

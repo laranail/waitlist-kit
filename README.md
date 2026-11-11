@@ -10,7 +10,8 @@ registry version to show (see Install).
 > Waitlists, coming-soon and early-access pages for Laravel: lead capture and conversion, a Blade + Alpine.js backend, and themes as packages.
 
 Requires PHP `^8.5` on Laravel `^13`. Pre-release: campaigns take sign-ups on a themed page (two themes ship; theme packages
-add more), thank each new address once and forward it to integrations; the backend arrives in the next release.
+add more), thank each new address once and forward it to integrations, all run from a Blade +
+Alpine.js backend.
 
 ## Install
 
@@ -33,7 +34,7 @@ Publish the config, run the migrations and check the install in one command:
 php artisan laranail::waitlist-kit.install --migrate
 ```
 
-It creates seven tables under the `laranail_waitlist_kit_` prefix and ends by running the doctor, which exits
+It creates eight tables under the `laranail_waitlist_kit_` prefix and ends by running the doctor, which exits
 non-zero on any problem. Choose how many campaigns the install may run with `WAITLIST_KIT_CAMPAIGNS`
 (`single`, `limited` or `multi`) before you create one.
 
@@ -82,6 +83,7 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Models](docs/tools/models.md) — campaigns, subscribers, blocks, funnel events, integrations
 - [Sign-ups](docs/tools/signups.md) — routes, the request, the guards and the answer
 - [Mail](docs/tools/mail.md) — the thank-you, once, in the sign-up's language
+- [Backend](docs/tools/backend.md) — signing in, abilities, every screen, accessibility
 - [Themes](docs/tools/themes.md) — two kit themes, theme packages, view fallback, settings as CSS, prebuilt assets
 - [Contact](docs/tools/contact.md) — the headless contact form: endpoint, component and rules
 - [Legal pages](docs/tools/legal-pages.md) — privacy and terms, seeded as drafts, served once published
@@ -99,6 +101,8 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Mirror sign-ups to Brevo](docs/recipes/mirror-to-brevo.md) — a contact list kept in step
 - [Export subscribers and erase an address](docs/recipes/export-and-erase.md) — CSV and erasure requests
 - [Try it with demo data](docs/recipes/try-it-with-demo-data.md) — a filled local install
+- [Sign in with your own users](docs/recipes/sign-in-with-your-users.md) — host sign-in and abilities
+- [Use the bundled login](docs/recipes/use-the-bundled-login.md) — for an application with no users
 - [Switch a campaign's theme](docs/recipes/switch-a-campaigns-theme.md) — per campaign or for all
 - [Build a theme](docs/recipes/build-a-theme.md) — a look as a Composer package
 - [Add a contact form](docs/recipes/add-a-contact-form.md) — the headless form on any page

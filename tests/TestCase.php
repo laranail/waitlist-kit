@@ -20,10 +20,11 @@ abstract class TestCase extends Orchestra
         parent::setUp();
 
         // What `vendor:publish --tag=laranail::waitlist-kit-assets` does on a real install.
+        // Copied fresh every time, so a rebuilt dist is never tested against an older copy.
         $target = $this->app->publicPath('vendor/waitlist-kit');
-        if (! is_file($target . '/manifest.json')) {
-            (new Filesystem)->copyDirectory(__DIR__ . '/../resources/dist', $target);
-        }
+        $files = new Filesystem;
+        $files->deleteDirectory($target);
+        $files->copyDirectory(__DIR__ . '/../resources/dist', $target);
     }
 
     /** @return list<class-string> */

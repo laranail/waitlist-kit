@@ -26,7 +26,7 @@ The service provider registers itself through Laravel's package discovery.
 
 ## Database
 
-The kit's seven tables start with `laranail_waitlist_kit_`, so they cannot collide with an application's own, and
+The kit's eight tables start with `laranail_waitlist_kit_`, so they cannot collide with an application's own, and
 can live on their own connection ([Use a separate database](recipes/use-a-separate-database.md)). Every index name is
 explicit and short, so a longer prefix stays inside PostgreSQL's 63-character limit.
 

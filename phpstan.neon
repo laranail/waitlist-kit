@@ -21,4 +21,5 @@ parameters:
                 - src/Mail/ThankYouMail.php
                 - src/Mail/EnquiryNotice.php
                 - src/View/Components/*.php
+                - src/Http/Controllers/Admin/*.php
     treatPhpDocTypesAsCertain: false

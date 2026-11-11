@@ -3,7 +3,10 @@
  * It styles the same wk-* markup as the plain theme, through @apply, and reads the backend's settings as --wk-*.
  */
 @import "tailwindcss" source(none);
-@source "../../../views";
+/* Only the views a page renders: the backend's own markup must not add classes to a public theme. */
+@source "../../../views/base";
+@source "../../../views/partials";
+@source "../../../views/components";
 
 @theme {
     --color-wk-primary: var(--wk-primary);

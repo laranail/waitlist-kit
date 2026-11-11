@@ -17,6 +17,9 @@ final readonly class KitConfig
 {
     public const string KEY = 'laranail.waitlist-kit';
 
+    /** The guard (and its user provider) the kit registers for `bundled` sign-in. */
+    public const string BUNDLED_GUARD = 'laranail-waitlist-kit';
+
     public function __construct(private Repository $config) {}
 
     public function connection(): ?string
@@ -151,6 +154,25 @@ final readonly class KitConfig
     {
         return AuthMode::tryFrom($this->string('auth.mode'))
             ?? throw new InvalidConfiguration('auth.mode', $this->string('auth.mode'), AuthMode::cases());
+    }
+
+    public function adminEnabled(): bool
+    {
+        return $this->config->get(self::KEY . '.admin.enabled') === true;
+    }
+
+    /** @return list<string> lower-cased */
+    public function adminEmails(): array
+    {
+        $value = $this->config->get(self::KEY . '.admin.emails');
+
+        return is_array($value) ? array_values(array_map(static fn (mixed $e): string => is_string($e) ? mb_strtolower($e) : '', $value)) : [];
+    }
+
+    /** The guard the backend authenticates against: the host's in `host` mode, the kit's own in `bundled`. */
+    public function adminGuard(): string
+    {
+        return $this->authMode() === AuthMode::Bundled ? self::BUNDLED_GUARD : $this->authGuard();
     }
 
     public function authGuard(): string

@@ -2,6 +2,8 @@
 
 Turn the seeded privacy and terms drafts into published pages.
 
+In the backend: Pages, open one, edit its text blocks, set the status to published. Or in code:
+
 ```php
 $page = Page::query()->where('slug', Page::PRIVACY)->sole();
 // Replace every [bracketed] item in its blocks, have it reviewed, then:

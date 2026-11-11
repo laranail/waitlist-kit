@@ -89,6 +89,20 @@ return [
         'demo_in_production' => (bool) env('WAITLIST_KIT_DEMO_IN_PRODUCTION', false),
     ],
 
+    'admin' => [
+        // The backend: campaigns, page blocks, themes, subscribers, enquiries, pages and integrations.
+        'enabled' => (bool) env('WAITLIST_KIT_ADMIN', true),
+
+        // It lives at /{prefix}.
+        'prefix' => env('WAITLIST_KIT_ADMIN_PREFIX', 'waitlist-admin'),
+
+        'middleware' => ['web'],
+
+        // In `host` sign-in, who the kit's default abilities let in, by email. Define the abilities yourself
+        // (Gate::define('laranail-waitlist-kit.view', ...)) to use roles instead; the kit never overrides yours.
+        'emails' => array_values(array_filter(array_map(trim(...), explode(',', (string) env('WAITLIST_KIT_ADMIN_EMAILS', ''))))),
+    ],
+
     'auth' => [
         // How the backend signs people in: `host` (the application's own guard and Gate abilities) or
         // `bundled` (the kit's own admin login and admin table, for an application without users).
