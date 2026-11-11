@@ -99,6 +99,10 @@ return [
 
         // Let the demo seeder run in production. It refuses there otherwise.
         'demo_in_production' => (bool) env('WAITLIST_KIT_DEMO_IN_PRODUCTION', false),
+
+        // In `bundled` sign-in, the first administrator `php artisan db:seed` creates when there is none. Its password
+        // is generated and printed once by the seed; nothing is written down. Empty seeds no administrator.
+        'admin_email' => env('WAITLIST_KIT_SEED_ADMIN_EMAIL'),
     ],
 
     'admin' => [
