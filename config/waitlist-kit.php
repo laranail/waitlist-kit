@@ -49,6 +49,27 @@ return [
         'honeypot' => 'website',
     ],
 
+    'contact' => [
+        // The contact form: an endpoint at POST /{routes.prefix}/contact and an unstyled Blade component
+        // (<x-laranail-waitlist-kit::contact-form />) any page of the application can use.
+        'enabled' => (bool) env('WAITLIST_KIT_CONTACT', true),
+
+        // The inbox enquiries are mailed to, with the visitor as Reply-To. Empty keeps them in the database only.
+        'to' => env('WAITLIST_KIT_CONTACT_TO'),
+
+        // The topics the form offers. The first is preselected.
+        'topics' => ['sales', 'support', 'partnerships', 'other'],
+
+        // The company field: `optional`, `required` or `off`.
+        'company' => env('WAITLIST_KIT_CONTACT_COMPANY', 'optional'),
+
+        // Require agreeing to the privacy notice (the `privacy` page) before sending.
+        'consent' => (bool) env('WAITLIST_KIT_CONTACT_CONSENT', true),
+
+        // Enquiries per visitor per minute.
+        'per_minute' => (int) env('WAITLIST_KIT_CONTACT_PER_MINUTE', 5),
+    ],
+
     'security' => [
         // Require laranail/captcha's challenge (Turnstile and others) on the sign-up form. Needs that package.
         'captcha' => (bool) env('WAITLIST_KIT_CAPTCHA', false),

@@ -22,7 +22,7 @@ it('maps every kit model under the package prefix', function (): void {
             $models[] = $class;
         }
     }
-    expect($models)->toHaveCount(5);
+    expect($models)->toHaveCount(count(MorphMap::MAP));
 
     $map = Relation::morphMap();
     foreach ($models as $class) {

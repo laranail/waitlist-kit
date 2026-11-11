@@ -88,6 +88,48 @@ final readonly class KitConfig
         return is_string($value) && $value !== '' ? $value : 'Laravel';
     }
 
+    public function contactEnabled(): bool
+    {
+        return $this->config->get(self::KEY . '.contact.enabled') === true;
+    }
+
+    /** The inbox enquiries are mailed to, or null to keep them in the database only. */
+    public function contactInbox(): ?string
+    {
+        $value = $this->config->get(self::KEY . '.contact.to');
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    /** @return list<string> */
+    public function contactTopics(): array
+    {
+        $value = $this->config->get(self::KEY . '.contact.topics');
+        $topics = is_array($value) ? array_values(array_filter($value, is_string(...))) : [];
+
+        return $topics !== [] ? $topics : ['other'];
+    }
+
+    /** `optional`, `required` or `off`. */
+    public function contactCompany(): string
+    {
+        $value = $this->config->get(self::KEY . '.contact.company');
+
+        return in_array($value, ['optional', 'required', 'off'], true) ? $value : 'optional';
+    }
+
+    public function contactRequiresConsent(): bool
+    {
+        return $this->config->get(self::KEY . '.contact.consent') === true;
+    }
+
+    public function enquiriesPerMinute(): int
+    {
+        $value = $this->config->get(self::KEY . '.contact.per_minute');
+
+        return is_int($value) && $value > 0 ? $value : 5;
+    }
+
     public function seedsDefaultCampaign(): bool
     {
         return $this->config->get(self::KEY . '.seeding.default') === true;

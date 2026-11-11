@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\WaitlistKit\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
+use Simtabi\Laranail\WaitlistKit\Models\Page;
 use Illuminate\Contracts\Foundation\Application;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
@@ -30,6 +31,14 @@ final readonly class CampaignController
             'blocks'   => $campaign->blocks()->where('visible', true)->get(),
             'honeypot' => $this->config->honeypotField(),
             'captcha'  => $this->config->requiresCaptcha(),
+            'privacy'  => $this->privacyUrl(),
         ]);
+    }
+
+    private function privacyUrl(): ?string
+    {
+        $privacy = Page::query()->where('slug', Page::PRIVACY)->first();
+
+        return $privacy?->isPublished() === true ? route('laranail-waitlist-kit.page.show', $privacy) : null;
     }
 }

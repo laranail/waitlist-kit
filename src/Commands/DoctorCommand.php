@@ -27,7 +27,7 @@ final class DoctorCommand extends Command
     use SupportsNamespacedNames;
 
     /** The kit's tables, without the configured prefix. */
-    public const array TABLES = ['campaigns', 'subscribers', 'blocks', 'events', 'integrations'];
+    public const array TABLES = ['campaigns', 'subscribers', 'enquiries', 'pages', 'blocks', 'events', 'integrations'];
 
     /** The provider whose `laranail_captcha` rule the sign-up form needs when security.captcha is on. */
     public const string CAPTCHA_PROVIDER = CaptchaServiceProvider::class;

@@ -16,12 +16,15 @@ final class CampaignRules
 {
     public const string SLUG_PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
 
+    /** Paths the kit's own routes use under the prefix, so no campaign can take them. */
+    public const array RESERVED_SLUGS = ['contact', 'pages'];
+
     /** @return array<string, list<mixed>> */
     public static function create(): array
     {
         return [
             'name'      => ['required', 'string', 'max:120'],
-            'slug'      => ['required', 'string', 'max:120', 'regex:' . self::SLUG_PATTERN, Rule::unique(Tables::name('campaigns'), 'slug')],
+            'slug'      => ['required', 'string', 'max:120', 'regex:' . self::SLUG_PATTERN, Rule::notIn(self::RESERVED_SLUGS), Rule::unique(Tables::name('campaigns'), 'slug')],
             'type'      => ['required', Rule::enum(CampaignType::class)],
             'locales'   => ['required', 'array', 'min:1', 'max:20'],
             'locales.*' => ['required', 'distinct', new Locale],

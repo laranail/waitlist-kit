@@ -6,7 +6,7 @@ Two seeders and a factory for every model.
 
 | Seeder | Runs | Seeds |
 | --- | --- | --- |
-| `WaitlistKitSeeder` | With the application's `php artisan db:seed` (registered by the provider) | One draft campaign, `waitlist`, with a hero, a form and an FAQ, when the install has none |
+| `WaitlistKitSeeder` | With the application's `php artisan db:seed` (registered by the provider) | One draft campaign, `waitlist`, with a hero, a form and an FAQ, when the install has none; draft `privacy` and `terms` pages when missing ([Legal pages](legal-pages.md)) |
 | `WaitlistKitDemoSeeder` | Only when named | A live campaign with 25 subscribers (5 referred) and 85 funnel events |
 
 The starter seeder is idempotent, holds no fake data and needs no Faker; `seeding.default = false` turns it off. The
@@ -25,6 +25,8 @@ php artisan db:seed --class="Simtabi\Laranail\WaitlistKit\Database\Seeders\Waitl
 | `Block::factory()` | `on($campaign)` |
 | `FunnelEvent::factory()` | `about($subscriber, $type)` |
 | `Integration::factory()` | `forCampaign($campaign)` |
+| `Enquiry::factory()` | — |
+| `Page::factory()` | `published()`, `legal($slug)` |
 
 Subscriber factories use Faker's safe addresses (`example.com/.org/.net`), which no mailer delivers.
 

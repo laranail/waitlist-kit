@@ -22,6 +22,10 @@
             @error('captcha')<p>{{ $message }}</p>@enderror
         @endif
 
+        @if ($privacy)
+            <p data-part="consent">{!! __('laranail/waitlist-kit::page.consent_linked', ['link' => '<a href="' . e($privacy) . '">' . e(__('laranail/waitlist-kit::legal.privacy')) . '</a>']) !!}</p>
+        @endif
+
         <button type="submit">{{ $button ?? __('laranail/waitlist-kit::page.join') }}</button>
     </form>
 @endif

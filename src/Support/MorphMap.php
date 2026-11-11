@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\WaitlistKit\Support;
 
 use Illuminate\Database\Eloquent\Model;
+use Simtabi\Laranail\WaitlistKit\Models\Page;
 use Simtabi\Laranail\WaitlistKit\Models\Block;
+use Simtabi\Laranail\WaitlistKit\Models\Enquiry;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Models\FunnelEvent;
@@ -29,6 +31,8 @@ final class MorphMap
     public const array MAP = [
         self::PREFIX . 'campaign'    => Campaign::class,
         self::PREFIX . 'subscriber'  => Subscriber::class,
+        self::PREFIX . 'enquiry'     => Enquiry::class,
+        self::PREFIX . 'page'        => Page::class,
         self::PREFIX . 'block'       => Block::class,
         self::PREFIX . 'event'       => FunnelEvent::class,
         self::PREFIX . 'integration' => Integration::class,

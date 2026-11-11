@@ -32,6 +32,8 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
 {
     public const string SIGNUP_LIMITER = 'laranail-waitlist-kit.signups';
 
+    public const string ENQUIRY_LIMITER = 'laranail-waitlist-kit.enquiries';
+
     public function configurePackage(Package $package): void
     {
         $package
@@ -39,6 +41,7 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
             ->setPublishTagId('waitlist-kit')
             ->hasConfigFile('waitlist-kit')
             ->hasViews()
+            ->hasBladeComponentNamespace('Simtabi\\Laranail\\WaitlistKit\\View\\Components', 'laranail-waitlist-kit')
             ->hasTranslations()
             ->hasRoutesWhen('laranail.waitlist-kit.routes.enabled', 'web', true)
             ->hasCommands([DoctorCommand::class, ExportCommand::class, ForgetCommand::class, InstallCommand::class])
@@ -76,5 +79,7 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
             return Limit::perMinute($config->signupsPerMinute())
                 ->by((is_string($slug) ? $slug : '') . '|' . $request->ip());
         });
+
+        RateLimiter::for(self::ENQUIRY_LIMITER, static fn (Request $request): Limit => Limit::perMinute($config->enquiriesPerMinute())->by((string) $request->ip()));
     }
 }

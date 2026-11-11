@@ -34,6 +34,17 @@ Set both before the first migration: changing them later points the kit at table
 | `signups.thank_you` | `WAITLIST_KIT_THANK_YOU` | `true` | Thank a new sign-up by email, once |
 | `signups.honeypot` | — | `website` | The hidden field only a script fills in |
 
+## Contact
+
+| Key | Variable | Default | Meaning |
+| --- | --- | --- | --- |
+| `contact.enabled` | `WAITLIST_KIT_CONTACT` | `true` | The contact endpoint and component |
+| `contact.to` | `WAITLIST_KIT_CONTACT_TO` | empty | The inbox enquiries are mailed to; empty keeps them in the database only |
+| `contact.topics` | — | `sales, support, partnerships, other` | The topics on offer, the first preselected |
+| `contact.company` | `WAITLIST_KIT_CONTACT_COMPANY` | `optional` | `optional`, `required` or `off` |
+| `contact.consent` | `WAITLIST_KIT_CONTACT_CONSENT` | `true` | Require agreeing to the privacy notice |
+| `contact.per_minute` | `WAITLIST_KIT_CONTACT_PER_MINUTE` | `5` | Enquiries per visitor per minute |
+
 ## Security
 
 | Key | Variable | Default | Meaning |

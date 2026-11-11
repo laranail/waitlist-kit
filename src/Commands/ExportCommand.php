@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\WaitlistKit\Commands;
 
 use Override;
+use LogicException;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\Console\Tools\Commands\Command;
 use Simtabi\Laranail\WaitlistKit\Support\SubscriberExport;
@@ -16,18 +17,19 @@ final class ExportCommand extends Command
     use SupportsNamespacedNames;
 
     #[Override]
-    protected $signature = 'laranail::waitlist-kit.export {campaign : The campaign\'s slug} {--output= : A file to write; standard output when omitted}';
+    protected $signature = 'laranail::waitlist-kit.export {campaign? : The campaign\'s slug (optional with --enquiries)} {--enquiries : Export the contact enquiries instead of the subscribers} {--output= : A file to write; standard output when omitted}';
 
     #[Override]
-    protected $description = 'Export a campaign\'s subscribers as CSV, formula cells quoted.';
+    protected $description = 'Export a campaign\'s subscribers, or the enquiries, as CSV, formula cells quoted.';
 
     public function handle(SubscriberExport $export): int
     {
         $argument = $this->argument('campaign');
         $slug = is_string($argument) ? $argument : '';
 
-        $campaign = Campaign::query()->where('slug', $slug)->first();
-        if ($campaign === null) {
+        $enquiries = (bool) $this->option('enquiries');
+        $campaign = $slug === '' ? null : Campaign::query()->where('slug', $slug)->first();
+        if ($campaign === null && ($slug !== '' || ! $enquiries)) {
             $this->services->display()->error(sprintf('No campaign has the slug "%s".', $slug));
 
             return self::FAILURE;
@@ -41,11 +43,11 @@ final class ExportCommand extends Command
             return self::FAILURE;
         }
 
-        $count = $export->write($campaign, $out);
+        $count = $enquiries ? $export->writeEnquiries($campaign, $out) : $export->write($campaign ?? throw new LogicException('A campaign is required.'), $out);
         fclose($out);
 
         if (is_string($path) && $path !== '') {
-            $this->services->display()->success(sprintf('%d subscriber(s) written to %s', $count, $path));
+            $this->services->display()->success(sprintf('%d row(s) written to %s', $count, $path));
         }
 
         return self::SUCCESS;

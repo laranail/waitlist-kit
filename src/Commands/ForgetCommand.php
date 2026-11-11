@@ -18,7 +18,7 @@ final class ForgetCommand extends Command
     protected $signature = 'laranail::waitlist-kit.forget {email : The address to erase}';
 
     #[Override]
-    protected $description = 'Erase an address, and its funnel events, from every campaign. Integrations keep their own copies.';
+    protected $description = 'Erase an address everywhere: subscriber records, enquiries and their funnel events. Integrations keep their own copies.';
 
     public function handle(ForgetSubscriber $forget): int
     {
@@ -31,7 +31,7 @@ final class ForgetCommand extends Command
         }
 
         $erased = $forget->handle($email);
-        $this->services->display()->success(sprintf('%d subscriber record(s) erased.', $erased));
+        $this->services->display()->success(sprintf('%d subscriber record(s) and %d enquiry(ies) erased.', $erased['subscribers'], $erased['enquiries']));
         $this->services->display()->info('Integrations (an application endpoint, Brevo) keep their own copies: erase it there too.');
 
         return self::SUCCESS;

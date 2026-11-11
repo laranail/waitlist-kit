@@ -51,6 +51,12 @@ final class Campaign extends Model
         return $this->hasMany(Subscriber::class);
     }
 
+    /** @return HasMany<Enquiry, $this> */
+    public function enquiries(): HasMany
+    {
+        return $this->hasMany(Enquiry::class);
+    }
+
     /** @return MorphMany<Block, $this> */
     public function blocks(): MorphMany
     {

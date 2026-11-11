@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Schema;
+use Simtabi\Laranail\WaitlistKit\Models\Enquiry;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Models\FunnelEvent;
 use Simtabi\Laranail\WaitlistKit\Models\Integration;
@@ -72,6 +73,22 @@ it('exports a campaign as CSV with formula cells quoted', function (): void {
         ->and($lines[1])->toContain(",dana@example.com,pending,en,,'=CMD,,");
 
     $this->artisan('laranail::waitlist-kit.export', ['campaign' => 'nowhere'])->assertFailed();
+    $this->artisan('laranail::waitlist-kit.export')->assertFailed();
+});
+
+it('exports the enquiries, and forget erases them', function (): void {
+    Enquiry::factory()->create(['email' => 'dana@example.com', 'message' => '=HYPERLINK("x") please']);
+    $file = tempnam(sys_get_temp_dir(), 'wk') ?: '';
+
+    $this->artisan('laranail::waitlist-kit.export', ['--enquiries' => true, '--output' => $file])->assertSuccessful();
+    $lines = file($file, FILE_IGNORE_NEW_LINES) ?: [];
+    @unlink($file);
+    expect($lines[0])->toBe('id,name,email,company,topic,message,locale,created_at')
+        ->and($lines[1])->toContain('"\'=HYPERLINK(""x"") please"');
+
+    $this->artisan('laranail::waitlist-kit.forget', ['email' => 'dana@example.com'])
+        ->expectsOutputToContain('0 subscriber record(s) and 1 enquiry(ies) erased')->assertSuccessful();
+    expect(Enquiry::query()->count())->toBe(0);
 });
 
 it('forgets an address on every campaign, with its funnel events', function (): void {
@@ -84,7 +101,7 @@ it('forgets an address on every campaign, with its funnel events', function (): 
     FunnelEvent::factory()->about($dana)->create();
 
     $this->artisan('laranail::waitlist-kit.forget', ['email' => ' DANA@example.com'])
-        ->expectsOutputToContain('2 subscriber record(s) erased')
+        ->expectsOutputToContain('2 subscriber record(s) and 0 enquiry(ies) erased')
         ->assertSuccessful();
 
     expect(Subscriber::withTrashed()->where('email', 'dana@example.com')->count())->toBe(0)
