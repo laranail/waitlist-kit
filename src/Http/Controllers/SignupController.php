@@ -25,12 +25,18 @@ final readonly class SignupController
     public static function accepted(Request $request, Campaign $campaign): JsonResponse|RedirectResponse
     {
         $response = $request->expectsJson()
-            ? new JsonResponse(['message' => __('laranail/waitlist-kit::page.sent')], 201)
+            ? new JsonResponse(['message' => self::message($campaign)], 201)
             : redirect()->route('laranail-waitlist-kit.campaign.show', $campaign)->with(self::FLASH, true);
 
         $response->headers->set('Cache-Control', 'no-store');
 
         return $response;
+    }
+
+    /** "You're on the list", or, while the campaign asks for confirmation, "check your email": the same for everyone. */
+    public static function message(Campaign $campaign): string
+    {
+        return __($campaign->conversion()->doubleOptIn ? 'laranail/waitlist-kit::page.check_email' : 'laranail/waitlist-kit::page.sent');
     }
 
     public function store(SignupRequest $request, Campaign $campaign, SubscribeToCampaign $subscribe): JsonResponse|RedirectResponse

@@ -8,4 +8,6 @@ return [
     'sent'           => 'Anda sudah masuk daftar. Kami akan menghubungi Anda.',
     'faq'            => 'Pertanyaan',
     'consent_linked' => 'Dengan bergabung, Anda menyetujui :link.',
+    'check_email'    => 'Hampir selesai. Periksa email Anda dan buka tautannya untuk mengonfirmasi tempat Anda.',
+    'confirmed'      => 'Terkonfirmasi. Anda nomor :position dalam daftar.',
 ];

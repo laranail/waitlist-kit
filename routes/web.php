@@ -3,9 +3,11 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Middleware\ValidateSignature;
 use Simtabi\Laranail\WaitlistKit\Http\Middleware\RejectHoneypot;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\PageController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\SignupController;
+use Simtabi\Laranail\WaitlistKit\Http\Controllers\ConfirmController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\ContactController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\CampaignController;
 
@@ -31,6 +33,12 @@ Route::middleware($config['middleware'] ?? ['web'])
 
         Route::get('{campaign:slug}', [CampaignController::class, 'show'])
             ->name('campaign.show');
+
+        // Double opt-in: the signed, expiring link from ConfirmMail; the subscriber must belong to the campaign.
+        Route::get('{campaign:slug}/confirm/{subscriber}', ConfirmController::class)
+            ->middleware(ValidateSignature::class)
+            ->scopeBindings()
+            ->name('campaign.confirm');
 
         Route::post('{campaign:slug}', [SignupController::class, 'store'])
             ->middleware(['throttle:laranail-waitlist-kit.signups', RejectHoneypot::class . ':signup'])

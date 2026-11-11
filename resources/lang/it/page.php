@@ -8,4 +8,6 @@ return [
     'sent'           => 'Sei nella lista. Ti scriveremo.',
     'faq'            => 'Domande',
     'consent_linked' => 'Iscrivendoti, accetti l’:link.',
+    'check_email'    => 'Quasi fatto. Controlla la tua email e apri il link per confermare il tuo posto.',
+    'confirmed'      => 'Confermato. Sei il numero :position della lista.',
 ];

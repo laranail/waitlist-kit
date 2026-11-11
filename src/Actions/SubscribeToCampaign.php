@@ -10,6 +10,7 @@ use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Data\SignupResult;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Enums\FunnelEventType;
+use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
 use Simtabi\Laranail\WaitlistKit\Exceptions\CampaignNotOpen;
 
 /**
@@ -20,6 +21,7 @@ use Simtabi\Laranail\WaitlistKit\Exceptions\CampaignNotOpen;
  * whole transaction. Only a new subscriber is recorded in the funnel, thanked and sent to the integrations, and the
  * last two happen after the commit, so nothing is mailed or forwarded for a row that was rolled back. Without double
  * opt-in the new subscriber also joins the list in the same transaction (AdmitToList): confirmed, positioned, coded.
+ * With it, they stay pending and are mailed a signed link (AskToConfirm); the welcome waits for ConfirmSubscriber.
  */
 final readonly class SubscribeToCampaign
 {
@@ -27,6 +29,7 @@ final readonly class SubscribeToCampaign
         private DateFactory $date,
         private AdmitToList $admit,
         private WelcomeSubscriber $welcome,
+        private AskToConfirm $askToConfirm,
     ) {}
 
     public function handle(Campaign $campaign, SignupData $data): SignupResult
@@ -57,8 +60,12 @@ final readonly class SubscribeToCampaign
             return new SignupResult($subscriber, created: $subscriber->wasRecentlyCreated);
         });
 
-        if ($result->created) {
+        $doubleOptIn = $campaign->conversion()->doubleOptIn;
+        if ($result->created && ! $doubleOptIn) {
             $this->welcome->handle($campaign, $result->subscriber);
+        } elseif ($doubleOptIn && $result->subscriber->status === SubscriberStatus::Pending) {
+            // A new sign-up is asked to confirm; a repeat while still pending gets the link again, rate-limited.
+            $this->askToConfirm->handle($campaign, $result->subscriber);
         }
 
         return $result;
