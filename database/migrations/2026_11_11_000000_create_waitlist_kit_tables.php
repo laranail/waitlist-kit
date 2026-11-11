@@ -9,7 +9,7 @@ use Simtabi\Laranail\WaitlistKit\Support\Tables;
 
 /**
  * Every table the kit needs, in one migration: campaigns, subscribers, contact enquiries, pages (legal and others),
- * blocks, funnel events and integrations.
+ * blocks, funnel events, integrations, and the bundled sign-in's administrators.
  *
  * Polymorphic owners use `*able` columns holding morph-map aliases (`laranail-waitlist-kit.campaign`), never class
  * names, so renaming a class never strands a row. Index names are explicit and short, so any table prefix stays under
@@ -113,6 +113,16 @@ return new class extends Migration
             $table->index(['campaign_id', 'type', 'occurred_at'], 'wk_events_funnel_index');
         });
 
+        // The bundled sign-in's own administrators (auth.mode = bundled). Unused in host mode.
+        $schema->create(Tables::name('admins'), static function (Blueprint $table): void {
+            $table->ulid('id')->primary();
+            $table->string('name', 120);
+            $table->string('email', 254)->unique('wk_admins_email_unique');
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
         $schema->create(Tables::name('integrations'), static function (Blueprint $table): void {
             $table->ulid('id')->primary();
             // What the integration serves: a campaign, or nothing for one every campaign uses.
@@ -128,7 +138,7 @@ return new class extends Migration
     {
         $schema = Schema::connection($this->getConnection());
 
-        foreach (['integrations', 'events', 'blocks', 'pages', 'enquiries', 'subscribers', 'campaigns'] as $table) {
+        foreach (['integrations', 'admins', 'events', 'blocks', 'pages', 'enquiries', 'subscribers', 'campaigns'] as $table) {
             $schema->dropIfExists(Tables::name($table));
         }
     }

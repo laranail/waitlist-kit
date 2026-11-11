@@ -6,6 +6,7 @@ namespace Simtabi\Laranail\WaitlistKit\Support;
 
 use Illuminate\Database\Eloquent\Model;
 use Simtabi\Laranail\WaitlistKit\Models\Page;
+use Simtabi\Laranail\WaitlistKit\Models\Admin;
 use Simtabi\Laranail\WaitlistKit\Models\Block;
 use Simtabi\Laranail\WaitlistKit\Models\Enquiry;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
@@ -35,6 +36,7 @@ final class MorphMap
         self::PREFIX . 'page'        => Page::class,
         self::PREFIX . 'block'       => Block::class,
         self::PREFIX . 'event'       => FunnelEvent::class,
+        self::PREFIX . 'admin'       => Admin::class,
         self::PREFIX . 'integration' => Integration::class,
     ];
 }
