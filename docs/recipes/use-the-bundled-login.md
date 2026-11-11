@@ -10,7 +10,17 @@ WAITLIST_KIT_AUTH=bundled
 php artisan laranail::waitlist-kit.admin owner@example.org --name="Owner"
 ```
 
-The command asks for the password twice, hidden; it is never an argument. Sign in at `/waitlist-admin/login`. See
+The command asks for the password twice, hidden; it is never an argument. Or let the seeder create the first one:
+
+```dotenv
+WAITLIST_KIT_SEED_ADMIN_EMAIL=owner@example.org
+```
+
+```bash
+php artisan db:seed
+```
+
+It prints a generated password once; change it with the command above. Sign in at `/waitlist-admin/login`. See
 [Backend](../tools/backend.md#signing-in).
 
 ---

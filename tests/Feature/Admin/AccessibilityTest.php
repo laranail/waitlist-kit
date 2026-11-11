@@ -58,6 +58,13 @@ function accessibilityProblems(string $html): array
         }
     }
 
+    foreach ($xpath->query('//div[contains(concat(" ", @class, " "), " table-responsive ")]') ?: [] as $region) {
+        assert($region instanceof DOMElement);
+        if ($region->getAttribute('tabindex') !== '0' || $region->getAttribute('role') !== 'region' || $region->getAttribute('aria-labelledby') === '') {
+            $problems[] = 'a scrolling table region not reachable by keyboard or not labelled';
+        }
+    }
+
     foreach ($xpath->query('//*[@tabindex]') ?: [] as $element) {
         assert($element instanceof DOMElement);
         if ((int) $element->getAttribute('tabindex') > 0) {
@@ -102,7 +109,12 @@ it('gives every backend screen its structure', function (string $mode): void {
 
         expect(accessibilityProblems($html))->toBe([], $url)
             ->and($html)->toContain('href="#content"')
-            ->and($html)->toContain('aria-current="page"');
+            ->and($html)->toContain('aria-current="page"')
+            // Tabler's shell, with the sidebar toggle on Alpine (no Bootstrap script) and the signed-in user shown.
+            ->and($html)->toContain('<div class="navbar navbar-vertical navbar-expand-lg" x-data="wkNav">')
+            ->not->toContain('<aside')
+            ->not->toContain('data-bs-toggle')
+            ->toContain('owner@example.org');
     }
     expect($screens)->toHaveCount(13);
 })->with(['host', 'bundled']);
@@ -114,7 +126,7 @@ it('summarises errors in an alert that links to each field', function (): void {
         ->post('/waitlist-admin/campaigns', ['name' => '', 'slug' => 'Bad Slug', 'type' => 'waitlist', 'locales' => 'en'])
         ->getContent();
 
-    expect($html)->toContain('role="alert"')
+    expect($html)->toContain('role="alert" aria-labelledby="wka-errors-title" tabindex="-1" autofocus')
         ->toContain('href="#f-name"')
         ->toContain('id="f-name"')
         ->toContain('aria-invalid="true"')
@@ -127,6 +139,8 @@ it('can fail', function (): void {
             'no lang on <html>', 'not exactly one <h1>', 'no <main id="content">', 'an unlabelled control: x',
             'a button with no text', 'a table without a caption', 'a column header without scope', 'a positive tabindex',
         ])
+        ->and(accessibilityProblems('<html lang="en"><main id="content"><h1>a</h1><div class="table-responsive"><table><caption>c</caption></table></div></main></html>'))
+        ->toBe(['a scrolling table region not reachable by keyboard or not labelled'])
         ->and(referenceProblems('<label for="a">A</label><input id="a"><input id="a" aria-describedby="a-hint"><label for="b">B</label>'))
         ->toBe(['the id a used more than once', 'a reference to the missing id a-hint', 'a reference to the missing id b']);
 });

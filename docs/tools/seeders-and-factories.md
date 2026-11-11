@@ -1,15 +1,18 @@
 # Seeders and factories
 
-Two seeders and a factory for every model.
+Three seeders and a factory for every model.
 
 ## Seeders
 
 | Seeder | Runs | Seeds |
 | --- | --- | --- |
 | `WaitlistKitSeeder` | With the application's `php artisan db:seed` (registered by the provider) | One draft campaign, `waitlist`, with a hero, a form and an FAQ, when the install has none; draft `privacy` and `terms` pages when missing ([Legal pages](legal-pages.md)) |
+| `WaitlistKitAdminSeeder` | From `WaitlistKitSeeder` | The first administrator, in `bundled` sign-in with `seeding.admin_email` set and no administrator yet; its password is generated and printed once |
 | `WaitlistKitDemoSeeder` | Only when named | A live campaign with 25 subscribers (5 referred) and 85 funnel events |
 
-The starter seeder is idempotent, holds no fake data and needs no Faker; `seeding.default = false` turns it off. The
+The starter seeder is idempotent, holds no fake data and needs no Faker; `seeding.default = false` turns off its
+campaign and pages, not the administrator. The administrator seeder writes no password down: it exists only in the
+output of the `db:seed` run that created it. The
 demo seeder needs Faker and refuses to run in production unless `seeding.demo_in_production` is true.
 
 ```bash

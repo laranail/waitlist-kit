@@ -78,6 +78,7 @@ again. `database` without `laranail/settings` installed is reported by the docto
 | --- | --- | --- | --- |
 | `seeding.default` | `WAITLIST_KIT_SEED_DEFAULT` | `true` | Seed a starter draft campaign with `php artisan db:seed` when there is none |
 | `seeding.demo_in_production` | `WAITLIST_KIT_DEMO_IN_PRODUCTION` | `false` | Let the demo seeder run in production |
+| `seeding.admin_email` | `WAITLIST_KIT_SEED_ADMIN_EMAIL` | empty | In `bundled` sign-in, the first administrator `db:seed` creates when there is none (password printed once) |
 
 ## Backend
 

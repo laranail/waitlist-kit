@@ -1,0 +1,1 @@
+(()=>{const e=document.documentElement;if(e.dataset.wkAppearance!=="system"||typeof window.matchMedia!="function")return;const t=window.matchMedia("(prefers-color-scheme: dark)"),a=()=>e.setAttribute("data-bs-theme",t.matches?"dark":"light");a(),t.addEventListener("change",a)})();

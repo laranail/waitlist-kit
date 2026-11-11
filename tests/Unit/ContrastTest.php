@@ -60,23 +60,36 @@ function contrastStylesheet(string $name): string
     return (string) file_get_contents(dirname(__DIR__, 2) . '/resources/assets/css/' . $name);
 }
 
-it('keeps the backend\'s text and controls readable', function (): void {
-    $t = contrastTokens(contrastStylesheet('admin.css'));
-    expect($t)->toHaveKeys(['a-ink', 'a-muted', 'a-bg', 'a-accent', 'a-danger', 'a-ok']);
+it('keeps the backend on the Tabler release whose colours were measured, with its corrections', function (): void {
+    // Tabler's colours are oklch and mixed in oklab, so they are measured in a browser rather than here: axe-core 4.10
+    // on every backend screen, 2026-11-11, with @tabler/core 1.7.1. These assertions pin that measurement: a Tabler
+    // upgrade or a dropped correction fails here, which is the prompt to measure again (docs/accessibility.md).
+    $package = json_decode((string) file_get_contents(dirname(__DIR__, 2) . '/package.json'), true, flags: JSON_THROW_ON_ERROR);
+    $admin = contrastStylesheet('admin.css');
 
-    foreach (['a-ink', 'a-muted', 'a-accent', 'a-danger', 'a-ok'] as $text) {
-        foreach (['#ffffff', $t['a-bg']] as $page) {
-            expect(contrastRatio(contrastRgb($t[$text]), contrastRgb($page)))->toBeGreaterThanOrEqual(4.5, "{$text} on {$page}");
-        }
+    expect($package['devDependencies']['@tabler/core'] ?? null)->toBe('1.7.1')
+        ->and($admin)->toContain('@import "@tabler/core/dist/css/tabler.min.css";');
+
+    $corrections = [
+        // measured before: green 2.48, yellow 1.97, secondary 4.19 (tinted badges); info alert 2.83; danger 4.47; table link 2.07
+        '/\.wka \.badge\.bg-green-lt \{ color: color-mix\(in oklab, var\(--tblr-green\) 55%, #000\) !important; \}/',
+        '/\.wka \.badge\.bg-yellow-lt \{ color: color-mix\(in oklab, var\(--tblr-yellow\) 50%, #000\) !important; \}/',
+        '/\.wka \.badge\.bg-secondary-lt \{ color: color-mix\(in oklab, var\(--tblr-secondary\) 60%, #000\) !important; \}/',
+        '/\.wka \.badge\.bg-azure-lt \{/',
+        '/\.wka \.badge\.bg-red-lt \{/',
+        '/\.wka \.alert \{\s*--tblr-alert-color: var\(--tblr-body-color\);/',
+        '/\.wka \.btn-danger,\s*\.wka \.btn-ghost-danger,\s*\.wka \.btn-outline-danger \{\s*--tblr-btn-variant: color-mix\(in oklab, var\(--tblr-danger\) 88%, #000\);/',
+        '/\.wka \.card-table a:not\(\.btn\) \{\s*text-decoration: underline;/',
+        '/\.wka a\.btn-primary,\s*\.wka a\.btn-danger \{\s*color: #fff;/',
+        // dark scheme, measured before: primary text 2.71-3.02, ghost danger below 4.5
+        '/\[data-bs-theme=dark\] \.wka \.badge\.bg-green-lt \{ color: color-mix\(in oklab, var\(--tblr-green\) 55%, #fff\)/',
+        '/\[data-bs-theme=dark\] \.wka \.btn-outline-primary:not\(:hover\):not\(:active\),[^{]*\.nav-pills \.nav-link\.active \{\s*color: color-mix\(in oklab, var\(--tblr-primary\) 45%, #fff\);/',
+        '/\[data-bs-theme=dark\] \.wka \.btn-ghost-danger:not\(:hover\):not\(:active\) \{\s*color: color-mix\(in oklab, var\(--tblr-danger\) 50%, #fff\);/',
+    ];
+    foreach ($corrections as $rule) {
+        expect($admin)->toMatch($rule);
     }
-    // Button labels are white on the accent and the danger colour.
-    expect(contrastRatio(contrastRgb('#ffffff'), contrastRgb($t['a-accent'])))->toBeGreaterThanOrEqual(4.5)
-        ->and(contrastRatio(contrastRgb('#ffffff'), contrastRgb($t['a-danger'])))->toBeGreaterThanOrEqual(4.5);
-
-    // A control's edge, and the rule that keeps a link-button's label white (`.wka a` outranks `.wka-button`).
-    preg_match('/\.wka-field input:not\(\[type="checkbox"\]\)[^{]*\{[^}]*border: 1px solid (#[0-9a-f]{6})/', contrastStylesheet('admin.css'), $edge);
-    expect(contrastRatio(contrastRgb($edge[1] ?? '#ffffff'), contrastRgb('#ffffff')))->toBeGreaterThanOrEqual(3.0)
-        ->and(contrastStylesheet('admin.css'))->toMatch('/\.wka a\.wka-button\s*\{\s*color: #fff;/');
+    expect($corrections)->toHaveCount(12);
 });
 
 it('keeps both public themes readable with their default colours', function (): void {

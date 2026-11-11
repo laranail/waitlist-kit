@@ -11,11 +11,15 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Simtabi\Laranail\WaitlistKit\Themes\KitThemes;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Simtabi\Laranail\WaitlistKit\Themes\ThemeAssets;
+use Simtabi\Laranail\WaitlistKit\Enums\AdminAppearance;
 
 /** Gives the backend's layout its stylesheet and script, its navigation with the current section, and who is signed in. */
 final readonly class AdminLayoutComposer
 {
     public const string STYLESHEET = 'resources/assets/css/admin.css';
+
+    /** Runs before the first paint to apply the `system` colour scheme; see AdminAppearance. */
+    public const string APPEARANCE_SCRIPT = 'resources/assets/js/admin-theme.js';
 
     public function __construct(
         private ThemeAssets $assets,
@@ -40,6 +44,7 @@ final readonly class AdminLayoutComposer
         $nav = [];
         foreach ($sections as $key => [$route, $covers]) {
             $nav[] = [
+                'key'     => $key,
                 'label'   => __('laranail/waitlist-kit::admin.nav.' . $key),
                 'url'     => $this->urls->route('laranail-waitlist-kit.admin.' . $route),
                 'current' => $this->request->routeIs(...array_map(static fn (string $p): string => 'laranail-waitlist-kit.admin.' . $p, $covers)),
@@ -49,11 +54,26 @@ final readonly class AdminLayoutComposer
         $user = $this->auth->guard($this->config->adminGuard())->user();
 
         $view->with([
-            'adminAssets' => $this->assets->tagsFor(KitThemes::BUILD_DIRECTORY, [self::STYLESHEET, KitThemes::SCRIPT]),
-            'nonce'       => $this->assets->nonce(),
-            'nav'         => $nav,
-            'who'         => is_object($user) && (property_exists($user, 'email') && $user->email !== null) && is_string($user->email) ? $user->email : null,
-            'bundled'     => $this->config->adminGuard() === KitConfig::BUNDLED_GUARD,
+            'adminAssets'      => $this->assets->tagsFor(KitThemes::BUILD_DIRECTORY, [self::STYLESHEET, KitThemes::SCRIPT]),
+            'appearance'       => AdminAppearance::fromCookie($this->request->cookie(AdminAppearance::COOKIE)),
+            'appearanceScript' => $this->assets->classicScript(KitThemes::BUILD_DIRECTORY, self::APPEARANCE_SCRIPT),
+            'appearances'      => AdminAppearance::cases(),
+            'currentPath'      => $this->request->getRequestUri(),
+            'nonce'            => $this->assets->nonce(),
+            'nav'              => $nav,
+            'who'              => $this->emailOf($user),
+            'bundled'          => $this->config->adminGuard() === KitConfig::BUNDLED_GUARD,
         ]);
+    }
+
+    /**
+     * The signed-in user's address. Read through data_get: an Eloquent model's attributes are magic, so
+     * property_exists() is false for them and the sidebar showed nobody for any database-backed user.
+     */
+    private function emailOf(mixed $user): ?string
+    {
+        $email = is_object($user) ? data_get($user, 'email') : null;
+
+        return is_string($email) && $email !== '' ? $email : null;
     }
 }

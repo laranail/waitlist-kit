@@ -47,6 +47,15 @@ All notable changes to this project are documented here. The format follows
   configuration. `mail.from_address` and `mail.from_name` set the sender of the kit's mail.
 - [Accessibility](docs/accessibility.md): what the pages guarantee, how it is tested, and a screen-reader script.
 
+- The backend is redesigned on Tabler (`@tabler/core` 1.7.1): a vertical sidebar, page headers with actions, KPI
+  cards on the dashboard, tables in cards with empty states and status badges, Bootstrap-5 pagination, danger-zone
+  cards and Tabler's form controls, with Tabler Icons inline. Tabler's CSS is compiled into the kit's stylesheet; its
+  Bootstrap JavaScript is not shipped (the sidebar toggle is an Alpine component).
+- Backend appearance: Match the system, Light or Dark, chosen in the sidebar and kept in a cookie. Light and Dark are
+  rendered by the server; Match the system is applied by a tiny blocking head script, so there is no flash.
+- `WaitlistKitAdminSeeder`: in `bundled` sign-in, `db:seed` creates the first administrator for
+  `seeding.admin_email` when there is none, with a generated password printed once.
+
 ### Fixed
 
 - The block editor repeated control ids in every block's form, so labels and the error summary reached only the
@@ -58,6 +67,14 @@ All notable changes to this project are documented here. The format follows
   its error and focused. An answer's status region is revealed before it is filled, and takes focus on success.
 - After a reload with errors, the first rejected field takes focus; the consent and captcha errors are tied to
   their controls.
+- The backend never showed who was signed in: it read the address with `property_exists()`, which is false for an
+  Eloquent model's attributes.
+- Tabler's tinted badges, alert text and danger buttons were below 4.5:1; the kit's stylesheet corrects them.
+- From a virtual screen-reader pass: the contact form is a region named by its heading, footer blocks render after
+  `<main>` as the page's contentinfo, the backend sidebar is no longer an unnamed complementary landmark, the
+  add-block form is named, and the backend's error summary takes focus after a reload (with a script fallback where
+  a browser skips `autofocus`).
+- The contact form's consent checkbox sat on its own line above its label; it now sits beside it.
 - The sign-up and contact forms shared one error bag and old input, so a contact error marked the sign-up form's
   email field too. Their errors are now in `$errors->signup` and `$errors->contact`.
 

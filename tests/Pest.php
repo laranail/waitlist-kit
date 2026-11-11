@@ -36,7 +36,7 @@ function signInAdmin(string $mode = 'host'): void
 {
     if ($mode === 'bundled') {
         config()->set('laranail.waitlist-kit.auth.mode', 'bundled');
-        test()->actingAs(Admin::factory()->create(), KitConfig::BUNDLED_GUARD);
+        test()->actingAs(Admin::factory()->create(['email' => 'owner@example.org']), KitConfig::BUNDLED_GUARD);
 
         return;
     }

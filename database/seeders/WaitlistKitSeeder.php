@@ -14,7 +14,7 @@ use Simtabi\Laranail\WaitlistKit\Enums\CampaignType;
 use Simtabi\Laranail\WaitlistKit\Actions\CreateCampaign;
 
 /**
- * The kit's baseline: one draft waitlist campaign with a starter page (hero, sign-up form, FAQ), and draft privacy
+ * The kit's baseline: the first administrator in bundled sign-in (WaitlistKitAdminSeeder), one draft waitlist campaign with a starter page (hero, sign-up form, FAQ), and draft privacy
  * and terms pages, so a fresh install has something to open and edit. Runs with the application's `php artisan db:seed` (registered by the provider).
  *
  * Idempotent and safe in production: it seeds no campaign when any exists and no page that exists, holds no fake data and no
@@ -26,6 +26,9 @@ final class WaitlistKitSeeder extends Seeder
 
     public function run(KitConfig $config, CreateCampaign $createCampaign): void
     {
+        // The first administrator, in bundled sign-in with seeding.admin_email set; separate from the starter content.
+        $this->call(WaitlistKitAdminSeeder::class);
+
         if (! $config->seedsDefaultCampaign()) {
             return;
         }

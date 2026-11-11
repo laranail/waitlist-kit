@@ -188,6 +188,14 @@ final readonly class KitConfig
         return $this->config->get(self::KEY . '.seeding.demo_in_production') === true;
     }
 
+    /** The address of the first administrator the seeder creates in `bundled` sign-in, or null to seed none. */
+    public function seedAdminEmail(): ?string
+    {
+        $email = $this->config->get(self::KEY . '.seeding.admin_email');
+
+        return is_string($email) && filter_var(trim($email), FILTER_VALIDATE_EMAIL) !== false ? mb_strtolower(trim($email)) : null;
+    }
+
     public function authMode(): AuthMode
     {
         return AuthMode::tryFrom($this->string('auth.mode'))
