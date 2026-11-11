@@ -18,6 +18,9 @@ release still needs from a person.
 | Countdown | No live region: the ticking label is hidden from assistive technology, which reads the launch date instead |
 | Honeypot | `hidden`, `aria-hidden` and `tabindex="-1"`: never reached by keyboard or read out |
 | Contrast | Text at 4.5:1 and control edges at 3:1 with the default colours, in both themes and the backend |
+| Dark scheme | The same corrections in dark: tinted badges lightened, primary and danger text lightened at rest; axe clean on every backend screen in both schemes |
+| Backend errors | The error summary takes focus on load, so it is read out at once; each line links to its field |
+| Landmarks | Public pages: main, a named region per form, and the footer as contentinfo after main. Backend: the named navigation, the page header, main, and named forms per card |
 | Backend on Tabler | Tabler's tinted badges, alert text and danger buttons fell short (1.97 to 4.47:1) and are corrected in the kit's stylesheet; table links are underlined; each scrolling table is a labelled region reachable by keyboard; the sidebar toggle reports `aria-expanded` |
 | Motion | Transitions off under `prefers-reduced-motion` |
 
@@ -36,6 +39,13 @@ in both themes, the privacy page, the login and 12 backend screens (again after 
 changelog were fixed. Contrast, focus order and error announcements were checked by hand alongside it.
 
 ## The screen-reader pass
+
+A virtual screen reader (Guidepup's Virtual Screen Reader 0.33, which voices the browser's accessibility tree the way
+VoiceOver and NVDA phrase it) was run through this script on 2026-11-11: reading order, landmarks, headings, the
+error paths with and without JavaScript, the success announcement, the countdown, the sidebar toggle and the
+appearance switch. It found and the kit fixed: an unnamed contact form, the footer inside main, an unnamed sidebar
+landmark and add-block form, and a backend error summary that was not focused after a reload. It does not voice
+focus moves or test real speech timing, so a pass with VoiceOver or NVDA is still worth doing before a release.
 
 Tests read markup; they cannot hear a page. Run this with VoiceOver (macOS: Safari, `Cmd F5`) and NVDA (Windows:
 Firefox or Chrome) on a demo install ([Try it with demo data](recipes/try-it-with-demo-data.md)).

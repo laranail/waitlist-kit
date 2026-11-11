@@ -11,6 +11,16 @@ compiled into the kit's own `admin` stylesheet and published with the other asse
 CDN and needs no Node. Tabler's Bootstrap JavaScript is not shipped: the sidebar toggle on small screens and the
 removal confirmations are Alpine components on the CSP build.
 
+## Appearance
+
+The sidebar's Appearance switch offers Match the system, Light and Dark, kept per browser in the
+`laranail_waitlist_kit_appearance` cookie for a year. Light and Dark are rendered by the server as Tabler's
+`data-bs-theme`, so the first paint is already right; Match the system follows the operating system through a 280-byte
+script loaded before the stylesheet, so a dark system never sees a light flash. The switch is a plain form and works
+without JavaScript.
+
+## Size and policy
+
 The stylesheet is about 680 KB (86 KB compressed) and is loaded only by the backend. A site with a strict
 Content-Security-Policy needs `img-src data:` for the backend, because Tabler draws its select arrows and switches
 as inline SVG images.
