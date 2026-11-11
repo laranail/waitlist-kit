@@ -107,7 +107,7 @@ it('sends a form without JavaScript back to its own path, never to another site'
     test()->post('/waitlist/contact', enquiry(['return' => '/about']))->assertRedirect('/about')->assertSessionHas('laranail/waitlist-kit.enquiry-sent');
     test()->post('/waitlist/contact', enquiry(['return' => '//evil.example/x']))->assertRedirect('/');
     test()->post('/waitlist/contact', enquiry(['return' => 'https://evil.example/x']))->assertRedirect('/');
-    test()->post('/waitlist/contact', enquiry(['email' => 'nope', 'return' => '/about']))->assertRedirect('/about')->assertSessionHasErrors('email');
+    test()->post('/waitlist/contact', enquiry(['email' => 'nope', 'return' => '/about']))->assertRedirect('/about')->assertSessionHasErrors('email', null, 'contact');
 });
 
 it('answers 404 with the contact form switched off', function (): void {

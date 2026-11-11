@@ -1,6 +1,6 @@
 {
   "resources/assets/css/admin.css": {
-    "file": "assets/css/admin-De5EiXpN.css",
+    "file": "assets/css/admin-BbwMtVHL.css",
     "src": "resources/assets/css/admin.css",
     "isEntry": true,
     "name": "admin",
@@ -9,7 +9,7 @@
     ]
   },
   "resources/assets/css/themes/default.css": {
-    "file": "assets/css/default-B6_PC4l1.css",
+    "file": "assets/css/default-Ckj6Fqq3.css",
     "src": "resources/assets/css/themes/default.css",
     "isEntry": true,
     "name": "default",
@@ -18,7 +18,7 @@
     ]
   },
   "resources/assets/css/themes/plain.css": {
-    "file": "assets/css/plain-KXeMlK1z.css",
+    "file": "assets/css/plain-C0slOjYq.css",
     "src": "resources/assets/css/themes/plain.css",
     "isEntry": true,
     "name": "plain",
@@ -27,7 +27,7 @@
     ]
   },
   "resources/assets/js/kit.js": {
-    "file": "assets/js/kit-CP0ex6kL.js",
+    "file": "assets/js/kit-DymMFfaI.js",
     "name": "kit",
     "src": "resources/assets/js/kit.js",
     "isEntry": true

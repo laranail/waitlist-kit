@@ -10,6 +10,8 @@
     --wk-logo: none;
     --wk-muted: color-mix(in srgb, var(--wk-text) 65%, var(--wk-background));
     --wk-border: color-mix(in srgb, var(--wk-text) 18%, var(--wk-background));
+    /* A control's edge needs 3:1 against the page (WCAG 1.4.11); --wk-border is for dividers only. */
+    --wk-control-border: color-mix(in srgb, var(--wk-text) 50%, var(--wk-background));
     --wk-radius: 0.5rem;
 }
 
@@ -46,7 +48,7 @@
 .wk-field, [data-scope="contact-form"] [data-part="field"] { display: grid; gap: 0.375rem; }
 .wk-label, [data-scope="contact-form"] [data-part="label"] { font-weight: 600; font-size: 0.875rem; }
 .wk-input, [data-scope="contact-form"] [data-part="input"]:not([type="checkbox"]) {
-    font: inherit; padding: 0.625rem 0.75rem; border: 1px solid var(--wk-border); border-radius: var(--wk-radius);
+    font: inherit; padding: 0.625rem 0.75rem; border: 1px solid var(--wk-control-border); border-radius: var(--wk-radius);
     background: var(--wk-background); color: var(--wk-text); width: 100%;
 }
 .wk-input:focus-visible, [data-scope="contact-form"] [data-part="input"]:focus-visible { outline: 2px solid var(--wk-primary); outline-offset: 2px; }
@@ -60,5 +62,8 @@
 .wk-status, [data-part="status"] { margin: 0; font-weight: 600; }
 .wk-consent { font-size: 0.875rem; color: var(--wk-muted); margin: 0; }
 .wk-page-updated { color: var(--wk-muted); }
+
+/* Visually hidden, still read by assistive technology. */
+.wk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }

@@ -40,6 +40,8 @@
 
     .wk-countdown { @apply text-center; }
     .wk-countdown-value { @apply text-4xl font-semibold tabular-nums; }
+    /* Visually hidden, still read by assistive technology. */
+    .wk-sr { @apply sr-only; }
 
     .wk-faq-item { @apply border-t border-wk-text/10 py-3; }
     .wk-faq-question { @apply cursor-pointer font-semibold; }
@@ -55,8 +57,9 @@
     .wk-form, [data-scope="contact-form"] { @apply mx-auto grid w-full max-w-md gap-4; }
     .wk-field, [data-scope="contact-form"] [data-part="field"] { @apply grid gap-1.5; }
     .wk-label, [data-scope="contact-form"] [data-part="label"] { @apply text-sm font-semibold; }
+    /* A control's edge needs 3:1 against the page (WCAG 1.4.11); half-strength ink keeps it for any text colour. */
     .wk-input, [data-scope="contact-form"] [data-part="input"]:not([type="checkbox"]) {
-        @apply w-full rounded-lg border border-wk-text/20 bg-wk-background px-3 py-2.5 text-wk-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wk-primary;
+        @apply w-full rounded-lg border border-wk-text/50 bg-wk-background px-3 py-2.5 text-wk-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wk-primary;
     }
     [data-state="invalid"] .wk-input, [data-state="invalid"] [data-part="input"] { @apply border-red-700; }
     .wk-error, [data-part="error"] { @apply m-0 text-sm text-red-700; }
