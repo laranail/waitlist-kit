@@ -14,7 +14,18 @@ workflow publishes the GitHub release from that section, with an SBOM. A tag is 
 
 ## Upgrading
 
-Run `php artisan migrate` after every update, then `php artisan laranail::waitlist-kit.doctor`.
+Run these after every update. The theme assets change with each release, so they are always republished:
+
+```bash
+php artisan migrate
+php artisan vendor:publish --tag=laranail::waitlist-kit-assets --force
+php artisan laranail::waitlist-kit.doctor
+```
+
+## Building the theme assets
+
+Maintainers only: `npm ci && npm run build` writes `resources/dist`, which is committed. CI rebuilds it and fails when
+the committed build is stale.
 
 ---
 
