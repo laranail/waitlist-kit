@@ -7,6 +7,7 @@ namespace Simtabi\Laranail\WaitlistKit\Tests\Feature\Admin;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Simtabi\Laranail\WaitlistKit\Auth\Abilities;
 use Simtabi\Laranail\WaitlistKit\Tests\TestCase;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
@@ -112,7 +113,11 @@ final class SettingsDatabaseTest extends TestCase
 
     protected function defineDatabaseMigrations(): void
     {
-        (require dirname(__DIR__, 3) . '/vendor/laranail/settings/database/migrations/create_laranail_settings_tables.php')->up();
+        // Once per database: on MySQL and PostgreSQL the tables outlive RefreshDatabase's per-test transaction (MySQL
+        // commits DDL), so creating them for every test fails on the second; SQLite in memory starts empty each time.
+        if (! Schema::hasTable('settings_categories')) {
+            (require dirname(__DIR__, 3) . '/vendor/laranail/settings/database/migrations/create_laranail_settings_tables.php')->up();
+        }
     }
 
     /** @return array<string, mixed> */
