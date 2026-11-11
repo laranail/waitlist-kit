@@ -1,0 +1,125 @@
+name: Static analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: static-analysis-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phpstan:
+    if: ${{ !github.event.pull_request.draft }}
+    name: PHPStan (level max)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Every action reference follows the org pinning rule: third-party on a release's commit SHA with the
+      # release named, first-party (actions/, github/) on a bare major.
+      - name: Action pins match the rule
+        run: |
+          python3 - <<'PINS'
+          import os, re, sys
+          d = ".github/workflows"
+          files = sorted(f for f in os.listdir(d) if f.endswith((".yml", ".yaml")))
+          if len(files) < 5:
+              sys.exit(f"{len(files)} workflow files; the floor is 5")
+          uses = re.compile(r"uses:\s*([\w.-]+/[\w./-]+?)@([\w./-]+?)([ \t]*#[ \t]*(\S+))?\s*$", re.M)
+          bad, seen = [], 0
+          for name in files:
+              for ref, at, _, note in uses.findall(open(os.path.join(d, name)).read()):
+                  if ref.startswith("./") or "/.github/workflows/" in ref:
+                      continue
+                  seen += 1
+                  if ref.startswith(("actions/", "github/")):
+                      if not re.fullmatch(r"v\d+", at) or note:
+                          bad.append(f"{name}: {ref}@{at}")
+                  elif not re.fullmatch(r"[0-9a-f]{40}", at) or not note or re.fullmatch(r"v?\d+", note):
+                      bad.append(f"{name}: {ref}@{at}")
+          print("\n".join(bad)); print(f"{seen} references in {len(files)} files; {len(bad)} off the rule")
+          sys.exit(1 if bad else 0)
+          PINS
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.5'
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, intl
+          coverage: none
+
+      - name: Drop cached laranail archives
+        shell: bash
+        run: rm -rf "$(composer config cache-files-dir)/laranail"
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Analyse
+        run: vendor/bin/phpstan analyse --no-progress --error-format=github
+
+  style:
+    if: ${{ !github.event.pull_request.draft }}
+    name: Pint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.5'
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, intl
+          coverage: none
+
+      - name: Drop cached laranail archives
+        shell: bash
+        run: rm -rf "$(composer config cache-files-dir)/laranail"
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Check formatting
+        run: vendor/bin/laranail-pint --test
+
+  rector:
+    if: ${{ !github.event.pull_request.draft }}
+    name: Rector
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.5'
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, intl
+          coverage: none
+
+      - name: Drop cached laranail archives
+        shell: bash
+        run: rm -rf "$(composer config cache-files-dir)/laranail"
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Check for pending refactorings
+        run: vendor/bin/rector process --dry-run --no-progress-bar

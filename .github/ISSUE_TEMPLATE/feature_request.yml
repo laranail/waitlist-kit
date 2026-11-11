@@ -1,0 +1,20 @@
+name: Feature request
+description: Propose a capability for waitlists, coming-soon or early-access pages.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The kit is thin on purpose: pre-launch pages and what converts their leads. Say how the proposal serves that.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true

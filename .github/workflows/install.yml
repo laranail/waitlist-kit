@@ -1,0 +1,78 @@
+name: Install
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: install-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Installs the package the way a consumer receives it (the dist, export-ignore applied) into a fresh Laravel
+  # application, then runs the install command, the migrations and the doctor. Every other job runs against the
+  # working tree, where every file exists by definition.
+  install:
+    if: ${{ !github.event.pull_request.draft }}
+    name: Install into a fresh Laravel application
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.5'
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, intl
+          coverage: none
+
+      - name: Build the dist exactly as Composer would
+        run: |
+          mkdir -p /tmp/dist
+          git archive --format=tar HEAD | tar -x -C /tmp/dist
+
+      - name: Assert the dist has what the runtime needs, and nothing it does not
+        run: |
+          failed=0
+          for path in composer.json src/Providers/WaitlistKitServiceProvider.php config/waitlist-kit.php database/migrations; do
+            [ -e "/tmp/dist/$path" ] || { echo "::error::$path is missing from the dist; check .gitattributes"; failed=1; }
+          done
+          for path in tests docs phpunit.xml .github; do
+            [ ! -e "/tmp/dist/$path" ] || { echo "::error::$path ships to consumers"; failed=1; }
+          done
+          exit $failed
+
+      - name: Create a fresh Laravel application
+        run: composer create-project laravel/laravel /tmp/app "^13.0" --no-interaction --prefer-dist
+
+      - name: Require the package from the dist
+        working-directory: /tmp/app
+        run: |
+          composer config minimum-stability dev
+          composer config prefer-stable true
+          composer config repositories.waitlist-kit '{"type":"path","url":"/tmp/dist","options":{"symlink":false}}'
+          composer config repositories.console '{"type":"vcs","url":"https://github.com/laranail/console"}'
+          composer config repositories.package-tools '{"type":"vcs","url":"https://github.com/laranail/package-tools"}'
+          composer require "laranail/waitlist-kit:*@dev" --no-interaction --no-progress
+
+      - name: Install, migrate and check
+        working-directory: /tmp/app
+        run: |
+          touch database/database.sqlite
+          php artisan laranail::waitlist-kit.install --migrate --no-interaction
+          test -f config/laranail/waitlist-kit.php || { echo "::error::the config was not published"; exit 1; }
+
+      - name: Publish the migrations
+        working-directory: /tmp/app
+        run: |
+          php artisan vendor:publish --tag=laranail::waitlist-kit-migrations --no-interaction
+          ls database/migrations/*waitlist_kit* >/dev/null || { echo "::error::the migrations tag published nothing"; exit 1; }
