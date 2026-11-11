@@ -27,7 +27,8 @@ use Simtabi\Laranail\WaitlistKit\Exceptions\CampaignNotOpen;
  * The insert is `createOrFirst`, which runs in a savepoint: a repeat address hits the unique index, the savepoint rolls
  * back, and the existing row comes back. On PostgreSQL a failed insert outside a savepoint would abort the request's
  * whole transaction. Only a new subscriber is recorded in the funnel, thanked and sent to the integrations, and the
- * last two happen after the commit, so nothing is mailed or forwarded for a row that was rolled back.
+ * last two happen after the commit, so nothing is mailed or forwarded for a row that was rolled back. Without double
+ * opt-in the new subscriber also joins the list in the same transaction (AdmitToList): confirmed, positioned, coded.
  */
 final readonly class SubscribeToCampaign
 {
@@ -37,6 +38,7 @@ final readonly class SubscribeToCampaign
         private Dispatcher $bus,
         private DateFactory $date,
         private LoggerInterface $log,
+        private AdmitToList $admit,
     ) {}
 
     public function handle(Campaign $campaign, SignupData $data): SignupResult
@@ -57,6 +59,11 @@ final readonly class SubscribeToCampaign
 
             if ($subscriber->wasRecentlyCreated) {
                 $subscriber->events()->create(['campaign_id' => $campaign->id, 'type' => FunnelEventType::Signup, 'occurred_at' => $this->date->now()]);
+
+                // Without double opt-in, signing up is the confirmation: the address joins the list at once.
+                if (! $campaign->conversion()->doubleOptIn) {
+                    $this->admit->handle($subscriber);
+                }
             }
 
             return new SignupResult($subscriber, created: $subscriber->wasRecentlyCreated);
