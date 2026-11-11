@@ -78,7 +78,7 @@ final readonly class SubscribeToCampaign
         if ($this->config->thanksNewSignups()) {
             $this->quietly('thank-you mail', $subscriber, fn () => $this->mail->mailer()->to($subscriber->email)
                 ->locale($subscriber->locale)
-                ->queue(new ThankYouMail($this->config->siteName(), $campaign->name)));
+                ->queue(new ThankYouMail($this->config->siteName(), $campaign->name, $this->config->sender())));
         }
 
         foreach ($this->integrations($campaign) as $integration) {

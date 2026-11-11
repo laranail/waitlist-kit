@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\WaitlistKit\Support;
 
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Contracts\Config\Repository;
 use Simtabi\Laranail\WaitlistKit\Enums\AuthMode;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignsMode;
+use Simtabi\Laranail\WaitlistKit\Settings\SettingsStore;
+use Simtabi\Laranail\WaitlistKit\Settings\EditableSettings;
 use Simtabi\Laranail\WaitlistKit\Exceptions\InvalidConfiguration;
 
 /**
@@ -20,7 +23,42 @@ final readonly class KitConfig
     /** The guard (and its user provider) the kit registers for `bundled` sign-in. */
     public const string BUNDLED_GUARD = 'laranail-waitlist-kit';
 
-    public function __construct(private Repository $config) {}
+    public function __construct(private Repository $config, private ?SettingsStore $overrides = null) {}
+
+    /** The raw value for the Settings screen. */
+    public function editable(string $key): mixed
+    {
+        return $this->value($key);
+    }
+
+    public function settingsStore(): string
+    {
+        $value = $this->config->get(self::KEY . '.settings.store');
+
+        return is_string($value) ? $value : 'env';
+    }
+
+    public function mailFromAddress(): ?string
+    {
+        $value = $this->value('mail.from_address');
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    /** The kit's own sender, or null to use the application's mail.from. */
+    public function sender(): ?Address
+    {
+        $address = $this->mailFromAddress();
+
+        return $address === null ? null : new Address($address, $this->mailFromName());
+    }
+
+    public function mailFromName(): ?string
+    {
+        $value = $this->value('mail.from_name');
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
 
     public function connection(): ?string
     {
@@ -61,14 +99,14 @@ final readonly class KitConfig
 
     public function signupsPerMinute(): int
     {
-        $value = $this->config->get(self::KEY . '.signups.per_minute');
+        $value = $this->value('signups.per_minute');
 
         return is_int($value) && $value > 0 ? $value : 10;
     }
 
     public function thanksNewSignups(): bool
     {
-        return $this->config->get(self::KEY . '.signups.thank_you') === true;
+        return $this->value('signups.thank_you') === true;
     }
 
     public function honeypotField(): string
@@ -80,7 +118,7 @@ final readonly class KitConfig
 
     public function requiresCaptcha(): bool
     {
-        return $this->config->get(self::KEY . '.security.captcha') === true;
+        return $this->value('security.captcha') === true;
     }
 
     /** The name sign-up mail is signed with: the application's. */
@@ -93,20 +131,20 @@ final readonly class KitConfig
 
     public function defaultTheme(): string
     {
-        $value = $this->config->get(self::KEY . '.themes.default');
+        $value = $this->value('themes.default');
 
         return is_string($value) && $value !== '' ? $value : 'laranail/waitlist-kit:default';
     }
 
     public function contactEnabled(): bool
     {
-        return $this->config->get(self::KEY . '.contact.enabled') === true;
+        return $this->value('contact.enabled') === true;
     }
 
     /** The inbox enquiries are mailed to, or null to keep them in the database only. */
     public function contactInbox(): ?string
     {
-        $value = $this->config->get(self::KEY . '.contact.to');
+        $value = $this->value('contact.to');
 
         return is_string($value) && $value !== '' ? $value : null;
     }
@@ -114,7 +152,7 @@ final readonly class KitConfig
     /** @return list<string> */
     public function contactTopics(): array
     {
-        $value = $this->config->get(self::KEY . '.contact.topics');
+        $value = $this->value('contact.topics');
         $topics = is_array($value) ? array_values(array_filter($value, is_string(...))) : [];
 
         return $topics !== [] ? $topics : ['other'];
@@ -123,19 +161,19 @@ final readonly class KitConfig
     /** `optional`, `required` or `off`. */
     public function contactCompany(): string
     {
-        $value = $this->config->get(self::KEY . '.contact.company');
+        $value = $this->value('contact.company');
 
         return in_array($value, ['optional', 'required', 'off'], true) ? $value : 'optional';
     }
 
     public function contactRequiresConsent(): bool
     {
-        return $this->config->get(self::KEY . '.contact.consent') === true;
+        return $this->value('contact.consent') === true;
     }
 
     public function enquiriesPerMinute(): int
     {
-        $value = $this->config->get(self::KEY . '.contact.per_minute');
+        $value = $this->value('contact.per_minute');
 
         return is_int($value) && $value > 0 ? $value : 5;
     }
@@ -202,6 +240,22 @@ final readonly class KitConfig
         }
 
         return $problems;
+    }
+
+    /**
+     * A kit setting: the backend's saved override when the settings store keeps one, else the configuration's value.
+     * Every reader below goes through this, so an override applies everywhere at once.
+     */
+    private function value(string $key): mixed
+    {
+        if ($this->overrides instanceof SettingsStore && array_key_exists($key, EditableSettings::all())) {
+            $override = $this->overrides->override($key);
+            if ($override !== null) {
+                return $override;
+            }
+        }
+
+        return $this->config->get(self::KEY . '.' . $key);
     }
 
     private function string(string $key): string

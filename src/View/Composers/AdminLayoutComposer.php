@@ -34,6 +34,7 @@ final readonly class AdminLayoutComposer
             'enquiries'    => ['enquiries.index', ['enquiries.*']],
             'pages'        => ['pages.index', ['pages.*']],
             'integrations' => ['integrations.index', ['integrations.*']],
+            'settings'     => ['settings.show', ['settings.*']],
         ];
 
         $nav = [];

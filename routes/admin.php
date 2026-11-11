@@ -9,6 +9,7 @@ use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\BlockController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\LoginController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\EnquiryController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\CampaignController;
+use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\SettingsController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\DashboardController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\SubscriberController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\IntegrationController;
@@ -59,6 +60,9 @@ Route::middleware($config['middleware'] ?? ['web'])
             Route::get('pages', [PageController::class, 'index'])->name('pages.index');
             Route::get('pages/{page}/edit', [PageController::class, 'edit'])->name('pages.edit');
             Route::put('pages/{page}', [PageController::class, 'update'])->name('pages.update');
+
+            Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');
+            Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
 
             Route::get('integrations', [IntegrationController::class, 'index'])->name('integrations.index');
             Route::get('integrations/create', [IntegrationController::class, 'create'])->name('integrations.create');
