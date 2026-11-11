@@ -9,7 +9,7 @@ declare(strict_types=1);
 const ALLOWED_HOSTS = [
     'localhost', '127.0.0.1', 'github.com', 'img.shields.io', 'opensource.simtabi.com', 'simtabi.com',
     'laravel.com', 'getcomposer.org', 'www.php.net', 'pestphp.com', 'keepachangelog.com', 'semver.org',
-    'www.contributor-covenant.org', 'repo.packagist.org', 'ploi.io', 'symfony.com', 'www.w3.org',
+    'www.contributor-covenant.org', 'api.brevo.com', 'developers.brevo.com', 'repo.packagist.org', 'ploi.io', 'symfony.com', 'www.w3.org',
 ];
 
 /** @return list<string> */

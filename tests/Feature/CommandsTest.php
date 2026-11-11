@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Schema;
+use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
+use Simtabi\Laranail\WaitlistKit\Models\FunnelEvent;
+use Simtabi\Laranail\WaitlistKit\Models\Integration;
 
 it('passes the doctor on a migrated install', function (): void {
     $this->artisan('laranail::waitlist-kit.doctor')->assertSuccessful();
@@ -46,4 +49,47 @@ it('installs: publishes the config and checks the result', function (): void {
     expect($published)->toBeFile();
     expect(require $published)->toHaveKeys(['database', 'campaigns', 'auth']);
     @unlink($published);
+});
+
+it('fails the doctor when an integration names an unknown driver', function (): void {
+    Integration::factory()->create(['driver' => 'mailchimp']);
+
+    $this->artisan('laranail::waitlist-kit.doctor')
+        ->expectsOutputToContain('Integrations name unknown drivers: mailchimp')
+        ->assertFailed();
+});
+
+it('exports a campaign as CSV with formula cells quoted', function (): void {
+    $campaign = liveCampaign();
+    Subscriber::factory()->create(['campaign_id' => $campaign->id, 'email' => 'dana@example.com', 'referral_code' => '=CMD']);
+    $file = tempnam(sys_get_temp_dir(), 'wk') ?: '';
+
+    $this->artisan('laranail::waitlist-kit.export', ['campaign' => 'launch', '--output' => $file])->assertSuccessful();
+
+    $lines = file($file, FILE_IGNORE_NEW_LINES) ?: [];
+    @unlink($file);
+    expect($lines[0])->toBe('id,email,status,locale,position,referral_code,referred_by_id,created_at')
+        ->and($lines[1])->toContain(",dana@example.com,pending,en,,'=CMD,,");
+
+    $this->artisan('laranail::waitlist-kit.export', ['campaign' => 'nowhere'])->assertFailed();
+});
+
+it('forgets an address on every campaign, with its funnel events', function (): void {
+    $a = liveCampaign();
+    $b = liveCampaign('other');
+    $dana = Subscriber::factory()->create(['campaign_id' => $a->id, 'email' => 'dana@example.com']);
+    $trashed = Subscriber::factory()->create(['campaign_id' => $b->id, 'email' => 'dana@example.com']);
+    $trashed->delete();
+    $referred = Subscriber::factory()->referredBy($dana)->create();
+    FunnelEvent::factory()->about($dana)->create();
+
+    $this->artisan('laranail::waitlist-kit.forget', ['email' => ' DANA@example.com'])
+        ->expectsOutputToContain('2 subscriber record(s) erased')
+        ->assertSuccessful();
+
+    expect(Subscriber::withTrashed()->where('email', 'dana@example.com')->count())->toBe(0)
+        ->and(FunnelEvent::query()->where('eventable_id', $dana->id)->count())->toBe(0)
+        ->and($referred->fresh()?->referred_by_id)->toBeNull();
+
+    $this->artisan('laranail::waitlist-kit.forget', ['email' => 'not-an-address'])->assertFailed();
 });

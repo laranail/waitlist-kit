@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\WaitlistKit\Providers;
 
 use Override;
+use Illuminate\Http\Request;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Support\Facades\RateLimiter;
 use Simtabi\Laranail\Package\Tools\Package;
 use Illuminate\Contracts\Foundation\Application;
 use Simtabi\Laranail\WaitlistKit\Support\Tables;
@@ -13,6 +16,8 @@ use Simtabi\Laranail\WaitlistKit\Support\MorphMap;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Simtabi\Laranail\WaitlistKit\Commands\DoctorCommand;
+use Simtabi\Laranail\WaitlistKit\Commands\ExportCommand;
+use Simtabi\Laranail\WaitlistKit\Commands\ForgetCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\InstallCommand;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\WaitlistKit\Database\Seeders\WaitlistKitSeeder;
@@ -25,13 +30,18 @@ use Simtabi\Laranail\WaitlistKit\Database\Seeders\WaitlistKitSeeder;
  */
 final class WaitlistKitServiceProvider extends PackageServiceProvider
 {
+    public const string SIGNUP_LIMITER = 'laranail-waitlist-kit.signups';
+
     public function configurePackage(Package $package): void
     {
         $package
             ->name('laranail/waitlist-kit')
             ->setPublishTagId('waitlist-kit')
             ->hasConfigFile('waitlist-kit')
-            ->hasCommands([DoctorCommand::class, InstallCommand::class])
+            ->hasViews()
+            ->hasTranslations()
+            ->hasRoutesWhen('laranail.waitlist-kit.routes.enabled', 'web', true)
+            ->hasCommands([DoctorCommand::class, ExportCommand::class, ForgetCommand::class, InstallCommand::class])
             ->discoversMigrations()
             ->runsMigrations()
             ->registerSeeder(WaitlistKitSeeder::class);
@@ -56,5 +66,15 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
 
         // Merged, never replacing the application's own map, and never enforced globally (see MorphMap).
         Relation::morphMap(MorphMap::MAP);
+
+        // Sign-ups per campaign per visitor. `$request->ip()` honours the application's TrustProxies, so behind
+        // Cloudflare or a load balancer each visitor has their own limit once the proxy is trusted there.
+        RateLimiter::for(self::SIGNUP_LIMITER, static function (Request $request) use ($config): Limit {
+            // The raw slug: Laravel's middleware priority runs throttling before route-model binding.
+            $slug = $request->route()?->originalParameter('campaign');
+
+            return Limit::perMinute($config->signupsPerMinute())
+                ->by((is_string($slug) ? $slug : '') . '|' . $request->ip());
+        });
     }
 }

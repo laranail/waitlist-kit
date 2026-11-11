@@ -45,6 +45,18 @@
     "repositories": [
         {
             "type": "vcs",
+            "url": "https://github.com/laranail/enumerator"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/laranail/db-tools"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/laranail/captcha"
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/laranail/console"
         },
         {
@@ -72,7 +84,8 @@
         "phpstan/phpstan": "^2.0",
         "rector/rector": "^2.5.8",
         "roave/security-advisories": "dev-latest",
-        "fakerphp/faker": "^1.24"
+        "fakerphp/faker": "^1.24",
+        "laranail/captcha": "^0.1"
     },
     "autoload": {
         "psr-4": {

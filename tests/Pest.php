@@ -18,3 +18,9 @@ function campaign(string $slug = 'launch'): Campaign
         'type' => CampaignType::Waitlist,
     ]);
 }
+
+/** A live campaign the public routes answer for. */
+function liveCampaign(string $slug = 'launch', array $locales = ['en']): Campaign
+{
+    return Campaign::factory()->live()->create(['slug' => $slug, 'locales' => $locales]);
+}

@@ -56,6 +56,38 @@ final readonly class KitConfig
         };
     }
 
+    public function signupsPerMinute(): int
+    {
+        $value = $this->config->get(self::KEY . '.signups.per_minute');
+
+        return is_int($value) && $value > 0 ? $value : 10;
+    }
+
+    public function thanksNewSignups(): bool
+    {
+        return $this->config->get(self::KEY . '.signups.thank_you') === true;
+    }
+
+    public function honeypotField(): string
+    {
+        $value = $this->config->get(self::KEY . '.signups.honeypot');
+
+        return is_string($value) && $value !== '' ? $value : 'website';
+    }
+
+    public function requiresCaptcha(): bool
+    {
+        return $this->config->get(self::KEY . '.security.captcha') === true;
+    }
+
+    /** The name sign-up mail is signed with: the application's. */
+    public function siteName(): string
+    {
+        $value = $this->config->get('app.name');
+
+        return is_string($value) && $value !== '' ? $value : 'Laravel';
+    }
+
     public function seedsDefaultCampaign(): bool
     {
         return $this->config->get(self::KEY . '.seeding.default') === true;

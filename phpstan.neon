@@ -9,4 +9,13 @@ parameters:
     # config/ is left out: Larastan reads a package's own config file as outside a config directory and
     # reports every env() call in it, which is exactly where env() belongs.
     # No baseline: a baseline is permission to be wrong.
+    ignoreErrors:
+        # Larastan cannot resolve a package-namespaced view (`laranail/waitlist-kit::...`) during analysis, so it reads
+        # each as an unverified string. The views exist: PageTest renders the page and MailTest renders the mail.
+        -
+            identifier: argument.type
+            message: '#expects view-string#'
+            paths:
+                - src/Http/Controllers/CampaignController.php
+                - src/Mail/ThankYouMail.php
     treatPhpDocTypesAsCertain: false

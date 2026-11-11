@@ -26,6 +26,34 @@ return [
         'max' => (int) env('WAITLIST_KIT_CAMPAIGNS_MAX', 3),
     ],
 
+    'routes' => [
+        // Register the public pages and the sign-up endpoint. Off for an application that routes them itself.
+        'enabled' => (bool) env('WAITLIST_KIT_ROUTES', true),
+
+        // Pages live at /{prefix}/{campaign slug}. An empty prefix puts them at the root.
+        'prefix' => env('WAITLIST_KIT_ROUTE_PREFIX', 'waitlist'),
+
+        // The `web` group gives the form its session and CSRF protection.
+        'middleware' => ['web'],
+    ],
+
+    'signups' => [
+        // Sign-ups per campaign per visitor per minute. The visitor's address is Laravel's `$request->ip()`, so
+        // behind a proxy it is right once the application's TrustProxies trusts that proxy.
+        'per_minute' => (int) env('WAITLIST_KIT_SIGNUPS_PER_MINUTE', 10),
+
+        // Thank a new sign-up by email, once, in their language. Off when a service sends its own welcome.
+        'thank_you' => (bool) env('WAITLIST_KIT_THANK_YOU', true),
+
+        // A form field people never see; a post that fills it is told it worked and nothing is kept.
+        'honeypot' => 'website',
+    ],
+
+    'security' => [
+        // Require laranail/captcha's challenge (Turnstile and others) on the sign-up form. Needs that package.
+        'captcha' => (bool) env('WAITLIST_KIT_CAPTCHA', false),
+    ],
+
     'seeding' => [
         // Seed a starter draft campaign with `php artisan db:seed` when the install has none.
         'default' => (bool) env('WAITLIST_KIT_SEED_DEFAULT', true),

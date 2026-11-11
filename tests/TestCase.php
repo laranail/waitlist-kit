@@ -6,6 +6,7 @@ namespace Simtabi\Laranail\WaitlistKit\Tests;
 
 use Orchestra\Testbench\TestCase as Orchestra;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Simtabi\Laranail\Captcha\Providers\CaptchaServiceProvider;
 use Simtabi\Laranail\WaitlistKit\Providers\WaitlistKitServiceProvider;
 use Simtabi\Laranail\Package\Tools\Providers\PackageToolsServiceProvider;
 
@@ -17,7 +18,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         // package-tools' own provider is discovered in a real application; Testbench does not discover it.
-        return [PackageToolsServiceProvider::class, WaitlistKitServiceProvider::class];
+        return [PackageToolsServiceProvider::class, CaptchaServiceProvider::class, WaitlistKitServiceProvider::class];
     }
 
     protected function defineEnvironment($app): void
