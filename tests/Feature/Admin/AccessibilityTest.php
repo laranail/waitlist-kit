@@ -111,7 +111,8 @@ it('gives every backend screen its structure', function (string $mode): void {
             ->and($html)->toContain('href="#content"')
             ->and($html)->toContain('aria-current="page"')
             // Tabler's shell, with the sidebar toggle on Alpine (no Bootstrap script) and the signed-in user shown.
-            ->and($html)->toContain('class="navbar navbar-vertical navbar-expand-lg" x-data="wkNav"')
+            ->and($html)->toContain('<div class="navbar navbar-vertical navbar-expand-lg" x-data="wkNav">')
+            ->not->toContain('<aside')
             ->not->toContain('data-bs-toggle')
             ->toContain('owner@example.org');
     }
@@ -125,7 +126,7 @@ it('summarises errors in an alert that links to each field', function (): void {
         ->post('/waitlist-admin/campaigns', ['name' => '', 'slug' => 'Bad Slug', 'type' => 'waitlist', 'locales' => 'en'])
         ->getContent();
 
-    expect($html)->toContain('role="alert"')
+    expect($html)->toContain('role="alert" aria-labelledby="wka-errors-title" tabindex="-1" autofocus')
         ->toContain('href="#f-name"')
         ->toContain('id="f-name"')
         ->toContain('aria-invalid="true"')

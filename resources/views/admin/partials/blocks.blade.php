@@ -58,7 +58,7 @@
     </div>
 
     <div class="card-footer">
-        <form method="post" action="{{ $store }}" class="row g-2 align-items-end">
+        <form method="post" action="{{ $store }}" class="row g-2 align-items-end" aria-label="{{ __('laranail/waitlist-kit::admin.add_block') }}">
             @csrf
             <input type="hidden" name="locale" value="{{ $locale }}">
             <input type="hidden" name="_form" value="{{ $form::ADD_BLOCK }}">

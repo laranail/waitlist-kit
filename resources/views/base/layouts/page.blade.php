@@ -19,5 +19,6 @@
 <main class="wk-main" id="main">
     @yield('content')
 </main>
+@yield('footer')
 </body>
 </html>

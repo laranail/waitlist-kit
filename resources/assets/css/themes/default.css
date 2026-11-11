@@ -51,12 +51,16 @@
     .wk-quote-text p { @apply text-lg; }
     .wk-quote-author { @apply mt-2 text-sm text-wk-text/60; }
 
-    .wk-footer { @apply border-t border-wk-text/10 pt-6 text-sm text-wk-text/60; }
+    /* The footer sits after <main> (its own contentinfo landmark), so it takes main's width itself. */
+    .wk-footer { @apply mx-auto max-w-2xl border-t border-wk-text/10 px-4 pt-6 pb-16 text-sm text-wk-text/60; }
     .wk-legal-links { @apply flex list-none flex-wrap gap-4 p-0; }
 
     .wk-form, [data-scope="contact-form"] { @apply mx-auto grid w-full max-w-md gap-4; }
     .wk-field, [data-scope="contact-form"] [data-part="field"] { @apply grid gap-1.5; }
     .wk-label, [data-scope="contact-form"] [data-part="label"] { @apply text-sm font-semibold; }
+    /* The consent checkbox sits beside its label, with any error on the line below. */
+    [data-scope="contact-form"] [data-field="agree"] { @apply flex flex-wrap items-baseline gap-2; }
+    [data-scope="contact-form"] [data-field="agree"] [data-part="error"] { @apply basis-full; }
     /* A control's edge needs 3:1 against the page (WCAG 1.4.11); half-strength ink keeps it for any text colour. */
     .wk-input, [data-scope="contact-form"] [data-part="input"]:not([type="checkbox"]) {
         @apply w-full rounded-lg border border-wk-text/50 bg-wk-background px-3 py-2.5 text-wk-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wk-primary;

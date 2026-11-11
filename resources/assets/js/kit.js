@@ -132,5 +132,13 @@ Alpine.data('wkConfirm', () => ({
     },
 }));
 
+// After a reload with errors the server marks one element `autofocus` (the backend's error summary, or a public form's
+// first rejected field). Browsers skip autofocus in some cases (an unfocused window, a non-form element), and a
+// screen reader then hears nothing about the errors, so focus it here too when nothing else has focus.
+const autofocus = document.querySelector('[autofocus]');
+if (autofocus instanceof HTMLElement && (document.activeElement === null || document.activeElement === document.body)) {
+    autofocus.focus();
+}
+
 window.Alpine = Alpine;
 Alpine.start();
