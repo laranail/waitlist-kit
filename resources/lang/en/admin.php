@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+// The backend's words. English ships; publish the translations to add others (the backend falls back to English).
+return [
+    'name'              => 'Waitlist',
+    'skip'              => 'Skip to content',
+    'nav'               => ['label' => 'Backend', 'dashboard' => 'Dashboard', 'campaigns' => 'Campaigns', 'enquiries' => 'Enquiries', 'pages' => 'Pages', 'integrations' => 'Integrations'],
+    'login'             => 'Sign in', 'logout' => 'Sign out', 'email' => 'Email address', 'password' => 'Password', 'remember' => 'Keep me signed in',
+    'login_failed'      => 'Those details do not match an administrator.',
+    'errors'            => 'Fix these to continue', 'problems' => 'Configuration problems',
+    'saved'             => 'Saved.', 'deleted' => 'Deleted.', 'removed' => 'Removed.',
+    'erased'            => 'Erased :subscribers subscriber record(s) and :enquiries enquiry(ies).',
+    'campaigns_summary' => 'Campaigns, with their subscribers and sign-ups in the last 7 days',
+    'campaign'          => 'Campaign', 'status' => 'Status', 'type' => 'Type', 'subscribers' => 'Subscribers', 'this_week' => 'Last 7 days',
+    'none'              => 'Nothing yet.', 'new_campaign' => 'New campaign', 'create' => 'Create', 'save' => 'Save', 'delete' => 'Delete', 'add' => 'Add',
+    'enquiries_week'    => '{0} No enquiries in the last 7 days|{1} 1 enquiry in the last 7 days|[2,*] :count enquiries in the last 7 days',
+    'limit_reached'     => '{1} This install runs one campaign.|[2,*] This install runs up to :limit campaigns, and has them all.',
+    'name_field'        => 'Name', 'slug' => 'Slug', 'slug_hint' => 'Lower-case letters, digits and hyphens; the page is /waitlist/{slug}.',
+    'locales'           => 'Languages', 'locales_hint' => 'Language codes, separated by commas: en, es, pt-BR. The first is the fallback.',
+    'details'           => 'Details', 'status_hint' => 'Only a live campaign has a page and takes sign-ups.',
+    'launches_at'       => 'Launch date', 'host' => 'Host', 'host_hint' => 'Optional: a domain this campaign answers on.',
+    'view_page'         => 'View the page', 'theme' => 'Theme', 'theme_hint' => 'Choosing another theme shows its settings after saving.',
+    'blocks'            => 'Blocks', 'locale' => 'Language', 'hidden' => 'hidden', 'visible' => 'Visible', 'add_block' => 'Add a block',
+    'move_up'           => 'Move up', 'move_down' => 'Move down', 'remove' => 'Remove', 'confirm_remove' => 'Remove this for good?',
+    'pairs_hint'        => 'One per line: first part | second part.', 'lines_hint' => 'Separate paragraphs with a blank line.',
+    'fields'            => [
+        'title'  => 'Title', 'body' => 'Body', 'label' => 'Field label', 'button' => 'Button', 'items' => 'Items', 'quote' => 'Quote',
+        'author' => 'Author', 'heading' => 'Heading', 'paragraphs' => 'Paragraphs', 'text' => 'Text',
+    ],
+    'delete_campaign' => 'Delete this campaign',
+    'delete_warning'  => 'Its subscribers, funnel events, blocks and integrations are removed for good. Enquiries it brought are kept.',
+    'type_slug'       => 'Type :slug to confirm',
+    'subscribers_of'  => 'Subscribers: :campaign', 'filter' => 'Filter', 'search' => 'Search by email', 'any' => 'Any',
+    'export_csv'      => 'Export as CSV', 'subscriber_count' => '{0} No subscribers|{1} 1 subscriber|[2,*] :count subscribers',
+    'joined'          => 'Joined', 'actions' => 'Actions',
+    'forget'          => 'Erase an address', 'forget_hint' => 'Removes the address from every campaign, with its enquiries and funnel events. Integrations keep their own copies.', 'erase' => 'Erase',
+    'from'            => 'From', 'topic' => 'Topic', 'received' => 'Received', 'enquiry_from' => 'Enquiry from :name', 'company' => 'Company',
+    'consent'         => 'Agreed to the privacy notice', 'not_asked' => 'Not asked', 'message' => 'Message', 'back' => 'Back',
+    'title'           => 'Title', 'draft_hint' => 'A draft is not shown on the site. Complete every [bracketed] item before publishing.',
+    'new_integration' => 'New integration', 'edit_integration' => 'Edit integration', 'driver' => 'Driver', 'serves' => 'Serves',
+    'every_campaign'  => 'Every campaign', 'enabled' => 'Enabled', 'yes' => 'Yes', 'no' => 'No',
+    'settings_for'    => 'Settings for :driver', 'endpoint' => 'Endpoint', 'endpoint_hint' => 'An https:// URL.',
+    'api_key'         => 'API key', 'secret_kept' => 'Leave empty to keep the stored key.', 'list_id' => 'List id',
+];

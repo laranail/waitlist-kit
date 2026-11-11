@@ -7,6 +7,7 @@ namespace Simtabi\Laranail\WaitlistKit\Validation;
 use Illuminate\Validation\Rule;
 use Simtabi\Laranail\WaitlistKit\Support\Tables;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignType;
+use Simtabi\Laranail\WaitlistKit\Enums\CampaignStatus;
 
 /**
  * The rules a campaign's own fields must meet, in one place: CreateCampaign applies them, and the backend's requests
@@ -18,6 +19,22 @@ final class CampaignRules
 
     /** Paths the kit's own routes use under the prefix, so no campaign can take them. */
     public const array RESERVED_SLUGS = ['contact', 'pages'];
+
+    /**
+     * The same fields for an existing campaign, plus its status, host and launch date; its own slug stays allowed.
+     *
+     * @return array<string, list<mixed>>
+     */
+    public static function update(string $campaignId): array
+    {
+        $rules = self::create();
+        $rules['slug'] = ['required', 'string', 'max:120', 'regex:' . self::SLUG_PATTERN, Rule::notIn(self::RESERVED_SLUGS), Rule::unique(Tables::name('campaigns'), 'slug')->ignore($campaignId)];
+        $rules['status'] = ['required', Rule::enum(CampaignStatus::class)];
+        $rules['host'] = ['nullable', 'string', 'max:255', 'regex:/^(?!-)[a-z0-9-]+(\.[a-z0-9-]+)+$/'];
+        $rules['launches_at'] = ['nullable', 'date'];
+
+        return $rules;
+    }
 
     /** @return array<string, list<mixed>> */
     public static function create(): array

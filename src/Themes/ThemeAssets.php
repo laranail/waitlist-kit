@@ -31,14 +31,24 @@ final readonly class ThemeAssets
      */
     public function tags(Theme $theme): Htmlable
     {
-        if (! $this->published($theme)) {
+        return $this->published($theme) ? $this->tagsFor($theme->buildDirectory, $theme->entries) : new HtmlString('');
+    }
+
+    /**
+     * Tags for any entries of a published build (the backend's own stylesheet uses the kit's build).
+     *
+     * @param list<string> $entries
+     */
+    public function tagsFor(string $buildDirectory, array $entries): Htmlable
+    {
+        if (! is_file($this->app->publicPath($buildDirectory . '/manifest.json'))) {
             return new HtmlString('');
         }
 
         $vite = clone $this->vite;
         $vite->useHotFile(sys_get_temp_dir() . '/laranail-waitlist-kit-never-hot');
 
-        return $vite($theme->entries, $theme->buildDirectory);
+        return $vite($entries, $buildDirectory);
     }
 
     public function nonce(): ?string
