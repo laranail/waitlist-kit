@@ -62,6 +62,11 @@ All notable changes to this project are documented here. The format follows
   conversion endpoint; a signed unsubscribe link with one-click headers in every mail; page views as events; and a
   Funnel screen with steps, rates, sign-ups by day and top sources.
 
+- Pages ([docs](docs/tools/pages.md)): closed and launched campaigns show a notice instead of a 404, and a launched
+  one can redirect to its launch URL; coming-soon campaigns lead with a countdown and a "Notify me" button; early-
+  access campaigns take an invitation code; per-language title and description, a share image, canonical and Open
+  Graph tags, `hreflang` alternates and `?lang=`; indexing is opt-in per campaign; and `/{prefix}/sitemap.xml`.
+
 ### Fixed
 
 - The block editor repeated control ids in every block's form, so labels and the error summary reached only the
