@@ -11,6 +11,7 @@ use Simtabi\Laranail\WaitlistKit\Enums\CampaignType;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignStatus;
+use Simtabi\Laranail\WaitlistKit\Data\ConversionSettings;
 use Simtabi\Laranail\WaitlistKit\Database\Factories\CampaignFactory;
 
 /**
@@ -73,6 +74,14 @@ final class Campaign extends Model
     public function integrations(): MorphMany
     {
         return $this->morphMany(Integration::class, 'integrable');
+    }
+
+    /** How sign-ups become the list: double opt-in and referral rules, from `settings.conversion`. */
+    public function conversion(): ConversionSettings
+    {
+        $stored = $this->settings['conversion'] ?? [];
+
+        return ConversionSettings::fromArray(is_array($stored) ? $stored : []);
     }
 
     public function acceptsSignups(): bool
