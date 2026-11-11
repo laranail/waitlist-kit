@@ -105,6 +105,24 @@ Alpine.data('wkCountdown', () => ({
     },
 }));
 
+// The backend's sidebar on small screens: a disclosure button that shows and hides the navigation (Tabler's own
+// toggle needs Bootstrap's script, which the kit does not ship).
+Alpine.data('wkNav', () => ({
+    open: false,
+
+    toggle() {
+        this.open = !this.open;
+    },
+
+    get expanded() {
+        return this.open ? 'true' : 'false';
+    },
+
+    get menuClass() {
+        return this.open ? 'show' : '';
+    },
+}));
+
 // Asks before a destructive form is sent: the form's data-message is the question.
 Alpine.data('wkConfirm', () => ({
     check(event) {

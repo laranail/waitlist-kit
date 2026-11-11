@@ -4,9 +4,23 @@ declare(strict_types=1);
 
 // The backend's words. English ships; publish the translations to add others (the backend falls back to English).
 return [
-    'name'              => 'Waitlist',
-    'skip'              => 'Skip to content',
-    'nav'               => ['label' => 'Backend', 'dashboard' => 'Dashboard', 'campaigns' => 'Campaigns', 'enquiries' => 'Enquiries', 'pages' => 'Pages', 'integrations' => 'Integrations', 'settings' => 'Settings'],
+    'name'         => 'Waitlist',
+    'skip'         => 'Skip to content',
+    'nav'          => ['label' => 'Backend', 'dashboard' => 'Dashboard', 'campaigns' => 'Campaigns', 'enquiries' => 'Enquiries', 'pages' => 'Pages', 'integrations' => 'Integrations', 'settings' => 'Settings', 'toggle' => 'Show or hide the menu'],
+    'signed_in_as' => 'Signed in as', 'overview' => 'Overview', 'manage' => 'Manage', 'content' => 'Content',
+    'stats'        => ['campaigns' => 'Campaigns', 'live' => 'Live now', 'subscribers' => 'Subscribers', 'week' => 'Sign-ups, last 7 days', 'enquiries' => 'Enquiries, last 7 days'],
+    'empty'        => [
+        'campaigns'    => 'No campaigns yet', 'campaigns_hint' => 'A campaign is one waitlist or coming-soon page, with its own sign-ups.',
+        'subscribers'  => 'No subscribers match', 'subscribers_hint' => 'Sign-ups appear here once the campaign is live.',
+        'enquiries'    => 'No enquiries yet', 'enquiries_hint' => 'Messages sent through the contact form appear here.',
+        'pages'        => 'No pages yet', 'pages_hint' => 'Run the kit\'s seeder to add draft privacy and terms pages.',
+        'integrations' => 'No integrations yet', 'integrations_hint' => 'Mirror sign-ups to your application or to Brevo.',
+    ],
+    'statuses' => [
+        'draft'   => 'Draft', 'live' => 'Live', 'closed' => 'Closed', 'launched' => 'Launched', 'published' => 'Published',
+        'pending' => 'Pending', 'confirmed' => 'Confirmed', 'invited' => 'Invited', 'converted' => 'Converted', 'unsubscribed' => 'Unsubscribed',
+    ],
+    'danger_zone'       => 'Danger zone', 'all_campaigns' => 'All campaigns', 'sign_in_to' => 'Sign in to the waitlist backend',
     'login'             => 'Sign in', 'logout' => 'Sign out', 'email' => 'Email address', 'password' => 'Password', 'remember' => 'Keep me signed in',
     'login_failed'      => 'Those details do not match an administrator.',
     'errors'            => 'Fix these to continue', 'problems' => 'Configuration problems',
@@ -37,7 +51,7 @@ return [
     'joined'            => 'Joined', 'actions' => 'Actions',
     'forget'            => 'Erase an address', 'forget_hint' => 'Removes the address from every campaign, with its enquiries and funnel events. Integrations keep their own copies.', 'erase' => 'Erase',
     'from'              => 'From', 'topic' => 'Topic', 'received' => 'Received', 'enquiry_from' => 'Enquiry from :name', 'company' => 'Company',
-    'consent'           => 'Agreed to the privacy notice', 'not_asked' => 'Not asked', 'message' => 'Message', 'back' => 'Back',
+    'consent'           => 'Agreed to the privacy notice', 'not_asked' => 'Not asked', 'message' => 'Message', 'back' => 'Back', 'reply' => 'Reply',
     'title'             => 'Title', 'draft_hint' => 'A draft is not shown on the site. Complete every [bracketed] item before publishing.',
     'new_integration'   => 'New integration', 'edit_integration' => 'Edit integration', 'driver' => 'Driver', 'serves' => 'Serves',
     'every_campaign'    => 'Every campaign', 'enabled' => 'Enabled', 'yes' => 'Yes', 'no' => 'No',

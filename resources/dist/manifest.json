@@ -1,6 +1,6 @@
 {
   "resources/assets/css/admin.css": {
-    "file": "assets/css/admin-BbwMtVHL.css",
+    "file": "assets/css/admin-DEJMW5GB.css",
     "src": "resources/assets/css/admin.css",
     "isEntry": true,
     "name": "admin",
@@ -27,7 +27,7 @@
     ]
   },
   "resources/assets/js/kit.js": {
-    "file": "assets/js/kit-DymMFfaI.js",
+    "file": "assets/js/kit-CU9BAYaM.js",
     "name": "kit",
     "src": "resources/assets/js/kit.js",
     "isEntry": true

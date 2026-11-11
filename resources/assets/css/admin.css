@@ -1,57 +1,104 @@
-/* The backend: plain CSS, readable and keyboard-friendly, with a visible focus everywhere and no reliance on colour alone. */
-:root { --a-ink: #111827; --a-muted: #4b5563; --a-line: #d1d5db; --a-bg: #f9fafb; --a-accent: #3730a3; --a-danger: #b91c1c; --a-ok: #166534; }
-* { box-sizing: border-box; }
-.wka { margin: 0; font: 16px/1.55 system-ui, sans-serif; color: var(--a-ink); background: var(--a-bg); }
-.wka a { color: var(--a-accent); }
-.wka :focus-visible { outline: 3px solid var(--a-accent); outline-offset: 2px; }
-.wka-skip { position: absolute; left: -9999px; }
-.wka-skip:focus { left: 1rem; top: 1rem; background: #fff; padding: 0.5rem 1rem; z-index: 10; }
-.wka-header { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; padding: 0.75rem 1.5rem; background: #fff; border-bottom: 1px solid var(--a-line); }
-.wka-brand { margin: 0; font-weight: 700; }
-.wka-nav { display: flex; flex-wrap: wrap; gap: 1rem; list-style: none; margin: 0; padding: 0; }
-.wka-nav a { text-decoration: none; padding: 0.25rem 0; }
-.wka-nav a[aria-current="page"] { font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
-.wka-who { margin-left: auto; display: flex; gap: 1rem; align-items: center; color: var(--a-muted); }
-.wka-main { max-width: 64rem; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
-.wka-narrow { max-width: 26rem; }
-.wka-panel { background: #fff; border: 1px solid var(--a-line); border-radius: 0.5rem; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
-.wka-panel h2 { margin-top: 0; font-size: 1.125rem; }
-.wka-warning { border-color: #d97706; }
-.wka-danger { border-color: var(--a-danger); }
-.wka-flash { padding: 0.75rem 1rem; border-left: 4px solid var(--a-ok); background: #f0fdf4; }
-.wka-errors { padding: 0.75rem 1rem; border-left: 4px solid var(--a-danger); background: #fef2f2; margin-bottom: 1.5rem; }
-.wka-errors h2 { margin: 0 0 0.5rem; font-size: 1rem; }
-.wka-form { display: grid; gap: 1rem; max-width: 40rem; }
-.wka-inline { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; max-width: none; }
-.wka-field { display: grid; gap: 0.25rem; }
-.wka-field-check { display: flex; gap: 0.5rem; align-items: center; }
-.wka-field label { font-weight: 600; }
-.wka-field input:not([type="checkbox"]), .wka-field select, .wka-field textarea { font: inherit; padding: 0.5rem 0.625rem; border: 1px solid #6b7280; border-radius: 0.375rem; background: #fff; width: 100%; }
-.wka-field input[type="color"] { padding: 0.125rem; height: 2.5rem; width: 4rem; }
-.wka-field [aria-invalid="true"] { border-color: var(--a-danger); border-width: 2px; }
-.wka-hint { margin: 0; color: var(--a-muted); font-size: 0.875rem; }
-.wka-error { margin: 0; color: var(--a-danger); font-size: 0.875rem; font-weight: 600; }
-.wka-button { font: inherit; font-weight: 600; padding: 0.5rem 1rem; border: 0; border-radius: 0.375rem; background: var(--a-accent); color: #fff; cursor: pointer; text-decoration: none; display: inline-block; }
-.wka-button-danger { background: var(--a-danger); }
-/* A link styled as a button: `.wka a` outranks `.wka-button`, which left its label accent on accent (1:1). */
-.wka a.wka-button { color: #fff; }
-.wka-link { font: inherit; background: none; border: 0; padding: 0; color: var(--a-accent); text-decoration: underline; cursor: pointer; }
-.wka-link:disabled { color: var(--a-muted); text-decoration: none; cursor: not-allowed; }
-.wka-danger-text { color: var(--a-danger); }
-.wka-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--a-line); }
-.wka-table caption { text-align: left; font-weight: 600; padding: 0.5rem 0; }
-.wka-table th, .wka-table td { text-align: left; padding: 0.625rem 0.75rem; border-bottom: 1px solid var(--a-line); vertical-align: top; }
-.wka-table thead th { background: var(--a-bg); font-size: 0.875rem; }
-.wka-num { text-align: right !important; font-variant-numeric: tabular-nums; }
-.wka-block { border: 1px solid var(--a-line); border-radius: 0.375rem; padding: 0.75rem 1rem; margin: 0.75rem 0; }
-.wka-block summary { cursor: pointer; }
-.wka-actions { display: flex; gap: 1rem; margin-top: 0.75rem; }
-.wka-tabs { display: flex; gap: 0.75rem; list-style: none; padding: 0; }
-.wka-tabs a[aria-current="true"] { font-weight: 700; }
-.wka-tag { font-size: 0.75rem; border: 1px solid var(--a-line); border-radius: 999px; padding: 0 0.5rem; }
-.wka-facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1.5rem; }
-.wka-facts dt { font-weight: 600; }
-.wka-facts dd { margin: 0; }
-.wka-message { white-space: pre-wrap; background: #fff; border: 1px solid var(--a-line); padding: 1rem; border-radius: 0.375rem; }
-.wka-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/*
+ * The backend: Tabler (@tabler/core, MIT) built into the kit's own stylesheet, so a site loads nothing from a CDN.
+ * Only Tabler's CSS is used; its Bootstrap JavaScript is not shipped, and the few behaviours that need a script (the
+ * sidebar toggle on small screens, confirming a removal) are Alpine components on the CSP build.
+ */
+@import "@tabler/core/dist/css/tabler.min.css";
+
+/* A focus ring that holds on every surface, not only Bootstrap's faint shadow on form controls. */
+.wka :focus-visible {
+    outline: 3px solid var(--tblr-primary);
+    outline-offset: 2px;
+}
+
+/* A link styled as a button keeps the button's text colour, never the link colour. */
+.wka a.btn-primary,
+.wka a.btn-danger {
+    color: #fff;
+}
+
+/*
+ * Contrast corrections over Tabler's defaults, measured with axe on every screen (WCAG 1.4.3, 1.4.1):
+ * - a tinted (`-lt`) badge's text is its tint at full strength, 2 to 4:1 on its own pale fill; darken the text
+ *   to 55% of the tint, which keeps the hue and clears 4.5:1;
+ * - an alert's text is its variant colour (info measured 2.83:1); body text with a tinted edge reads instead;
+ * - a link in a table cell differs from the text beside it by colour alone (2.07:1), so it is underlined;
+ * - the danger buttons, below.
+ */
+.wka .badge.bg-green-lt { color: color-mix(in oklab, var(--tblr-green) 55%, #000) !important; }
+.wka .badge.bg-azure-lt { color: color-mix(in oklab, var(--tblr-azure) 55%, #000) !important; }
+.wka .badge.bg-yellow-lt { color: color-mix(in oklab, var(--tblr-yellow) 50%, #000) !important; }
+.wka .badge.bg-red-lt { color: color-mix(in oklab, var(--tblr-red) 60%, #000) !important; }
+.wka .badge.bg-secondary-lt { color: color-mix(in oklab, var(--tblr-secondary) 60%, #000) !important; }
+/* Tabler's red is 4.47:1 against white, as a fill under white text and as the text of ghost and outline buttons. */
+.wka .btn-danger,
+.wka .btn-ghost-danger,
+.wka .btn-outline-danger {
+    --tblr-btn-variant: color-mix(in oklab, var(--tblr-danger) 88%, #000);
+    --tblr-btn-variant-darken: color-mix(in oklab, var(--tblr-danger) 76%, #000);
+}
+.wka .alert {
+    --tblr-alert-color: var(--tblr-body-color);
+}
+.wka .alert .icon {
+    color: var(--tblr-alert-variant-color);
+}
+.wka .card-table a:not(.btn) {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+/* Long values (an environment variable's name) wrap rather than make the table scroll sideways. */
+.wka .card-table td {
+    overflow-wrap: anywhere;
+}
+
+/* The skip link: hidden until focused, then above the sidebar. */
+.wka .skip-link:focus {
+    position: fixed;
+    inset: 0.75rem auto auto 0.75rem;
+    z-index: 1100;
+    padding: 0.5rem 1rem;
+    background: var(--tblr-bg-surface);
+    border-radius: var(--tblr-border-radius);
+    box-shadow: var(--tblr-box-shadow);
+}
+
+/* The sidebar's collapse, driven by wkNav instead of Bootstrap's script: closed below `lg`, open above it. */
+@media (max-width: 991.98px) {
+    .wka .navbar-collapse:not(.show) {
+        display: none;
+    }
+}
+
+/* Block editor: each block is a native <details>, styled as a card row. */
+.wka .wka-block > summary {
+    cursor: pointer;
+    list-style: none;
+}
+.wka .wka-block > summary::-webkit-details-marker {
+    display: none;
+}
+.wka .wka-block .wka-chevron .icon {
+    transition: transform 0.15s ease;
+}
+.wka .wka-block[open] .wka-chevron .icon {
+    transform: rotate(180deg);
+}
+.wka .wka-block[open] > summary {
+    border-bottom: var(--tblr-border-width) solid var(--tblr-border-color);
+}
+
+/* An enquiry's message keeps its line breaks. */
+.wka .wka-message {
+    white-space: pre-wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wka *,
+    .wka *::before,
+    .wka *::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}
