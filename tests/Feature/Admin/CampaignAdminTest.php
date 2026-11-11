@@ -64,7 +64,8 @@ it('adds, edits one language of, moves and removes blocks', function (string $mo
     $this->post("/waitlist-admin/campaigns/{$campaign->id}/blocks", ['type' => 'faq', 'locale' => 'en', 'items' => "When? | Soon\nWhere? | Here"])->assertRedirect();
     [$hero, $faq] = $campaign->blocks()->get()->all();
 
-    expect($faq->content['en']['items'])->toBe([['question' => 'When?', 'answer' => 'Soon'], ['question' => 'Where?', 'answer' => 'Here']]);
+    // toEqual, not toBe: MySQL's JSON type stores object keys in its own order.
+    expect($faq->content['en']['items'])->toEqual([['question' => 'When?', 'answer' => 'Soon'], ['question' => 'Where?', 'answer' => 'Here']]);
 
     $this->put("/waitlist-admin/blocks/{$hero->id}", ['type' => 'hero', 'locale' => 'es', 'title' => 'Hola'])->assertRedirect();
     expect($hero->fresh()?->content)->toBe(['en' => ['title' => 'Hello'], 'es' => ['title' => 'Hola']]);
