@@ -45,3 +45,38 @@ function signInAdmin(string $mode = 'host'): void
     config()->set('laranail.waitlist-kit.admin.emails', ['owner@example.org']);
     test()->actingAs(new GenericUser(['id' => 1, 'name' => 'Owner', 'email' => 'owner@example.org']), 'web');
 }
+
+/**
+ * What a page's ids and references get wrong: an id used twice (a label or an error then points at the first one
+ * only), or a label `for`, `aria-describedby` or `aria-labelledby` naming an id that is not there.
+ *
+ * @return list<string> what is wrong, as sentences
+ */
+function referenceProblems(string $html): array
+{
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+    $problems = [];
+    $ids = [];
+
+    foreach ($xpath->query('//*[@id]') ?: [] as $element) {
+        assert($element instanceof DOMElement);
+        $ids[] = $element->getAttribute('id');
+    }
+    foreach (array_keys(array_filter(array_count_values($ids), static fn (int $count): bool => $count > 1)) as $id) {
+        $problems[] = 'the id ' . $id . ' used more than once';
+    }
+
+    foreach ($xpath->query('//label[@for] | //*[@aria-describedby] | //*[@aria-labelledby]') ?: [] as $element) {
+        assert($element instanceof DOMElement);
+        $named = trim($element->getAttribute('for') . ' ' . $element->getAttribute('aria-describedby') . ' ' . $element->getAttribute('aria-labelledby'));
+        foreach (preg_split('/\s+/', $named) ?: [] as $id) {
+            if ($id !== '' && ! in_array($id, $ids, true)) {
+                $problems[] = 'a reference to the missing id ' . $id;
+            }
+        }
+    }
+
+    return $problems;
+}

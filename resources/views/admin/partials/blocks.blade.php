@@ -29,11 +29,12 @@
                         'label' => __('laranail/waitlist-kit::admin.fields.' . $field),
                         'type'  => $spec['kind'] === 'text' ? 'text' : 'textarea',
                         'rows'  => $spec['kind'] === 'text' ? 1 : 6,
-                        'value' => old('block') === $block->id ? old($field) : $values[$field],
+                        'value' => $values[$field],
+                        'idPrefix' => \Simtabi\Laranail\WaitlistKit\Support\AdminForm::block($block->id),
                         'hint'  => match ($spec['kind']) { 'pairs' => __('laranail/waitlist-kit::admin.pairs_hint'), 'lines' => __('laranail/waitlist-kit::admin.lines_hint'), default => null },
                     ])
                 @endforeach
-                @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'visible', 'type' => 'checkbox', 'label' => __('laranail/waitlist-kit::admin.visible'), 'value' => $block->visible])
+                @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'visible', 'idPrefix' => \Simtabi\Laranail\WaitlistKit\Support\AdminForm::block($block->id), 'type' => 'checkbox', 'label' => __('laranail/waitlist-kit::admin.visible'), 'value' => $block->visible])
                 <button type="submit" class="wka-button">{{ __('laranail/waitlist-kit::admin.save') }}</button>
             </form>
             <div class="wka-actions">
@@ -47,7 +48,8 @@
     <form method="post" action="{{ $store }}" class="wka-form wka-inline">
         @csrf
         <input type="hidden" name="locale" value="{{ $locale }}">
-        @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'type', 'type' => 'select', 'label' => __('laranail/waitlist-kit::admin.add_block'), 'value' => '', 'options' => collect($blockTypes)->mapWithKeys(fn ($t) => [$t->value => $t->value])->all()])
+        <input type="hidden" name="_form" value="{{ \Simtabi\Laranail\WaitlistKit\Support\AdminForm::ADD_BLOCK }}">
+        @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'type', 'idPrefix' => \Simtabi\Laranail\WaitlistKit\Support\AdminForm::ADD_BLOCK, 'type' => 'select', 'label' => __('laranail/waitlist-kit::admin.add_block'), 'value' => '', 'options' => collect($blockTypes)->mapWithKeys(fn ($t) => [$t->value => $t->value])->all()])
         <button type="submit" class="wka-button">{{ __('laranail/waitlist-kit::admin.add') }}</button>
     </form>
 </section>
