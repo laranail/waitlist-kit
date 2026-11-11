@@ -112,10 +112,13 @@ it('gives every backend screen its structure', function (string $mode): void {
             ->and($html)->toContain('href="#content"')
             ->and($html)->toContain('aria-current="page"')
             // Tabler's shell, with the sidebar toggle on Alpine (no Bootstrap script) and the signed-in user shown.
-            ->and($html)->toContain('<div class="navbar navbar-vertical navbar-expand-lg" x-data="wkNav">')
+            ->and($html)->toContain('<header class="navbar navbar-vertical navbar-expand-lg" x-data="wkNav">')
             ->not->toContain('<aside')
             ->not->toContain('data-bs-toggle')
-            ->toContain('owner@example.org');
+            ->toContain('owner@example.org')
+            // One banner (the sidebar); the page title is inside <main>.
+            ->and(substr_count($html, '<header'))->toBe(1)
+            ->and($html)->toMatch('#<main id="content" tabindex="-1">\s*<div class="page-header#');
     }
     expect($screens)->toHaveCount(14);
 })->with(['host', 'bundled']);

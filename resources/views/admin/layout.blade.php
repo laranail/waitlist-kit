@@ -13,8 +13,9 @@
 <body class="wka">
 <a class="visually-hidden-focusable skip-link" href="#content">{{ __('laranail/waitlist-kit::admin.skip') }}</a>
 <div class="page">
-    {{-- A plain container, not <aside>: the sidebar is navigation, and its named <nav> is the landmark to announce. --}}
-    <div class="navbar navbar-vertical navbar-expand-lg" x-data="wkNav">
+    {{-- The page's banner: brand, menu toggle and the named <nav>. Not <aside>, which made the navigation a nameless
+         complementary landmark; the page title below is a plain block, so there is one banner. --}}
+    <header class="navbar navbar-vertical navbar-expand-lg" x-data="wkNav">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" aria-controls="wka-menu" aria-expanded="false"
                     x-bind:aria-expanded="expanded" x-on:click="toggle">
@@ -65,26 +66,28 @@
                 @endif
             </nav>
         </div>
-    </div>
+    </header>
 
     <div class="page-wrapper">
-        <header class="page-header d-print-none">
-            <div class="container-xl">
-                <div class="row g-2 align-items-center">
-                    <div class="col">
-                        @isset($pretitle)<div class="page-pretitle">{{ $pretitle }}</div>@endisset
-                        <h1 class="page-title">{{ $title }}</h1>
-                    </div>
-                    @hasSection('actions')
-                        <div class="col-auto ms-auto d-print-none">
-                            <div class="btn-list">@yield('actions')</div>
+        {{-- The title sits inside <main>, so the skip link lands on it and every part of the page is in a landmark. --}}
+        <main id="content" tabindex="-1">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            @isset($pretitle)<div class="page-pretitle">{{ $pretitle }}</div>@endisset
+                            <h1 class="page-title">{{ $title }}</h1>
                         </div>
-                    @endif
+                        @hasSection('actions')
+                            <div class="col-auto ms-auto d-print-none">
+                                <div class="btn-list">@yield('actions')</div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
-        </header>
 
-        <main id="content" class="page-body" tabindex="-1">
+            <div class="page-body">
             <div class="container-xl">
                 @if (session('status'))
                     <div class="alert alert-success" role="status">
@@ -96,6 +99,7 @@
                 @endif
                 @include('laranail/waitlist-kit::admin.partials.errors')
                 @yield('content')
+            </div>
             </div>
         </main>
 
