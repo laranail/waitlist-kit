@@ -8,7 +8,10 @@ use Override;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignType;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignStatus;
+use Simtabi\Laranail\WaitlistKit\Database\Factories\CampaignFactory;
 
 /**
  * One waitlist, coming-soon or early-access page. Create through CreateCampaign, which holds the install to its
@@ -28,6 +31,9 @@ use Simtabi\Laranail\WaitlistKit\Enums\CampaignStatus;
  */
 final class Campaign extends Model
 {
+    /** @use HasFactory<CampaignFactory> */
+    use HasFactory;
+
     #[Override]
     protected $fillable = ['name', 'slug', 'type', 'status', 'host', 'locales', 'theme', 'theme_settings', 'settings', 'launches_at'];
 
@@ -45,10 +51,16 @@ final class Campaign extends Model
         return $this->hasMany(Subscriber::class);
     }
 
-    /** @return HasMany<Block, $this> */
-    public function blocks(): HasMany
+    /** @return HasMany<Enquiry, $this> */
+    public function enquiries(): HasMany
     {
-        return $this->hasMany(Block::class)->orderBy('position');
+        return $this->hasMany(Enquiry::class);
+    }
+
+    /** @return MorphMany<Block, $this> */
+    public function blocks(): MorphMany
+    {
+        return $this->morphMany(Block::class, 'blockable')->orderBy('position');
     }
 
     /** @return HasMany<FunnelEvent, $this> */
@@ -57,9 +69,20 @@ final class Campaign extends Model
         return $this->hasMany(FunnelEvent::class);
     }
 
+    /** @return MorphMany<Integration, $this> */
+    public function integrations(): MorphMany
+    {
+        return $this->morphMany(Integration::class, 'integrable');
+    }
+
     public function acceptsSignups(): bool
     {
         return $this->status === CampaignStatus::Live;
+    }
+
+    protected static function newFactory(): CampaignFactory
+    {
+        return CampaignFactory::new();
     }
 
     protected function baseTable(): string

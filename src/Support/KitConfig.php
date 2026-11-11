@@ -56,6 +56,90 @@ final readonly class KitConfig
         };
     }
 
+    public function signupsPerMinute(): int
+    {
+        $value = $this->config->get(self::KEY . '.signups.per_minute');
+
+        return is_int($value) && $value > 0 ? $value : 10;
+    }
+
+    public function thanksNewSignups(): bool
+    {
+        return $this->config->get(self::KEY . '.signups.thank_you') === true;
+    }
+
+    public function honeypotField(): string
+    {
+        $value = $this->config->get(self::KEY . '.signups.honeypot');
+
+        return is_string($value) && $value !== '' ? $value : 'website';
+    }
+
+    public function requiresCaptcha(): bool
+    {
+        return $this->config->get(self::KEY . '.security.captcha') === true;
+    }
+
+    /** The name sign-up mail is signed with: the application's. */
+    public function siteName(): string
+    {
+        $value = $this->config->get('app.name');
+
+        return is_string($value) && $value !== '' ? $value : 'Laravel';
+    }
+
+    public function contactEnabled(): bool
+    {
+        return $this->config->get(self::KEY . '.contact.enabled') === true;
+    }
+
+    /** The inbox enquiries are mailed to, or null to keep them in the database only. */
+    public function contactInbox(): ?string
+    {
+        $value = $this->config->get(self::KEY . '.contact.to');
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    /** @return list<string> */
+    public function contactTopics(): array
+    {
+        $value = $this->config->get(self::KEY . '.contact.topics');
+        $topics = is_array($value) ? array_values(array_filter($value, is_string(...))) : [];
+
+        return $topics !== [] ? $topics : ['other'];
+    }
+
+    /** `optional`, `required` or `off`. */
+    public function contactCompany(): string
+    {
+        $value = $this->config->get(self::KEY . '.contact.company');
+
+        return in_array($value, ['optional', 'required', 'off'], true) ? $value : 'optional';
+    }
+
+    public function contactRequiresConsent(): bool
+    {
+        return $this->config->get(self::KEY . '.contact.consent') === true;
+    }
+
+    public function enquiriesPerMinute(): int
+    {
+        $value = $this->config->get(self::KEY . '.contact.per_minute');
+
+        return is_int($value) && $value > 0 ? $value : 5;
+    }
+
+    public function seedsDefaultCampaign(): bool
+    {
+        return $this->config->get(self::KEY . '.seeding.default') === true;
+    }
+
+    public function seedsDemoInProduction(): bool
+    {
+        return $this->config->get(self::KEY . '.seeding.demo_in_production') === true;
+    }
+
     public function authMode(): AuthMode
     {
         return AuthMode::tryFrom($this->string('auth.mode'))

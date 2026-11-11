@@ -15,4 +15,5 @@ enum FunnelEventType: string
     case Invite = 'invite';
     case Convert = 'convert';
     case Unsubscribe = 'unsubscribe';
+    case Enquiry = 'enquiry';
 }

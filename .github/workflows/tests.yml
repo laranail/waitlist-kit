@@ -107,4 +107,4 @@ jobs:
           WAITLIST_KIT_TEST_DRIVER: ${{ matrix.driver }}
           WAITLIST_KIT_TEST_PORT: ${{ matrix.port }}
           WAITLIST_KIT_TEST_PASSWORD: throwaway
-        run: vendor/bin/pest --ci tests/Feature/SchemaTest.php tests/Feature/ModelsTest.php
+        run: vendor/bin/pest --ci tests/Feature/SchemaTest.php tests/Feature/ModelsTest.php tests/Feature/MorphMapTest.php tests/Feature/SignupTest.php tests/Feature/CommandsTest.php tests/Feature/ContactTest.php tests/Feature/LegalPagesTest.php

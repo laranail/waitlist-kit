@@ -9,8 +9,8 @@ registry version to show (see Install).
 
 > Waitlists, coming-soon and early-access pages for Laravel: lead capture and conversion, a Blade + Alpine.js backend, and themes as packages.
 
-Requires PHP `^8.5` on Laravel `^13`. Pre-release: this version is the foundation (schema, models, configuration,
-install and doctor commands); the public pages, themes and backend arrive in the next releases.
+Requires PHP `^8.5` on Laravel `^13`. Pre-release: campaigns take sign-ups on a plain page, thank each new address
+once and forward it to integrations; themes and the backend arrive in the next releases.
 
 ## Install
 
@@ -33,7 +33,7 @@ Publish the config, run the migrations and check the install in one command:
 php artisan laranail::waitlist-kit.install --migrate
 ```
 
-It creates five tables under the `laranail_waitlist_kit_` prefix and ends by running the doctor, which exits
+It creates seven tables under the `laranail_waitlist_kit_` prefix and ends by running the doctor, which exits
 non-zero on any problem. Choose how many campaigns the install may run with `WAITLIST_KIT_CAMPAIGNS`
 (`single`, `limited` or `multi`) before you create one.
 
@@ -48,6 +48,12 @@ use Simtabi\Laranail\WaitlistKit\Enums\CampaignType;
 $campaign = app(CreateCampaign::class)->handle('Launch list', 'launch', CampaignType::Waitlist, ['en', 'es']);
 
 $campaign->subscribers()->create(['email' => 'dana@example.com']);
+```
+
+Make it live and its page takes sign-ups at `/waitlist/launch`:
+
+```php
+$campaign->update(['status' => CampaignStatus::Live]);
 ```
 
 Check an install at any time, for example as a deploy step:
@@ -74,13 +80,26 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 ### Reference
 
 - [Models](docs/tools/models.md) — campaigns, subscribers, blocks, funnel events, integrations
+- [Sign-ups](docs/tools/signups.md) — routes, the request, the guards and the answer
+- [Mail](docs/tools/mail.md) — the thank-you, once, in the sign-up's language
+- [Contact](docs/tools/contact.md) — the headless contact form: endpoint, component and rules
+- [Legal pages](docs/tools/legal-pages.md) — privacy and terms, seeded as drafts, served once published
+- [Integrations](docs/tools/integrations.md) — the `app` and `brevo` drivers, queued and retried
+- [Morph map](docs/tools/morph-map.md) — `*able` columns and the namespaced aliases
+- [Seeders and factories](docs/tools/seeders-and-factories.md) — the starter and demo seeders, a factory per model
 - [Campaign limits](docs/tools/campaign-limits.md) — `single`, `limited`, `multi`, and `CreateCampaign`
-- [Commands](docs/tools/commands.md) — `install` and `doctor`
+- [Commands](docs/tools/commands.md) — `install`, `doctor`, `export`, `forget`
 
 ### Recipes
 
 - [Use a separate database](docs/recipes/use-a-separate-database.md) — the kit's tables on their own connection
 - [Check an install in a deploy](docs/recipes/check-an-install-in-a-deploy.md) — the doctor as a gate
+- [Require a captcha](docs/recipes/require-a-captcha.md) — Turnstile on every sign-up
+- [Mirror sign-ups to Brevo](docs/recipes/mirror-to-brevo.md) — a contact list kept in step
+- [Export subscribers and erase an address](docs/recipes/export-and-erase.md) — CSV and erasure requests
+- [Try it with demo data](docs/recipes/try-it-with-demo-data.md) — a filled local install
+- [Add a contact form](docs/recipes/add-a-contact-form.md) — the headless form on any page
+- [Publish your legal pages](docs/recipes/publish-your-legal-pages.md) — from seeded draft to served page
 
 ## Contributing and security
 

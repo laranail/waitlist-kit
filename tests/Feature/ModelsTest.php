@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignType;
+use Simtabi\Laranail\WaitlistKit\Models\FunnelEvent;
 use Simtabi\Laranail\WaitlistKit\Models\Integration;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignStatus;
 use Simtabi\Laranail\WaitlistKit\Enums\FunnelEventType;
@@ -67,10 +68,13 @@ it('soft-deletes a subscriber before any purge', function (): void {
         ->and(Subscriber::withTrashed()->count())->toBe(1);
 });
 
-it('records funnel events without an update time', function (): void {
-    $event = campaign()->events()->create(['type' => FunnelEventType::Signup, 'occurred_at' => now()]);
+it('records funnel events about a subject, without an update time', function (): void {
+    $subscriber = campaign()->subscribers()->create(['email' => 'dana@example.com']);
+    $event = FunnelEvent::factory()->about($subscriber)->create();
 
     expect($event->fresh()?->type)->toBe(FunnelEventType::Signup)
+        ->and($event->eventable?->is($subscriber))->toBeTrue()
+        ->and($subscriber->events()->count())->toBe(1)
         ->and(array_key_exists('updated_at', $event->fresh()?->getAttributes() ?? []))->toBeFalse();
 });
 

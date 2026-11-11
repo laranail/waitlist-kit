@@ -5,22 +5,29 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\WaitlistKit\Models;
 
 use Override;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Simtabi\Laranail\WaitlistKit\Database\Factories\IntegrationFactory;
 
 /**
- * A configured driver a campaign's sign-ups are sent to (a webhook, a mailing service, an application endpoint).
- * `settings` is encrypted with the application key, because it holds credentials.
+ * A configured driver sign-ups are sent to (an application endpoint, a mailing service). It serves an `integrable`
+ * (a campaign), or every campaign when it has none. `settings` is encrypted with the application key and hidden from
+ * serialisation, because it holds credentials.
  *
  * @property string $id
- * @property ?string $campaign_id
+ * @property ?string $integrable_type
+ * @property ?string $integrable_id
  * @property string $driver
  * @property array<string, mixed> $settings
  * @property bool $enabled
  */
 final class Integration extends Model
 {
+    /** @use HasFactory<IntegrationFactory> */
+    use HasFactory;
+
     #[Override]
-    protected $fillable = ['campaign_id', 'driver', 'settings', 'enabled'];
+    protected $fillable = ['driver', 'settings', 'enabled'];
 
     #[Override]
     protected $hidden = ['settings'];
@@ -30,10 +37,15 @@ final class Integration extends Model
         'enabled' => true,
     ];
 
-    /** @return BelongsTo<Campaign, $this> */
-    public function campaign(): BelongsTo
+    /** @return MorphTo<\Illuminate\Database\Eloquent\Model, $this> */
+    public function integrable(): MorphTo
     {
-        return $this->belongsTo(Campaign::class);
+        return $this->morphTo();
+    }
+
+    protected static function newFactory(): IntegrationFactory
+    {
+        return IntegrationFactory::new();
     }
 
     protected function baseTable(): string

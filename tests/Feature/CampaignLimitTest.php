@@ -10,8 +10,10 @@ use Simtabi\Laranail\WaitlistKit\Exceptions\InvalidConfiguration;
 
 function createCampaigns(int $count): void
 {
-    for ($i = 1; $i <= $count; $i++) {
-        app(CreateCampaign::class)->handle("Campaign {$i}", "campaign-{$i}", CampaignType::Waitlist);
+    static $made = 0;
+    for ($i = 0; $i < $count; $i++) {
+        $made++;
+        app(CreateCampaign::class)->handle("Campaign {$made}", "campaign-{$made}", CampaignType::Waitlist);
     }
 }
 
