@@ -21,7 +21,7 @@ final class InstallCommand extends PackageToolsInstallCommand
         {--migrate : Run the kit\'s migrations after publishing the config}
         {--force : Overwrite a config file that was already published}';
 
-    public const string DESCRIPTION = 'Publish the waitlist-kit config, optionally migrate, and check the install.';
+    public const string DESCRIPTION = 'Publish the waitlist-kit config and theme assets, optionally migrate, and check the install.';
 
     public function __construct(Package $package)
     {
@@ -40,6 +40,10 @@ final class InstallCommand extends PackageToolsInstallCommand
             '--force' => (bool) $this->option('force'),
         ]));
         $this->services->display()->success('Published config/laranail/waitlist-kit.php');
+
+        // Always forced: the theme assets are the kit's own files, rebuilt with every release.
+        $this->callSilently('vendor:publish', ['--tag' => 'laranail::waitlist-kit-assets', '--force' => true]);
+        $this->services->display()->success('Published the theme assets to public/vendor/waitlist-kit');
 
         if ((bool) $this->option('migrate')) {
             $exit = $this->call('migrate', ['--force' => true]);

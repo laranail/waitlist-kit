@@ -1,0 +1,66 @@
+/*
+ * laranail/waitlist-kit:default. Tailwind 4, built by the maintainers and shipped prebuilt, so a site needs no Node.
+ * It styles the same wk-* markup as the plain theme, through @apply, and reads the backend's settings as --wk-*.
+ */
+@import "tailwindcss" source(none);
+@source "../../../views";
+
+@theme {
+    --color-wk-primary: var(--wk-primary);
+    --color-wk-background: var(--wk-background);
+    --color-wk-text: var(--wk-text);
+    --font-wk: var(--wk-font);
+}
+
+:root {
+    --wk-primary: #4f46e5;
+    --wk-background: #ffffff;
+    --wk-text: #111827;
+    --wk-font: system-ui, sans-serif;
+    --wk-logo: none;
+}
+
+@layer components {
+    .wk-body { @apply m-0 bg-wk-background font-wk text-wk-text antialiased; }
+    .wk-main { @apply mx-auto grid max-w-2xl gap-14 px-4 py-16 sm:py-24; }
+
+    .wk-logo { @apply block size-12 bg-contain bg-center bg-no-repeat; background-image: var(--wk-logo); }
+    .wk-hero { @apply text-center; }
+    .wk-hero-title, .wk-page-title { @apply mb-4 text-4xl font-bold tracking-tight text-balance sm:text-5xl; }
+    .wk-hero-body { @apply text-lg text-wk-text/70 text-pretty; }
+    .wk-heading { @apply mb-4 text-2xl font-semibold tracking-tight; }
+
+    .wk-feature-list { @apply grid list-none gap-6 p-0 sm:grid-cols-2; }
+    .wk-feature { @apply rounded-xl border border-wk-text/10 p-5; }
+    .wk-feature-title { @apply mb-1 text-base font-semibold; }
+    .wk-feature-body { @apply text-wk-text/70; }
+
+    .wk-countdown { @apply text-center; }
+    .wk-countdown-value { @apply text-4xl font-semibold tabular-nums; }
+
+    .wk-faq-item { @apply border-t border-wk-text/10 py-3; }
+    .wk-faq-question { @apply cursor-pointer font-semibold; }
+    .wk-faq-answer { @apply mt-2 text-wk-text/70; }
+
+    .wk-quote { @apply m-0 border-l-4 border-wk-primary pl-4; }
+    .wk-quote-text p { @apply text-lg; }
+    .wk-quote-author { @apply mt-2 text-sm text-wk-text/60; }
+
+    .wk-footer { @apply border-t border-wk-text/10 pt-6 text-sm text-wk-text/60; }
+    .wk-legal-links { @apply flex list-none flex-wrap gap-4 p-0; }
+
+    .wk-form, [data-scope="contact-form"] { @apply mx-auto grid w-full max-w-md gap-4; }
+    .wk-field, [data-scope="contact-form"] [data-part="field"] { @apply grid gap-1.5; }
+    .wk-label, [data-scope="contact-form"] [data-part="label"] { @apply text-sm font-semibold; }
+    .wk-input, [data-scope="contact-form"] [data-part="input"]:not([type="checkbox"]) {
+        @apply w-full rounded-lg border border-wk-text/20 bg-wk-background px-3 py-2.5 text-wk-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wk-primary;
+    }
+    [data-state="invalid"] .wk-input, [data-state="invalid"] [data-part="input"] { @apply border-red-700; }
+    .wk-error, [data-part="error"] { @apply m-0 text-sm text-red-700; }
+    .wk-button, [data-scope="contact-form"] [data-part="submit"] {
+        @apply cursor-pointer rounded-lg bg-wk-primary px-5 py-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wk-primary;
+    }
+    .wk-status, [data-part="status"] { @apply m-0 font-semibold; }
+    .wk-consent { @apply m-0 text-sm text-wk-text/60; }
+    .wk-consent a, .wk-footer a, [data-scope="contact-form"] a { @apply text-wk-primary underline; }
+}

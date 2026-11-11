@@ -30,6 +30,12 @@ away from a collision, so every table carries `laranail_waitlist_kit_` unless th
 Subscriber and campaign ids appear in URLs (status pages, confirmation links). ULIDs are not guessable in sequence and
 sort by creation time, so they leak no counts and still index well.
 
+## Why themes are packages with prebuilt assets
+
+A site switches its look by installing a Composer package and choosing it, never by running a build on the server.
+Each theme ships its built CSS and JS; the kit's own themes share one set of base views and differ only in styling,
+so a fix to the markup reaches both.
+
 ## Why nothing runs at boot
 
 The provider reads configuration and nothing else: no query, no network call. A database outage then fails the

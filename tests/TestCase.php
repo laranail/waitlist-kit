@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\WaitlistKit\Tests;
 
+use Illuminate\Filesystem\Filesystem;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Simtabi\Laranail\Captcha\Providers\CaptchaServiceProvider;
@@ -13,6 +14,17 @@ use Simtabi\Laranail\Package\Tools\Providers\PackageToolsServiceProvider;
 abstract class TestCase extends Orchestra
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // What `vendor:publish --tag=laranail::waitlist-kit-assets` does on a real install.
+        $target = $this->app->publicPath('vendor/waitlist-kit');
+        if (! is_file($target . '/manifest.json')) {
+            (new Filesystem)->copyDirectory(__DIR__ . '/../resources/dist', $target);
+        }
+    }
 
     /** @return list<class-string> */
     protected function getPackageProviders($app): array

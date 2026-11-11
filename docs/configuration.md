@@ -34,6 +34,12 @@ Set both before the first migration: changing them later points the kit at table
 | `signups.thank_you` | `WAITLIST_KIT_THANK_YOU` | `true` | Thank a new sign-up by email, once |
 | `signups.honeypot` | — | `website` | The hidden field only a script fills in |
 
+## Themes
+
+| Key | Variable | Default | Meaning |
+| --- | --- | --- | --- |
+| `themes.default` | `WAITLIST_KIT_THEME` | `laranail/waitlist-kit:default` | The theme a campaign without its own uses; must be installed |
+
 ## Contact
 
 | Key | Variable | Default | Meaning |
