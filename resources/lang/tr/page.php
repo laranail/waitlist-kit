@@ -24,4 +24,13 @@ return [
     'unsubscribe_body'   => ':campaign hakkında haber almak istemiyor musunuz? İstediğiniz zaman yeniden katılabilirsiniz.',
     'unsubscribe_button' => 'Listeden çık',
     'unsubscribed'       => ':campaign listesinden çıktınız. Bu konuda size bir daha e-posta göndermeyeceğiz.',
+    'notify'             => 'Bana haber ver',
+    'closed_title'       => 'Kayıtlar kapandı',
+    'closed_body'        => ':campaign listesi artık kayıt almıyor. İlginiz için teşekkürler.',
+    'launched_title'     => ':campaign yayında',
+    'launched_body'      => 'Bekleyiş bitti: :campaign artık açık.',
+    'access_title'       => 'Davetiniz mi var?',
+    'access_label'       => 'Davet kodu',
+    'access_button'      => 'Devam et',
+    'access_invalid'     => 'Bu kod bu liste için geçerli değil.',
 ];

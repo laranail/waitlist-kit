@@ -24,4 +24,13 @@ return [
     'unsubscribe_body'   => 'Ne plus recevoir de nouvelles de :campaign ? Vous pourrez vous réinscrire à tout moment.',
     'unsubscribe_button' => 'Quitter la liste',
     'unsubscribed'       => 'Vous avez quitté la liste :campaign. Nous ne vous écrirons plus à ce sujet.',
+    'notify'             => 'Prévenez-moi',
+    'closed_title'       => 'Les inscriptions sont closes',
+    'closed_body'        => 'La liste :campaign n\'accepte plus d\'inscriptions. Merci de votre intérêt.',
+    'launched_title'     => ':campaign est lancé',
+    'launched_body'      => 'L\'attente est terminée : :campaign est ouvert.',
+    'access_title'       => 'Vous avez une invitation ?',
+    'access_label'       => 'Code d\'invitation',
+    'access_button'      => 'Continuer',
+    'access_invalid'     => 'Ce code n\'est pas valable pour cette liste.',
 ];
