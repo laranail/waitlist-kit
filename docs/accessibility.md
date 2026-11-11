@@ -18,6 +18,7 @@ release still needs from a person.
 | Countdown | No live region: the ticking label is hidden from assistive technology, which reads the launch date instead |
 | Honeypot | `hidden`, `aria-hidden` and `tabindex="-1"`: never reached by keyboard or read out |
 | Contrast | Text at 4.5:1 and control edges at 3:1 with the default colours, in both themes and the backend |
+| Backend on Tabler | Tabler's tinted badges, alert text and danger buttons fell short (1.97 to 4.47:1) and are corrected in the kit's stylesheet; table links are underlined; each scrolling table is a labelled region reachable by keyboard; the sidebar toggle reports `aria-expanded` |
 | Motion | Transitions off under `prefers-reduced-motion` |
 
 A site's own theme settings (`primary`, `background`, `text`) are its own to check: the kit cannot know a brand's
@@ -26,11 +27,12 @@ colours are readable.
 ## How it is tested
 
 Feature tests check the structure and references on every backend screen in both sign-in modes, and on the public
-pages in both themes; they also check each error path above. A unit test computes the contrast of the shipped
-colours from the stylesheets' own tokens. Each check was seen failing against the defect it guards.
+pages in both themes; they also check each error path above. A unit test computes the contrast of the public themes'
+shipped colours from their tokens. Tabler's colours are oklch and are measured in a browser instead; the test pins
+the Tabler release that was measured and each correction, so an upgrade fails until it is measured again. Each check was seen failing against the defect it guards.
 
 axe-core 4.10 (WCAG 2.2 A and AA, plus best practices) was run by hand against a demo install: the campaign page
-in both themes, the privacy page, the login and 12 backend screens, with no violations once the defects listed in the
+in both themes, the privacy page, the login and 12 backend screens (again after the move to Tabler), with no violations once the defects listed in the
 changelog were fixed. Contrast, focus order and error announcements were checked by hand alongside it.
 
 ## The screen-reader pass
