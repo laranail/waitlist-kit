@@ -123,7 +123,8 @@ it('records where a sign-up came from and who referred it', function (): void {
 
     $kai = Subscriber::query()->where('email', 'kai@example.com')->sole();
     expect($kai->referred_by_id)->toBe($referrer->id)
-        ->and($kai->attribution)->toBe(['utm_source' => 'newsletter', 'referrer' => 'news.example.org']);
+        // toEqual, not toBe: MySQL's JSON type stores keys in its own order.
+        ->and($kai->attribution)->toEqual(['utm_source' => 'newsletter', 'referrer' => 'news.example.org']);
 });
 
 it('refuses, in the action itself, a campaign that is not live', function (): void {
