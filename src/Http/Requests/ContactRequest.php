@@ -18,6 +18,13 @@ use Simtabi\Laranail\WaitlistKit\Validation\ContactRules;
  */
 final class ContactRequest extends FormRequest
 {
+    /**
+     * Its own error bag: a page can hold the sign-up and the contact form at once, and both have an `email` field,
+     * so a shared bag marked (and focused) the wrong form's field. Read it as `$errors->contact`.
+     */
+    #[Override]
+    protected $errorBag = 'contact';
+
     public function authorize(): bool
     {
         return true;

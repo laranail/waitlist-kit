@@ -22,7 +22,7 @@ final class EnquiryNotice extends Mailable implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public function __construct(public readonly string $enquiryId, public readonly string $site)
+    public function __construct(public readonly string $enquiryId, public readonly string $site, public readonly ?Address $sender = null)
     {
         $this->afterCommit();
     }
@@ -32,6 +32,7 @@ final class EnquiryNotice extends Mailable implements ShouldQueue
         $enquiry = $this->enquiry();
 
         return new Envelope(
+            from: $this->sender,
             replyTo: [new Address($enquiry->email, $enquiry->name)],
             subject: sprintf('[%s] %s via %s', ucfirst($enquiry->topic), $enquiry->name, $this->site),
         );

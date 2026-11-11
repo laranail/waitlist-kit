@@ -6,6 +6,7 @@ namespace Simtabi\Laranail\WaitlistKit\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,14 +19,14 @@ final class ThankYouMail extends Mailable implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public readonly string $site, public readonly string $campaign)
+    public function __construct(public readonly string $site, public readonly string $campaign, public readonly ?Address $sender = null)
     {
         $this->afterCommit();
     }
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: __('laranail/waitlist-kit::mail.subject', ['site' => $this->site]));
+        return new Envelope(from: $this->sender, subject: __('laranail/waitlist-kit::mail.subject', ['site' => $this->site]));
     }
 
     public function content(): Content

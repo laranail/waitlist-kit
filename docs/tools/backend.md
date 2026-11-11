@@ -41,6 +41,7 @@ Gate::define('laranail-waitlist-kit.erase', fn (User $user) => $user->hasRole('o
 | Enquiries | Newest first, and one in full |
 | Pages | The privacy notice and terms: title per language, text blocks, publish |
 | Integrations | `app` and `brevo`, per campaign or for every campaign; a stored key is never shown back and an empty field keeps it |
+| Settings | The twelve editable settings: a form (`manage`) on the `database` store, otherwise read-only with the variable that sets each |
 
 Every change goes through a form request (its ability, then the same rule classes the rest of the kit uses) and an
 action. Blocks are edited one language at a time, so saving Spanish leaves English as it was.
@@ -48,8 +49,10 @@ action. Blocks are edited one language at a time, so saving Spanish leaves Engli
 ## Accessibility
 
 Every screen has a skip link, one `h1`, landmarks, the current section marked with `aria-current`, a label for every
-control, captions and header scopes on tables, and an error summary (`role="alert"`) linking to each field. A test
-checks every screen in both sign-in modes. It checks structure; a pass with a screen reader is still worth doing.
+control, captions and header scopes on tables, unique ids, and an error summary (`role="alert"`) linking to each
+field. The block editor names each block's form apart (`b-<block id>-…`, `add-block-…`), so an error shows only in
+the block that was saved and the summary links there. A test checks every screen in both sign-in modes; see
+[Accessibility](../accessibility.md) for the rest and the screen-reader pass.
 
 ---
 

@@ -16,16 +16,20 @@ use Simtabi\Laranail\WaitlistKit\Models\Admin;
 use Illuminate\Contracts\Foundation\Application;
 use Simtabi\Laranail\WaitlistKit\Auth\Abilities;
 use Simtabi\Laranail\WaitlistKit\Support\Tables;
+use Simtabi\Laranail\Settings\Contracts\Settings;
 use Simtabi\Laranail\WaitlistKit\Support\MorphMap;
 use Simtabi\Laranail\WaitlistKit\Themes\KitThemes;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Simtabi\Laranail\WaitlistKit\Settings\ConfigStore;
 use Simtabi\Laranail\WaitlistKit\Themes\ThemeRegistry;
 use Simtabi\Laranail\WaitlistKit\Commands\AdminCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\DoctorCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\ExportCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\ForgetCommand;
+use Simtabi\Laranail\WaitlistKit\Settings\SettingsStore;
 use Simtabi\Laranail\WaitlistKit\Commands\InstallCommand;
+use Simtabi\Laranail\WaitlistKit\Settings\LaranailSettingsStore;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\WaitlistKit\Database\Seeders\WaitlistKitSeeder;
 use Simtabi\Laranail\WaitlistKit\View\Composers\AdminLayoutComposer;
@@ -43,6 +47,9 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
     public const string ENQUIRY_LIMITER = 'laranail-waitlist-kit.enquiries';
 
     public const string LOGIN_LIMITER = 'laranail-waitlist-kit.admin-login';
+
+    /** laranail/settings' contract, bound only when that package is installed. */
+    public const string LARANAIL_SETTINGS = Settings::class;
 
     public function configurePackage(Package $package): void
     {
@@ -85,17 +92,30 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
         $auth->set('auth.guards.' . KitConfig::BUNDLED_GUARD, ['driver' => 'session', 'provider' => KitConfig::BUNDLED_GUARD]);
         $auth->set('auth.providers.' . KitConfig::BUNDLED_GUARD, ['driver' => 'eloquent', 'model' => Admin::class]);
 
-        $this->app->bind(KitConfig::class, static fn (Application $app): KitConfig => new KitConfig($app->make(Repository::class)));
+        // The editable settings' store, chosen once here: laranail/settings when asked for and installed, else the
+        // configuration alone. A missing package with store = database is the doctor's to report, not a boot failure.
+        $this->app->scoped(SettingsStore::class, static function (Application $app): SettingsStore {
+            $wanted = $app->make(Repository::class)->get('laranail.waitlist-kit.settings.store');
+
+            return $wanted === 'database' && $app->bound(self::LARANAIL_SETTINGS)
+                ? new LaranailSettingsStore($app->make(self::LARANAIL_SETTINGS))
+                : new ConfigStore;
+        });
+
+        $this->app->bind(KitConfig::class, static fn (Application $app): KitConfig => new KitConfig($app->make(Repository::class), $app->make(SettingsStore::class)));
     }
 
     #[Override]
     public function packageBooted(): void
     {
-        // Configuration, not request state: the same for every request a long-running worker serves.
+        // Table names: configuration only (never an editable setting), so they are the same for every request a
+        // long-running worker serves. Everything below reads KitConfig per call instead: an editable setting can
+        // change between requests, and its store is request-scoped.
         $config = $this->app->make(KitConfig::class);
         Tables::configure($config->tablePrefix(), $config->connection());
+        $app = $this->app;
 
-        $this->defineAbilities($config);
+        $this->defineAbilities();
 
         View::composer(['laranail/waitlist-kit::admin.layout', 'laranail/waitlist-kit::admin.login'], AdminLayoutComposer::class);
 
@@ -104,18 +124,18 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
 
         // Sign-ups per campaign per visitor. `$request->ip()` honours the application's TrustProxies, so behind
         // Cloudflare or a load balancer each visitor has their own limit once the proxy is trusted there.
-        RateLimiter::for(self::SIGNUP_LIMITER, static function (Request $request) use ($config): Limit {
+        RateLimiter::for(self::SIGNUP_LIMITER, static function (Request $request) use ($app): Limit {
             // The raw slug: Laravel's middleware priority runs throttling before route-model binding.
             $slug = $request->route()?->originalParameter('campaign');
 
-            return Limit::perMinute($config->signupsPerMinute())
+            return Limit::perMinute($app->make(KitConfig::class)->signupsPerMinute())
                 ->by((is_string($slug) ? $slug : '') . '|' . $request->ip());
         });
 
         // Five sign-in attempts per address per minute, so the bundled login cannot be guessed at speed.
         RateLimiter::for(self::LOGIN_LIMITER, static fn (Request $request): Limit => Limit::perMinute(5)->by(mb_strtolower($request->string('email')->toString()) . '|' . $request->ip()));
 
-        RateLimiter::for(self::ENQUIRY_LIMITER, static fn (Request $request): Limit => Limit::perMinute($config->enquiriesPerMinute())->by((string) $request->ip()));
+        RateLimiter::for(self::ENQUIRY_LIMITER, static fn (Request $request): Limit => Limit::perMinute($app->make(KitConfig::class)->enquiriesPerMinute())->by((string) $request->ip()));
     }
 
     /**
@@ -123,21 +143,23 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
      * always wins. Bundled administrators hold all four. In host mode the default admits the addresses in
      * admin.emails, and nobody else.
      */
-    private function defineAbilities(KitConfig $config): void
+    private function defineAbilities(): void
     {
+        $app = $this->app;
+
         foreach (Abilities::ALL as $ability) {
             if (Gate::has($ability)) {
                 continue;
             }
 
-            Gate::define($ability, static function (mixed $user) use ($config): bool {
+            Gate::define($ability, static function (mixed $user) use ($app): bool {
                 if ($user instanceof Admin) {
                     return true;
                 }
 
                 $email = is_object($user) && isset($user->email) && is_string($user->email) ? mb_strtolower($user->email) : null;
 
-                return $email !== null && in_array($email, $config->adminEmails(), true);
+                return $email !== null && in_array($email, $app->make(KitConfig::class)->adminEmails(), true);
             });
         }
     }

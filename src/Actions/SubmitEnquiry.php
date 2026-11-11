@@ -58,7 +58,7 @@ final readonly class SubmitEnquiry
         $inbox = $this->config->contactInbox();
         if ($inbox !== null) {
             try {
-                $this->mail->mailer()->to($inbox)->queue(new EnquiryNotice($enquiry->id, $this->config->siteName()));
+                $this->mail->mailer()->to($inbox)->queue(new EnquiryNotice($enquiry->id, $this->config->siteName(), $this->config->sender()));
             } catch (Throwable $e) {
                 $this->log->warning('laranail/waitlist-kit: an enquiry notice failed', ['enquiry' => $enquiry->id, 'reason' => $e->getMessage()]);
             }

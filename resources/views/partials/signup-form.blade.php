@@ -7,11 +7,11 @@
         @csrf
         <input type="hidden" name="locale" value="{{ $locale }}">
 
-        <div class="wk-field" data-part="field" data-field="email" @error('email') data-state="invalid" @enderror>
+        <div class="wk-field" data-part="field" data-field="email" @error('email', 'signup') data-state="invalid" @enderror>
             <label class="wk-label" data-part="label" for="waitlist-email">{{ $label ?? __('laranail/waitlist-kit::page.email') }}</label>
-            <input class="wk-input" data-part="input" id="waitlist-email" type="email" name="email" value="{{ old('email') }}" required maxlength="254"
-                   autocomplete="email" @error('email') aria-invalid="true" aria-describedby="waitlist-email-error" @enderror>
-            <p class="wk-error" data-part="error" data-for="email" id="waitlist-email-error" @unless ($errors->has('email')) hidden @endunless>{{ $errors->first('email') }}</p>
+            <input class="wk-input" data-part="input" id="waitlist-email" type="email" name="email" value="{{ $errors->signup->any() ? old('email') : '' }}" required maxlength="254"
+                   autocomplete="email" @error('email', 'signup') aria-invalid="true" aria-describedby="waitlist-email-error" autofocus @enderror>
+            <p class="wk-error" data-part="error" data-for="email" id="waitlist-email-error" @unless ($errors->signup->has('email')) hidden @endunless>{{ $errors->signup->first('email') }}</p>
         </div>
 
         {{-- The honeypot: hidden from people and from assistive technology; only a script fills it in. --}}
@@ -23,7 +23,7 @@
         @if ($captcha)
             {{-- Resolved only when rendered, so the page compiles without laranail/captcha installed. --}}
             <x-dynamic-component component="laranail-captcha::captcha" />
-            @error('captcha')<p class="wk-error" data-part="error">{{ $message }}</p>@enderror
+            @error('captcha', 'signup')<p class="wk-error" data-part="error" data-for="captcha" id="waitlist-captcha-error" role="alert">{{ $message }}</p>@enderror
         @endif
 
         @if ($privacy)
@@ -31,6 +31,6 @@
         @endif
 
         <button class="wk-button" data-part="submit" type="submit">{{ $button ?? __('laranail/waitlist-kit::page.join') }}</button>
-        <p class="wk-status" data-part="status" role="status" hidden></p>
+        <p class="wk-status" data-part="status" role="status" tabindex="-1" hidden></p>
     </form>
 @endif

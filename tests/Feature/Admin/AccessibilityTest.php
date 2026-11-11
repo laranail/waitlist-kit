@@ -11,7 +11,7 @@ use Simtabi\Laranail\WaitlistKit\Models\Integration;
 /**
  * The backend's structural accessibility, checked on every screen: a language, one h1, a main landmark with a skip
  * link to it, a label for every control, text on every button, captions and header scopes on tables, the current
- * section marked, and no positive tabindex. A manual pass with a screen reader is still the owner's call.
+ * section marked, no positive tabindex, unique ids, and every label and description pointing at something. A manual pass with a screen reader is still the owner's call.
  *
  * @return list<string> what is wrong, as sentences
  */
@@ -65,17 +65,20 @@ function accessibilityProblems(string $html): array
         }
     }
 
-    return $problems;
+    return [...$problems, ...referenceProblems($html)];
 }
 
 it('gives every backend screen its structure', function (string $mode): void {
     signInAdmin($mode);
     $campaign = Campaign::factory()->create(['locales' => ['en', 'es']]);
     $campaign->blocks()->create(['type' => 'faq', 'content' => ['en' => ['items' => [['question' => 'When?', 'answer' => 'Soon']]]]]);
+    // Two blocks of one type: their forms repeat the same fields, which is where ids used to collide.
+    $campaign->blocks()->create(['type' => 'faq', 'content' => ['en' => ['items' => [['question' => 'Where?', 'answer' => 'Here']]]]]);
     Subscriber::factory()->create(['campaign_id' => $campaign->id]);
     $enquiry = Enquiry::factory()->create();
     $page = Page::factory()->legal('privacy')->create();
     $page->blocks()->create(['type' => 'text', 'content' => ['en' => ['heading' => 'What we keep']]]);
+    $page->blocks()->create(['type' => 'text', 'content' => ['en' => ['heading' => 'How long we keep it']]]);
     $integration = Integration::factory()->create();
 
     $screens = [
@@ -91,6 +94,7 @@ it('gives every backend screen its structure', function (string $mode): void {
         '/waitlist-admin/integrations',
         '/waitlist-admin/integrations/create',
         "/waitlist-admin/integrations/{$integration->id}/edit",
+        '/waitlist-admin/settings',
     ];
 
     foreach ($screens as $url) {
@@ -100,7 +104,7 @@ it('gives every backend screen its structure', function (string $mode): void {
             ->and($html)->toContain('href="#content"')
             ->and($html)->toContain('aria-current="page"');
     }
-    expect($screens)->toHaveCount(12);
+    expect($screens)->toHaveCount(13);
 })->with(['host', 'bundled']);
 
 it('summarises errors in an alert that links to each field', function (): void {
@@ -122,5 +126,39 @@ it('can fail', function (): void {
         ->toBe([
             'no lang on <html>', 'not exactly one <h1>', 'no <main id="content">', 'an unlabelled control: x',
             'a button with no text', 'a table without a caption', 'a column header without scope', 'a positive tabindex',
-        ]);
+        ])
+        ->and(referenceProblems('<label for="a">A</label><input id="a"><input id="a" aria-describedby="a-hint"><label for="b">B</label>'))
+        ->toBe(['the id a used more than once', 'a reference to the missing id a-hint', 'a reference to the missing id b']);
+});
+
+it('keeps a rejected block edit to the block it came from', function (): void {
+    signInAdmin('host');
+    $page = Page::factory()->legal('privacy')->create();
+    $first = $page->blocks()->create(['type' => 'text', 'content' => ['en' => ['heading' => 'What we keep']]]);
+    $second = $page->blocks()->create(['type' => 'text', 'content' => ['en' => ['heading' => 'How long we keep it']]]);
+    $tooLong = str_repeat('x', 161);
+
+    $html = (string) $this->followingRedirects()->from("/waitlist-admin/pages/{$page->id}/edit")
+        ->put("/waitlist-admin/blocks/{$second->id}", ['type' => 'text', 'locale' => 'en', 'block' => $second->id, 'heading' => $tooLong, 'paragraphs' => ''])
+        ->assertOk()->getContent();
+
+    // The summary links to the rejected block's field, which exists, and only that block shows the error and the input.
+    expect(referenceProblems($html))->toBe([])
+        ->and($html)->toContain('href="#b-' . $second->id . '-heading"')
+        ->toContain('id="b-' . $second->id . '-heading-error"')
+        ->not->toContain('id="b-' . $first->id . '-heading-error"')
+        ->not->toContain('id="f-heading-error"')
+        ->and(substr_count($html, 'value="' . $tooLong . '"'))->toBe(1)
+        ->and($html)->toContain('value="What we keep"');
+});
+
+it('names the add-block form apart from the page form', function (): void {
+    signInAdmin('host');
+    $campaign = Campaign::factory()->create();
+
+    $html = (string) $this->get("/waitlist-admin/campaigns/{$campaign->id}/edit")->assertOk()->getContent();
+
+    expect($html)->toContain('id="add-block-type"')
+        ->toContain('name="_form" value="add-block"')
+        ->and(referenceProblems($html))->toBe([]);
 });

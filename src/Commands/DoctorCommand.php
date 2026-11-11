@@ -19,6 +19,7 @@ use Simtabi\Laranail\WaitlistKit\Themes\ThemeAssets;
 use Simtabi\Laranail\WaitlistKit\Integrations\Drivers;
 use Simtabi\Laranail\WaitlistKit\Themes\ThemeRegistry;
 use Simtabi\Laranail\Captcha\Providers\CaptchaServiceProvider;
+use Simtabi\Laranail\WaitlistKit\Providers\WaitlistKitServiceProvider;
 use Simtabi\Laranail\Console\Tools\Commands\Concerns\SupportsNamespacedNames;
 
 /**
@@ -46,6 +47,12 @@ final class DoctorCommand extends Command
         $this->services->display()->header('laranail/waitlist-kit');
 
         $problems = $config->problems();
+
+        if ($config->settingsStore() === 'database' && ! $app->bound(WaitlistKitServiceProvider::LARANAIL_SETTINGS)) {
+            $problems[] = 'settings.store is database, but laranail/settings is not installed: the backend\'s settings are read-only.';
+        } elseif (! in_array($config->settingsStore(), ['env', 'database'], true)) {
+            $problems[] = sprintf('laranail.waitlist-kit.settings.store is "%s"; expected one of: env, database.', $config->settingsStore());
+        }
 
         if (! $themes->has($config->defaultTheme())) {
             $problems[] = sprintf('themes.default names "%s", which is not installed; installed: %s.', $config->defaultTheme(), implode(', ', array_keys($themes->all())));

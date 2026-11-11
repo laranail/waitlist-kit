@@ -26,6 +26,18 @@ return [
         'max' => (int) env('WAITLIST_KIT_CAMPAIGNS_MAX', 3),
     ],
 
+    'settings' => [
+        // Where the backend's editable settings live: `env` (this file and .env only; the Settings screen is read-only)
+        // or `database` (laranail/settings; a value saved in the backend overrides this file). Needs laranail/settings.
+        'store' => env('WAITLIST_KIT_SETTINGS_STORE', 'env'),
+    ],
+
+    'mail' => [
+        // The sender of the kit's mail. Empty uses the application's mail.from.
+        'from_address' => env('WAITLIST_KIT_MAIL_FROM_ADDRESS'),
+        'from_name'    => env('WAITLIST_KIT_MAIL_FROM_NAME'),
+    ],
+
     'routes' => [
         // Register the public pages and the sign-up endpoint. Off for an application that routes them itself.
         'enabled' => (bool) env('WAITLIST_KIT_ROUTES', true),

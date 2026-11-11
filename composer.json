@@ -45,6 +45,10 @@
     "repositories": [
         {
             "type": "vcs",
+            "url": "https://github.com/laranail/settings"
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/laranail/enumerator"
         },
         {
@@ -85,7 +89,8 @@
         "rector/rector": "^2.5.8",
         "roave/security-advisories": "dev-latest",
         "fakerphp/faker": "^1.24",
-        "laranail/captcha": "^0.1"
+        "laranail/captcha": "^0.1",
+        "laranail/settings": "^0.1"
     },
     "autoload": {
         "psr-4": {
@@ -138,6 +143,7 @@
     "prefer-stable": true,
     "suggest": {
         "fakerphp/faker": "Needed by the factories and the demo seeder (a development dependency).",
-        "laranail/captcha": "Server-side captcha (Turnstile and others) on the sign-up form, with security.captcha on."
+        "laranail/captcha": "Server-side captcha (Turnstile and others) on the sign-up form, with security.captcha on.",
+        "laranail/settings": "Edit the kit's settings in the backend (settings.store = database)."
     }
 }

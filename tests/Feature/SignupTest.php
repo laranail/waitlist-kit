@@ -82,7 +82,7 @@ it('sends a post without JavaScript back to its own page, never to a Referer', f
 
     test()->post('/waitlist/launch', ['email' => 'nope'], ['Referer' => 'https://evil.example/x'])
         ->assertRedirect($page)
-        ->assertSessionHasErrors('email');
+        ->assertSessionHasErrors('email', null, 'signup');
 });
 
 it('never lets an answer to a post be cached', function (): void {

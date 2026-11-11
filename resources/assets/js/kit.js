@@ -17,6 +17,7 @@ Alpine.data('wkForm', () => ({
         const status = form.querySelector('[data-part="status"]');
         form.querySelectorAll('[data-part="error"][data-for]').forEach((el) => { el.hidden = true; el.textContent = ''; });
         form.querySelectorAll('[data-state="invalid"]').forEach((el) => el.removeAttribute('data-state'));
+        form.querySelectorAll('[data-part="input"][aria-invalid]').forEach((input) => this.describe(input, null));
 
         try {
             const response = await fetch(form.action, {
@@ -32,13 +33,20 @@ Alpine.data('wkForm', () => ({
                 form.querySelectorAll('[data-part="field"], [data-part="submit"]').forEach((el) => { el.hidden = true; });
                 this.show(status, body.message ?? '');
                 form.setAttribute('data-state', 'sent');
+                // The button that had focus is gone: hand focus to the answer rather than dropping it on the page.
+                status?.focus();
             } else if (response.status === 422) {
+                let first = null;
                 for (const [field, messages] of Object.entries(body.errors ?? {})) {
                     const error = form.querySelector(`[data-part="error"][data-for="${CSS.escape(field)}"]`);
                     const wrapper = form.querySelector(`[data-part="field"][data-field="${CSS.escape(field)}"]`);
+                    const input = wrapper?.querySelector('[data-part="input"]');
                     if (error) { error.textContent = messages[0] ?? ''; error.hidden = false; }
                     if (wrapper) { wrapper.setAttribute('data-state', 'invalid'); }
+                    if (input) { this.describe(input, error); first ??= input; }
                 }
+                // Nothing else announces a rejected field: focus it, and the screen reader reads its error with it.
+                first?.focus();
             } else {
                 this.show(status, body.message ?? '');
             }
@@ -49,17 +57,36 @@ Alpine.data('wkForm', () => ({
         }
     },
 
+    // A live region that appears and changes in one step is often not announced: reveal it, then fill it.
     show(element, text) {
         if (element) {
-            element.textContent = text;
             element.hidden = false;
+            element.textContent = '';
+            window.setTimeout(() => { element.textContent = text; }, 100);
         }
+    },
+
+    // Marks an input invalid and points it at its error (or, with no error, clears both).
+    describe(input, error) {
+        const ids = (input.getAttribute('aria-describedby') ?? '').split(' ').filter((id) => id !== '' && !id.endsWith('-error'));
+        if (error) {
+            input.setAttribute('aria-invalid', 'true');
+            if (error.id) { ids.push(error.id); }
+        } else {
+            input.removeAttribute('aria-invalid');
+        }
+        if (ids.length > 0) { input.setAttribute('aria-describedby', ids.join(' ')); } else { input.removeAttribute('aria-describedby'); }
     },
 }));
 
 // Days, hours and minutes until data-target, updated every minute.
 Alpine.data('wkCountdown', () => ({
     label: '',
+
+    // Once the visual label shows, the launch date stays only for assistive technology.
+    get dateClass() {
+        return this.label === '' ? '' : 'wk-sr';
+    },
 
     init() {
         const target = Date.parse(this.$el.dataset.target ?? '');

@@ -57,6 +57,21 @@ Set both before the first migration: changing them later points the kit at table
 | --- | --- | --- | --- |
 | `security.captcha` | `WAITLIST_KIT_CAPTCHA` | `false` | Require `laranail/captcha`'s challenge on the form; the doctor fails if the package is missing |
 
+## Settings and mail
+
+| Key | Variable | Default | Meaning |
+| --- | --- | --- | --- |
+| `settings.store` | `WAITLIST_KIT_SETTINGS_STORE` | `env` | `env` (this file and `.env` only; the backend's Settings screen is read-only) or `database` (`laranail/settings`; a value saved in the backend overrides the configuration) |
+| `mail.from_address` | `WAITLIST_KIT_MAIL_FROM_ADDRESS` | empty | The sender of the kit's mail; empty uses the application's `mail.from` |
+| `mail.from_name` | `WAITLIST_KIT_MAIL_FROM_NAME` | empty | The sender's name, with `mail.from_address` |
+
+Twelve keys are editable in the backend when the store is `database`: `mail.from_address`, `mail.from_name`,
+`signups.thank_you`, `signups.per_minute`, `contact.enabled`, `contact.to`, `contact.topics`, `contact.company`,
+`contact.consent`, `contact.per_minute`, `security.captcha` and `themes.default`. A saved value wins over the
+configuration everywhere the kit reads it; emptying a field removes the saved value, so the configuration applies
+again. `database` without `laranail/settings` installed is reported by the doctor and falls back to `env`. See
+[Edit settings in the backend](recipes/edit-settings-in-the-backend.md).
+
 ## Seeding
 
 | Key | Variable | Default | Meaning |
@@ -80,7 +95,7 @@ Set both before the first migration: changing them later points the kit at table
 | `auth.mode` | `WAITLIST_KIT_AUTH` | `host` | `host` (the application's guard) or `bundled` (the kit's own admin login) |
 | `auth.guard` | `WAITLIST_KIT_AUTH_GUARD` | `web` | The guard `host` mode uses; must exist in `config/auth.php` |
 
-See [Backend](tools/backend.md#signing-in). Mail is signed with `app.name`.
+See [Backend](tools/backend.md#signing-in). Mail is signed with `app.name`, and sent from `mail.from_address` when set.
 
 ## Invalid values
 

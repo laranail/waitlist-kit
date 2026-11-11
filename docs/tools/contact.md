@@ -12,7 +12,9 @@ campaign or without one.
 
 It renders accessible markup with no classes and no styles, only a contract for CSS to target:
 `data-scope="contact-form"` on the form, and `data-part` (`field`, `label`, `input`, `error`, `submit`, `status`),
-`data-field` and `data-state="invalid"` inside. Attributes on the tag land on the form. It renders nothing while
+`data-field` and `data-state="invalid"` inside. Attributes on the tag land on the form. Its errors are in their
+own bag, `$errors->contact`, and its old input is reused only when that bag has errors, so a sign-up form on the
+same page (bag `signup`) never shows the contact form's errors or input, and the reverse. It renders nothing while
 `contact.enabled` is false, and links the consent line to the privacy notice once that page is published.
 
 ## The endpoint
