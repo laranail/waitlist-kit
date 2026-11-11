@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\WaitlistKit\Models;
 
 use Override;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Simtabi\Laranail\WaitlistKit\Database\Factories\BlockFactory;
 
 /**
- * One piece of a campaign's page (hero, form, features, countdown, FAQ, ...), in order. `content` holds its fields
- * per locale: `{"en": {"title": "..."}, "es": {...}}`.
+ * One piece of a page (hero, form, features, countdown, FAQ, ...), in order. It belongs to a `blockable`: a campaign
+ * today. `content` holds its fields per locale: `{"en": {"title": "..."}, "es": {...}}`.
  *
  * @property string $id
- * @property string $campaign_id
+ * @property string $blockable_type
+ * @property string $blockable_id
  * @property string $type
  * @property int $position
  * @property array<string, array<string, mixed>> $content
@@ -20,8 +23,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class Block extends Model
 {
+    /** @use HasFactory<BlockFactory> */
+    use HasFactory;
+
     #[Override]
-    protected $fillable = ['campaign_id', 'type', 'position', 'content', 'visible'];
+    protected $fillable = ['type', 'position', 'content', 'visible'];
 
     #[Override]
     protected $attributes = [
@@ -30,10 +36,10 @@ final class Block extends Model
         'visible'  => true,
     ];
 
-    /** @return BelongsTo<Campaign, $this> */
-    public function campaign(): BelongsTo
+    /** @return MorphTo<\Illuminate\Database\Eloquent\Model, $this> */
+    public function blockable(): MorphTo
     {
-        return $this->belongsTo(Campaign::class);
+        return $this->morphTo();
     }
 
     /**
@@ -47,6 +53,11 @@ final class Block extends Model
         $base = $this->content[$fallback] ?? [];
 
         return [...$base, ...$own];
+    }
+
+    protected static function newFactory(): BlockFactory
+    {
+        return BlockFactory::new();
     }
 
     protected function baseTable(): string

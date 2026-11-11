@@ -8,7 +8,10 @@ use Override;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
+use Simtabi\Laranail\WaitlistKit\Database\Factories\SubscriberFactory;
 
 /**
  * A lead in one campaign. The address is unique per campaign. Erasure soft-deletes first, so the funnel's counts
@@ -28,6 +31,9 @@ use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
  */
 final class Subscriber extends Model
 {
+    /** @use HasFactory<SubscriberFactory> */
+    use HasFactory;
+
     use SoftDeletes;
 
     #[Override]
@@ -58,6 +64,17 @@ final class Subscriber extends Model
     public function referrals(): HasMany
     {
         return $this->hasMany(self::class, 'referred_by_id');
+    }
+
+    /** @return MorphMany<FunnelEvent, $this> */
+    public function events(): MorphMany
+    {
+        return $this->morphMany(FunnelEvent::class, 'eventable');
+    }
+
+    protected static function newFactory(): SubscriberFactory
+    {
+        return SubscriberFactory::new();
     }
 
     protected function baseTable(): string

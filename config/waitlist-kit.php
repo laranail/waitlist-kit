@@ -26,6 +26,14 @@ return [
         'max' => (int) env('WAITLIST_KIT_CAMPAIGNS_MAX', 3),
     ],
 
+    'seeding' => [
+        // Seed a starter draft campaign with `php artisan db:seed` when the install has none.
+        'default' => (bool) env('WAITLIST_KIT_SEED_DEFAULT', true),
+
+        // Let the demo seeder run in production. It refuses there otherwise.
+        'demo_in_production' => (bool) env('WAITLIST_KIT_DEMO_IN_PRODUCTION', false),
+    ],
+
     'auth' => [
         // How the backend signs people in: `host` (the application's own guard and Gate abilities) or
         // `bundled` (the kit's own admin login and admin table, for an application without users).

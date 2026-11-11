@@ -56,6 +56,16 @@ final readonly class KitConfig
         };
     }
 
+    public function seedsDefaultCampaign(): bool
+    {
+        return $this->config->get(self::KEY . '.seeding.default') === true;
+    }
+
+    public function seedsDemoInProduction(): bool
+    {
+        return $this->config->get(self::KEY . '.seeding.demo_in_production') === true;
+    }
+
     public function authMode(): AuthMode
     {
         return AuthMode::tryFrom($this->string('auth.mode'))

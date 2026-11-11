@@ -1,12 +1,32 @@
 {
     "name": "laranail/waitlist-kit",
     "description": "Waitlists, coming-soon and early-access pages for Laravel: lead capture and conversion, a Blade + Alpine.js backend, and themes as packages.",
-    "keywords": ["laravel", "laranail", "waitlist", "coming-soon", "early-access", "lead-capture", "referrals", "landing-page", "blade", "alpinejs"],
+    "keywords": [
+        "laravel",
+        "laranail",
+        "waitlist",
+        "coming-soon",
+        "early-access",
+        "lead-capture",
+        "referrals",
+        "landing-page",
+        "blade",
+        "alpinejs"
+    ],
     "homepage": "https://opensource.simtabi.com/products/laranail/waitlist-kit",
     "license": "MIT",
     "authors": [
-        {"name": "Simtabi LLC", "email": "opensource@simtabi.com", "homepage": "https://opensource.simtabi.com", "role": "Organization"},
-        {"name": "Imani Manyara", "email": "imani@simtabi.com", "role": "Maintainer"}
+        {
+            "name": "Simtabi LLC",
+            "email": "opensource@simtabi.com",
+            "homepage": "https://opensource.simtabi.com",
+            "role": "Organization"
+        },
+        {
+            "name": "Imani Manyara",
+            "email": "imani@simtabi.com",
+            "role": "Maintainer"
+        }
     ],
     "support": {
         "issues": "https://github.com/laranail/waitlist-kit/issues",
@@ -23,10 +43,24 @@
         "laranail/package-tools": "^0.1.12"
     },
     "repositories": [
-        {"type": "vcs", "url": "https://github.com/laranail/console"},
-        {"type": "vcs", "url": "https://github.com/laranail/package-tools"},
-        {"type": "composer", "url": "https://repo.packagist.org", "exclude": ["laranail/*"]},
-        {"packagist.org": false}
+        {
+            "type": "vcs",
+            "url": "https://github.com/laranail/console"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/laranail/package-tools"
+        },
+        {
+            "type": "composer",
+            "url": "https://repo.packagist.org",
+            "exclude": [
+                "laranail/*"
+            ]
+        },
+        {
+            "packagist.org": false
+        }
     ],
     "require-dev": {
         "larastan/larastan": "^3.0",
@@ -37,13 +71,21 @@
         "pestphp/pest-plugin-laravel": "^4.0",
         "phpstan/phpstan": "^2.0",
         "rector/rector": "^2.5.8",
-        "roave/security-advisories": "dev-latest"
+        "roave/security-advisories": "dev-latest",
+        "fakerphp/faker": "^1.24"
     },
     "autoload": {
-        "psr-4": {"Simtabi\\Laranail\\WaitlistKit\\": "src/"}
+        "psr-4": {
+            "Simtabi\\Laranail\\WaitlistKit\\": "src/",
+            "Simtabi\\Laranail\\WaitlistKit\\Database\\Factories\\": "database/factories/",
+            "Simtabi\\Laranail\\WaitlistKit\\Database\\Seeders\\": "database/seeders/"
+        }
     },
     "autoload-dev": {
-        "psr-4": {"Simtabi\\Laranail\\WaitlistKit\\Tests\\": "tests/"}
+        "psr-4": {
+            "Simtabi\\Laranail\\WaitlistKit\\Tests\\": "tests/",
+            "Database\\Seeders\\": "tests/Fixtures/Seeders/"
+        }
     },
     "scripts": {
         "test": "vendor/bin/pest --colors=always",
@@ -52,20 +94,37 @@
         "phpstan": "vendor/bin/phpstan analyse --no-progress",
         "rector": "vendor/bin/rector process --dry-run",
         "rector-fix": "vendor/bin/rector process",
-        "lint": ["@pint", "@phpstan", "@rector"],
-        "ci": ["@lint", "@test"],
+        "lint": [
+            "@pint",
+            "@phpstan",
+            "@rector"
+        ],
+        "ci": [
+            "@lint",
+            "@test"
+        ],
         "format": "@pint-fix"
     },
     "extra": {
-        "branch-alias": {"dev-main": "0.1.x-dev"},
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        },
         "laravel": {
-            "providers": ["Simtabi\\Laranail\\WaitlistKit\\Providers\\WaitlistKitServiceProvider"]
+            "providers": [
+                "Simtabi\\Laranail\\WaitlistKit\\Providers\\WaitlistKitServiceProvider"
+            ]
         }
     },
     "config": {
         "sort-packages": true,
-        "allow-plugins": {"pestphp/pest-plugin": true}
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "suggest": {
+        "fakerphp/faker": "Needed by the factories and the demo seeder (a development dependency).",
+        "laranail/captcha": "Server-side captcha (Turnstile and others) on the sign-up form, with security.captcha on."
+    }
 }

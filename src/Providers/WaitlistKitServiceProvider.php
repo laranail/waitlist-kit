@@ -9,10 +9,13 @@ use Illuminate\Contracts\Config\Repository;
 use Simtabi\Laranail\Package\Tools\Package;
 use Illuminate\Contracts\Foundation\Application;
 use Simtabi\Laranail\WaitlistKit\Support\Tables;
+use Simtabi\Laranail\WaitlistKit\Support\MorphMap;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Simtabi\Laranail\WaitlistKit\Commands\DoctorCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\InstallCommand;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
+use Simtabi\Laranail\WaitlistKit\Database\Seeders\WaitlistKitSeeder;
 
 /**
  * Registers the kit: config at `laranail.waitlist-kit`, the migrations (run by `php artisan migrate`, or published
@@ -30,7 +33,8 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
             ->hasConfigFile('waitlist-kit')
             ->hasCommands([DoctorCommand::class, InstallCommand::class])
             ->discoversMigrations()
-            ->runsMigrations();
+            ->runsMigrations()
+            ->registerSeeder(WaitlistKitSeeder::class);
     }
 
     #[Override]
@@ -49,5 +53,8 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
         // Configuration, not request state: the same for every request a long-running worker serves.
         $config = $this->app->make(KitConfig::class);
         Tables::configure($config->tablePrefix(), $config->connection());
+
+        // Merged, never replacing the application's own map, and never enforced globally (see MorphMap).
+        Relation::morphMap(MorphMap::MAP);
     }
 }
