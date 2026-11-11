@@ -94,7 +94,7 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Morph map](docs/tools/morph-map.md) — `*able` columns and the namespaced aliases
 - [Seeders and factories](docs/tools/seeders-and-factories.md) — the starter and demo seeders, a factory per model
 - [Campaign limits](docs/tools/campaign-limits.md) — `single`, `limited`, `multi`, and `CreateCampaign`
-- [Commands](docs/tools/commands.md) — `install`, `doctor`, `export`, `forget`
+- [Commands](docs/tools/commands.md) — `install`, `doctor`, `eject`, `export`, `forget`
 
 ### Recipes
 

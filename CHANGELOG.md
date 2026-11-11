@@ -8,6 +8,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `laranail::waitlist-kit.eject`: copies the public views, controllers and routes into the application, which then
+  owns them, and turns the kit's own public routes off in the published config.
 - The foundation: a service provider built on `laranail/package-tools`, config at `laranail.waitlist-kit`, and
   five tables under a configurable prefix (`laranail_waitlist_kit_` by default) on a configurable connection.
 - Models for campaigns, subscribers, page blocks, funnel events and integrations, keyed by ULID. An address is
