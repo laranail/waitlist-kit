@@ -11,7 +11,7 @@ use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
 /**
  * Puts a subscriber on the list: confirmed, the next position, and a referral code of their own. Runs at sign-up
  * when the campaign has no double opt-in, and on confirmation when it has. Idempotent: someone already on the list
- * keeps their place.
+ * keeps their place. Someone who joined through a referral link credits their referrer (CreditReferral).
  *
  * Positions are handed out under a lock on the campaign's row, so two people joining at once never share a place.
  */
@@ -22,6 +22,8 @@ final readonly class AdmitToList
 
     public const int CODE_LENGTH = 10;
 
+    public function __construct(private CreditReferral $credit) {}
+
     public function handle(Subscriber $subscriber): Subscriber
     {
         if ($subscriber->position !== null) {
@@ -29,7 +31,7 @@ final readonly class AdmitToList
         }
 
         return $subscriber->getConnection()->transaction(function () use ($subscriber): Subscriber {
-            Campaign::query()->whereKey($subscriber->campaign_id)->lockForUpdate()->first();
+            $campaign = Campaign::query()->whereKey($subscriber->campaign_id)->lockForUpdate()->firstOrFail();
 
             $last = Subscriber::query()->withTrashed()->where('campaign_id', $subscriber->campaign_id)->max('position');
 
@@ -38,6 +40,9 @@ final readonly class AdmitToList
                 'position'      => (is_numeric($last) ? (int) $last : 0) + 1,
                 'referral_code' => $subscriber->referral_code ?? $this->uniqueCode(),
             ])->save();
+
+            // Joining through someone's link moves them up, under the same lock.
+            $this->credit->handle($campaign, $subscriber);
 
             return $subscriber;
         });
