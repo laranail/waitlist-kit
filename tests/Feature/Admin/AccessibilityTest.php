@@ -94,6 +94,7 @@ it('gives every backend screen its structure', function (string $mode): void {
         '/waitlist-admin/campaigns/create',
         "/waitlist-admin/campaigns/{$campaign->id}/edit",
         "/waitlist-admin/campaigns/{$campaign->id}/subscribers",
+        "/waitlist-admin/campaigns/{$campaign->id}/funnel",
         '/waitlist-admin/enquiries',
         "/waitlist-admin/enquiries/{$enquiry->id}",
         '/waitlist-admin/pages',
@@ -116,7 +117,7 @@ it('gives every backend screen its structure', function (string $mode): void {
             ->not->toContain('data-bs-toggle')
             ->toContain('owner@example.org');
     }
-    expect($screens)->toHaveCount(13);
+    expect($screens)->toHaveCount(14);
 })->with(['host', 'bundled']);
 
 it('summarises errors in an alert that links to each field', function (): void {

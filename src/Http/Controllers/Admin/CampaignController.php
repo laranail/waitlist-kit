@@ -14,6 +14,7 @@ use Simtabi\Laranail\WaitlistKit\Enums\CampaignType;
 use Simtabi\Laranail\WaitlistKit\Themes\ActiveTheme;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignStatus;
+use Simtabi\Laranail\WaitlistKit\Support\FunnelReport;
 use Simtabi\Laranail\WaitlistKit\Themes\ThemeRegistry;
 use Simtabi\Laranail\WaitlistKit\Actions\CreateCampaign;
 use Simtabi\Laranail\WaitlistKit\Actions\Admin\DeleteCampaign;
@@ -88,6 +89,12 @@ final readonly class CampaignController
         $update->handle($campaign, $request->string('theme')->toString(), $settings);
 
         return redirect()->route('laranail-waitlist-kit.admin.campaigns.edit', $campaign)->withFragment('theme')->with('status', __('laranail/waitlist-kit::admin.saved'));
+    }
+
+    /** The campaign's funnel over the last FunnelReport::DEFAULT_DAYS days. */
+    public function funnel(Campaign $campaign, FunnelReport $report): View
+    {
+        return $this->views->make('laranail/waitlist-kit::admin.campaigns.funnel', ['campaign' => $campaign, 'funnel' => $report->for($campaign)]);
     }
 
     public function conversion(ConversionRequest $request, Campaign $campaign, UpdateCampaignConversion $update): RedirectResponse

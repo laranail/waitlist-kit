@@ -5,6 +5,7 @@
         <a class="btn btn-outline-secondary" href="{{ route('laranail-waitlist-kit.campaign.show', $campaign->slug) }}">@include('laranail/waitlist-kit::admin.partials.icon', ['name' => 'external']) {{ __('laranail/waitlist-kit::admin.view_page') }}</a>
     @endif
     <a class="btn btn-outline-secondary" href="{{ route('laranail-waitlist-kit.admin.subscribers.index', $campaign) }}">@include('laranail/waitlist-kit::admin.partials.icon', ['name' => 'subscribers']) {{ __('laranail/waitlist-kit::admin.subscribers') }}</a>
+    <a class="btn btn-outline-secondary" href="{{ route('laranail-waitlist-kit.admin.campaigns.funnel', $campaign) }}">@include('laranail/waitlist-kit::admin.partials.icon', ['name' => 'trending']) {{ __('laranail/waitlist-kit::admin.funnel') }}</a>
 @endsection
 
 @section('content')

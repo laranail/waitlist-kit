@@ -44,6 +44,7 @@ Route::middleware($config['middleware'] ?? ['web'])
             Route::put('campaigns/{campaign}', [CampaignController::class, 'update'])->name('campaigns.update');
             Route::put('campaigns/{campaign}/theme', [CampaignController::class, 'theme'])->name('campaigns.theme');
             Route::put('campaigns/{campaign}/conversion', [CampaignController::class, 'conversion'])->name('campaigns.conversion');
+            Route::get('campaigns/{campaign}/funnel', [CampaignController::class, 'funnel'])->name('campaigns.funnel');
             Route::delete('campaigns/{campaign}', [CampaignController::class, 'destroy'])->name('campaigns.destroy');
 
             Route::post('campaigns/{campaign}/blocks', [BlockController::class, 'storeForCampaign'])->name('campaigns.blocks.store');
