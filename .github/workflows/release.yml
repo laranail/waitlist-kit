@@ -13,6 +13,11 @@ concurrency:
 permissions:
   contents: write
 
+# Composer resolves the laranail packages from their git repositories; authenticated with the job's own read-only
+# token, those lookups get the API's authenticated limit instead of the anonymous one every job would otherwise share.
+env:
+  COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+
 jobs:
   release:
     name: Publish GitHub release + SBOM
