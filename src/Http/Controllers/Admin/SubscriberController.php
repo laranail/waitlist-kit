@@ -14,9 +14,12 @@ use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
+use Simtabi\Laranail\WaitlistKit\Exceptions\NoInviteUrl;
 use Simtabi\Laranail\WaitlistKit\Actions\ForgetSubscriber;
 use Simtabi\Laranail\WaitlistKit\Support\SubscriberExport;
+use Simtabi\Laranail\WaitlistKit\Actions\InviteSubscribers;
 use Simtabi\Laranail\WaitlistKit\Http\Requests\Admin\ForgetRequest;
+use Simtabi\Laranail\WaitlistKit\Http\Requests\Admin\InviteRequest;
 
 /** A campaign's subscribers: search and filter, remove one, export the list (`export`), erase an address (`erase`). */
 final readonly class SubscriberController
@@ -76,5 +79,18 @@ final readonly class SubscriberController
         $erased = $forget->handle($request->string('email')->toString());
 
         return redirect()->back()->with('status', __('laranail/waitlist-kit::admin.erased', $erased));
+    }
+
+    public function invite(InviteRequest $request, Campaign $campaign, InviteSubscribers $invite): RedirectResponse
+    {
+        try {
+            $count = $invite->handle($campaign, $request->integer('count'));
+        } catch (NoInviteUrl) {
+            return redirect()->route('laranail-waitlist-kit.admin.subscribers.index', $campaign)
+                ->withErrors(['count' => __('laranail/waitlist-kit::admin.no_invite_url')]);
+        }
+
+        return redirect()->route('laranail-waitlist-kit.admin.subscribers.index', $campaign)
+            ->with('status', trans_choice('laranail/waitlist-kit::admin.invited', $count, ['count' => $count]));
     }
 }

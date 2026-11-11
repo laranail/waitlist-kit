@@ -188,6 +188,14 @@ final readonly class KitConfig
         return $this->config->get(self::KEY . '.seeding.demo_in_production') === true;
     }
 
+    /** The conversion endpoint's bearer token, or null while it is off. */
+    public function conversionToken(): ?string
+    {
+        $token = $this->config->get(self::KEY . '.conversion.token');
+
+        return is_string($token) && $token !== '' ? $token : null;
+    }
+
     /** The address of the first administrator the seeder creates in `bundled` sign-in, or null to seed none. */
     public function seedAdminEmail(): ?string
     {

@@ -13,4 +13,7 @@ return [
     'confirm_expires' => '{1} Bağlantı 1 gün geçerlidir.|[2,*] Bağlantı :days gün geçerlidir.',
     'confirm_ignore'  => 'Kaydolmadıysanız bu e-postayı yok sayın; bizden başka haber almayacaksınız.',
     'status'          => 'Yerinizi görün ve bağlantınızı paylaşın: :url',
+    'unsubscribe'     => 'Listeden çıkmak için: :url',
+    'invite_subject'  => ':site erişiminiz hazır',
+    'invite_body'     => ':site bekleme listesinde sıranız geldi. Erişiminiz hazır:',
 ];

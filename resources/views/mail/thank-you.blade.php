@@ -9,3 +9,7 @@
 @endif
 
 {{ __('laranail/waitlist-kit::mail.signoff', ['site' => $site]) }}
+@if ($unsubscribeUrl)
+
+{{ __('laranail/waitlist-kit::mail.unsubscribe', ['url' => $unsubscribeUrl]) }}
+@endif

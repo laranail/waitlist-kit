@@ -43,6 +43,7 @@ Route::middleware($config['middleware'] ?? ['web'])
             Route::get('campaigns/{campaign}/edit', [CampaignController::class, 'edit'])->name('campaigns.edit');
             Route::put('campaigns/{campaign}', [CampaignController::class, 'update'])->name('campaigns.update');
             Route::put('campaigns/{campaign}/theme', [CampaignController::class, 'theme'])->name('campaigns.theme');
+            Route::put('campaigns/{campaign}/conversion', [CampaignController::class, 'conversion'])->name('campaigns.conversion');
             Route::delete('campaigns/{campaign}', [CampaignController::class, 'destroy'])->name('campaigns.destroy');
 
             Route::post('campaigns/{campaign}/blocks', [BlockController::class, 'storeForCampaign'])->name('campaigns.blocks.store');
@@ -54,6 +55,7 @@ Route::middleware($config['middleware'] ?? ['web'])
             Route::get('campaigns/{campaign}/subscribers', [SubscriberController::class, 'index'])->name('subscribers.index');
             Route::get('campaigns/{campaign}/subscribers/export', [SubscriberController::class, 'export'])->name('subscribers.export');
             Route::delete('campaigns/{campaign}/subscribers/{subscriber}', [SubscriberController::class, 'destroy'])->name('subscribers.destroy');
+            Route::post('campaigns/{campaign}/invites', [SubscriberController::class, 'invite'])->name('subscribers.invite');
             Route::post('forget', [SubscriberController::class, 'forget'])->name('forget');
 
             Route::get('enquiries', [EnquiryController::class, 'index'])->name('enquiries.index');

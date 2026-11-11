@@ -13,6 +13,7 @@ use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Mail\ConfirmMail;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
+use Simtabi\Laranail\WaitlistKit\Support\MailLinks;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 
 /**
@@ -34,6 +35,7 @@ final readonly class AskToConfirm
         private DateFactory $date,
         private RateLimiter $limiter,
         private LoggerInterface $log,
+        private MailLinks $links,
     ) {}
 
     public function handle(Campaign $campaign, Subscriber $subscriber): bool
@@ -53,7 +55,7 @@ final readonly class AskToConfirm
         try {
             $this->mail->mailer()->to($subscriber->email)
                 ->locale($subscriber->locale)
-                ->queue(new ConfirmMail($this->config->siteName(), $campaign->name, $link, self::LINK_DAYS, $this->config->sender()));
+                ->queue(new ConfirmMail($this->config->siteName(), $campaign->name, $link, self::LINK_DAYS, $this->config->sender(), $this->links->unsubscribe($campaign, $subscriber)));
         } catch (Throwable $e) {
             $this->log->warning('laranail/waitlist-kit: a confirmation mail failed', ['subscriber' => $subscriber->id, 'reason' => $e->getMessage()]);
         }

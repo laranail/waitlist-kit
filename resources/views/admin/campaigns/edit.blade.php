@@ -59,6 +59,28 @@
                     <button type="submit" class="btn btn-primary">{{ __('laranail/waitlist-kit::admin.save') }}</button>
                 </div>
             </form>
+
+            @php($conversion = $campaign->conversion())
+            <form method="post" action="{{ route('laranail-waitlist-kit.admin.campaigns.conversion', $campaign) }}" class="card mt-3" id="conversion" aria-labelledby="conversion-title">
+                @csrf @method('PUT')
+                <div class="card-header"><h2 class="card-title" id="conversion-title">{{ __('laranail/waitlist-kit::admin.conversion') }}</h2></div>
+                <div class="card-body">
+                    @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'double_opt_in', 'type' => 'checkbox', 'label' => __('laranail/waitlist-kit::admin.double_opt_in'), 'value' => $conversion->doubleOptIn, 'hint' => __('laranail/waitlist-kit::admin.double_opt_in_hint')])
+                    @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'referrals', 'type' => 'checkbox', 'label' => __('laranail/waitlist-kit::admin.referrals_on'), 'value' => $conversion->referrals])
+                    <div class="row">
+                        <div class="col-md-6">
+                            @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'referral_bump', 'type' => 'number', 'label' => __('laranail/waitlist-kit::admin.referral_bump'), 'value' => $conversion->referralBump])
+                        </div>
+                        <div class="col-md-6">
+                            @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'referral_cap', 'type' => 'number', 'label' => __('laranail/waitlist-kit::admin.referral_cap'), 'value' => $conversion->referralCap])
+                        </div>
+                    </div>
+                    @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'invite_url', 'type' => 'url', 'label' => __('laranail/waitlist-kit::admin.invite_url'), 'value' => $conversion->inviteUrl, 'hint' => __('laranail/waitlist-kit::admin.invite_url_hint'), 'wrapperClass' => 'mb-0'])
+                </div>
+                <div class="card-footer text-end">
+                    <button type="submit" class="btn btn-primary">{{ __('laranail/waitlist-kit::admin.save') }}</button>
+                </div>
+            </form>
         </div>
 
         <div class="col-12">

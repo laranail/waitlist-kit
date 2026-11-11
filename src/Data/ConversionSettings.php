@@ -22,12 +22,16 @@ final readonly class ConversionSettings
         public bool $referrals = true,
         public int $referralBump = 1,
         public int $referralCap = 10,
+        public ?string $inviteUrl = null,
     ) {
         if ($referralBump < 0 || $referralBump > self::MAX_BUMP) {
             throw new InvalidArgumentException(sprintf('A referral moves a subscriber up 0 to %d places, not %d.', self::MAX_BUMP, $referralBump));
         }
         if ($referralCap < 0 || $referralCap > self::MAX_CAP) {
             throw new InvalidArgumentException(sprintf('The referral cap is 0 to %d, not %d.', self::MAX_CAP, $referralCap));
+        }
+        if ($inviteUrl !== null && ! self::isInviteUrl($inviteUrl)) {
+            throw new InvalidArgumentException('An invite URL is an absolute https:// address.');
         }
     }
 
@@ -47,10 +51,17 @@ final readonly class ConversionSettings
             referrals: is_bool($stored['referrals'] ?? null) ? $stored['referrals'] : $defaults->referrals,
             referralBump: $int('referral_bump', $defaults->referralBump, self::MAX_BUMP),
             referralCap: $int('referral_cap', $defaults->referralCap, self::MAX_CAP),
+            inviteUrl: is_string($stored['invite_url'] ?? null) && self::isInviteUrl($stored['invite_url']) ? $stored['invite_url'] : null,
         );
     }
 
-    /** @return array{double_opt_in: bool, referrals: bool, referral_bump: int, referral_cap: int} */
+    /** Where an invitation sends someone: an absolute https:// address (the product's own sign-up). */
+    public static function isInviteUrl(string $url): bool
+    {
+        return str_starts_with($url, 'https://') && filter_var($url, FILTER_VALIDATE_URL) !== false;
+    }
+
+    /** @return array{double_opt_in: bool, referrals: bool, referral_bump: int, referral_cap: int, invite_url: ?string} */
     public function toArray(): array
     {
         return [
@@ -58,6 +69,7 @@ final readonly class ConversionSettings
             'referrals'     => $this->referrals,
             'referral_bump' => $this->referralBump,
             'referral_cap'  => $this->referralCap,
+            'invite_url'    => $this->inviteUrl,
         ];
     }
 }

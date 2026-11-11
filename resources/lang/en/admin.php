@@ -8,6 +8,12 @@ return [
     'skip'         => 'Skip to content',
     'nav'          => ['label' => 'Backend', 'dashboard' => 'Dashboard', 'campaigns' => 'Campaigns', 'enquiries' => 'Enquiries', 'pages' => 'Pages', 'integrations' => 'Integrations', 'settings' => 'Settings', 'toggle' => 'Show or hide the menu'],
     'appearance'   => ['label' => 'Appearance', 'system' => 'Match the system', 'light' => 'Light', 'dark' => 'Dark'],
+    'conversion'   => 'Conversion', 'double_opt_in' => 'Ask new sign-ups to confirm their address', 'double_opt_in_hint' => 'They join the list, and are thanked, once they open the link in their email.',
+    'referrals_on' => 'Move people up when friends join with their link', 'referral_bump' => 'Places per referral', 'referral_cap' => 'Most referrals credited',
+    'invite_url'   => 'Invite URL', 'invite_url_hint' => 'Where an invitation sends people (https://). Their code is added as ?invite=.',
+    'invite_title' => 'Invite', 'invite_hint' => 'Invite the next confirmed subscribers, in list order. Each is mailed a link to the invite URL.',
+    'invite_count' => 'How many', 'invite_button' => 'Send invitations', 'no_invite_url' => 'Set an invite URL before sending invitations:',
+    'invited'      => '{0} Nobody was left to invite.|{1} Invited 1 subscriber.|[2,*] Invited :count subscribers.',
     'signed_in_as' => 'Signed in as', 'overview' => 'Overview', 'manage' => 'Manage', 'content' => 'Content',
     'stats'        => ['campaigns' => 'Campaigns', 'live' => 'Live now', 'subscribers' => 'Subscribers', 'week' => 'Sign-ups, last 7 days', 'enquiries' => 'Enquiries, last 7 days'],
     'empty'        => [

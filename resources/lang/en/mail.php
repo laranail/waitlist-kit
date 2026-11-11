@@ -13,4 +13,7 @@ return [
     'confirm_expires' => '{1} The link works for 1 day.|[2,*] The link works for :days days.',
     'confirm_ignore'  => 'If you didn\'t sign up, ignore this email and you won\'t hear from us.',
     'status'          => 'See your place and share your link: :url',
+    'unsubscribe'     => 'To leave the list: :url',
+    'invite_subject'  => 'Your access to :site is ready',
+    'invite_body'     => 'Your place on the :site waitlist has come up. Your access is ready:',
 ];

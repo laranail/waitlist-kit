@@ -12,6 +12,7 @@ use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Mail\ThankYouMail;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
+use Simtabi\Laranail\WaitlistKit\Support\MailLinks;
 use Simtabi\Laranail\WaitlistKit\Models\Integration;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Simtabi\Laranail\WaitlistKit\Jobs\MirrorSubscriber;
@@ -27,6 +28,7 @@ final readonly class WelcomeSubscriber
         private MailFactory $mail,
         private Dispatcher $bus,
         private LoggerInterface $log,
+        private MailLinks $links,
     ) {}
 
     /**
@@ -38,7 +40,7 @@ final readonly class WelcomeSubscriber
         if ($this->config->thanksNewSignups()) {
             $this->quietly('thank-you mail', $subscriber, fn () => $this->mail->mailer()->to($subscriber->email)
                 ->locale($subscriber->locale)
-                ->queue(new ThankYouMail($this->config->siteName(), $campaign->name, $this->config->sender(), $this->statusUrl($campaign, $subscriber))));
+                ->queue(new ThankYouMail($this->config->siteName(), $campaign->name, $this->config->sender(), $this->links->status($campaign, $subscriber), $this->links->unsubscribe($campaign, $subscriber))));
         }
 
         foreach ($this->integrations($campaign) as $integration) {
@@ -71,13 +73,5 @@ final readonly class WelcomeSubscriber
                         ->where('integrable_id', $campaign->id));
             })
             ->get();
-    }
-
-    /** The subscriber's status page, once they hold a place and a code; the welcome mail is the only way there. */
-    private function statusUrl(Campaign $campaign, Subscriber $subscriber): ?string
-    {
-        return $subscriber->position !== null && $subscriber->referral_code !== null
-            ? route('laranail-waitlist-kit.campaign.status', ['campaign' => $campaign->slug, 'code' => $subscriber->referral_code])
-            : null;
     }
 }

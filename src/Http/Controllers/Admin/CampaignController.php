@@ -19,6 +19,8 @@ use Simtabi\Laranail\WaitlistKit\Actions\CreateCampaign;
 use Simtabi\Laranail\WaitlistKit\Actions\Admin\DeleteCampaign;
 use Simtabi\Laranail\WaitlistKit\Actions\Admin\UpdateCampaign;
 use Simtabi\Laranail\WaitlistKit\Actions\Admin\UpdateCampaignTheme;
+use Simtabi\Laranail\WaitlistKit\Http\Requests\Admin\ConversionRequest;
+use Simtabi\Laranail\WaitlistKit\Actions\Admin\UpdateCampaignConversion;
 use Simtabi\Laranail\WaitlistKit\Http\Requests\Admin\CampaignThemeRequest;
 use Simtabi\Laranail\WaitlistKit\Http\Requests\Admin\StoreCampaignRequest;
 use Simtabi\Laranail\WaitlistKit\Http\Requests\Admin\DeleteCampaignRequest;
@@ -86,6 +88,13 @@ final readonly class CampaignController
         $update->handle($campaign, $request->string('theme')->toString(), $settings);
 
         return redirect()->route('laranail-waitlist-kit.admin.campaigns.edit', $campaign)->withFragment('theme')->with('status', __('laranail/waitlist-kit::admin.saved'));
+    }
+
+    public function conversion(ConversionRequest $request, Campaign $campaign, UpdateCampaignConversion $update): RedirectResponse
+    {
+        $update->handle($campaign, $request->toData());
+
+        return redirect()->route('laranail-waitlist-kit.admin.campaigns.edit', $campaign)->withFragment('conversion')->with('status', __('laranail/waitlist-kit::admin.saved'));
     }
 
     public function destroy(DeleteCampaignRequest $request, Campaign $campaign, DeleteCampaign $delete): RedirectResponse
