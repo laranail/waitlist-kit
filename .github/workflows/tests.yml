@@ -1,0 +1,110 @@
+name: Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+  workflow_dispatch:
+  # The post-merge check: pull requests are the only other trigger, so drift on main shows here weekly.
+  schedule:
+    - cron: '41 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: ${{ !github.event.pull_request.draft }}
+    name: PHP 8.5 · ${{ matrix.stability }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        stability: [prefer-stable, prefer-lowest]
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.5'
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, intl
+          coverage: none
+
+      - name: Drop cached laranail archives
+        # laranail/* can resolve through a moving tag, so a restored dist archive may be stale.
+        shell: bash
+        run: rm -rf "$(composer config cache-files-dir)/laranail"
+
+      - name: Install dependencies
+        run: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+
+      - name: Run the suite
+        run: vendor/bin/pest --ci
+
+  # The kit names its supported drivers (docs/installation.md), so its migrations run up and down on each.
+  migrations:
+    if: ${{ !github.event.pull_request.draft }}
+    name: Migrations · ${{ matrix.driver }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - driver: mysql
+            port: 3306
+          - driver: pgsql
+            port: 5432
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: waitlist
+          MYSQL_ROOT_PASSWORD: throwaway
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=5s --health-retries=10
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: waitlist
+          POSTGRES_PASSWORD: throwaway
+        ports: ['5432:5432']
+        options: --health-cmd=pg_isready --health-interval=5s --health-timeout=5s --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.5'
+          extensions: dom, curl, libxml, mbstring, zip, pdo, pdo_mysql, pdo_pgsql, bcmath, intl
+          coverage: none
+
+      - name: Drop cached laranail archives
+        shell: bash
+        run: rm -rf "$(composer config cache-files-dir)/laranail"
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Run the schema tests on ${{ matrix.driver }}
+        env:
+          WAITLIST_KIT_TEST_DRIVER: ${{ matrix.driver }}
+          WAITLIST_KIT_TEST_PORT: ${{ matrix.port }}
+          WAITLIST_KIT_TEST_PASSWORD: throwaway
+        run: vendor/bin/pest --ci tests/Feature/SchemaTest.php tests/Feature/ModelsTest.php

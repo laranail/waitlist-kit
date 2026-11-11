@@ -1,0 +1,29 @@
+version: 2
+
+updates:
+  - package-ecosystem: composer
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/New_York
+    labels: [dependencies]
+    groups:
+      dev-toolchain:
+        dependency-type: development
+        patterns: ["phpstan/*", "larastan/*", "laravel/pint", "rector/*", "pestphp/*", "phpunit/*", "orchestra/*"]
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/New_York
+    labels: [dependencies]
+    groups:
+      actions:
+        update-types: [minor, patch]
