@@ -29,7 +29,7 @@ The same for a new address, a repeat and a honeypot hit, so the form cannot tell
 | Request | Answer |
 | --- | --- |
 | `Accept: application/json` | `201` with `{"message": "..."}`; `422` with `errors` on a bad field; `429` when throttled |
-| A form without JavaScript | A redirect to the campaign's own page with a flash, or back there with errors; never to a `Referer` |
+| A form without JavaScript | A redirect to the campaign's own page with a flash, or back there with errors in the `signup` bag (`$errors->signup`); never to a `Referer` |
 
 The language kept is the form's `locale` when the campaign is built in it, else the campaign's first. The referring
 host and `utm_*` values are kept in `attribution`.

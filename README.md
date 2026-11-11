@@ -76,6 +76,7 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Getting started](docs/getting-started.md) — install, migrate, a first campaign and subscriber
 - [Configuration](docs/configuration.md) — every key and environment variable
 - [Architecture](docs/architecture.md) — the layers, and why the kit is built this way
+- [Accessibility](docs/accessibility.md) — what is guaranteed, how it is tested, and the screen-reader pass
 - [Release](docs/release.md) — versions, tags and upgrading
 
 ### Reference
@@ -83,7 +84,7 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Models](docs/tools/models.md) — campaigns, subscribers, blocks, funnel events, integrations
 - [Sign-ups](docs/tools/signups.md) — routes, the request, the guards and the answer
 - [Mail](docs/tools/mail.md) — the thank-you, once, in the sign-up's language
-- [Backend](docs/tools/backend.md) — signing in, abilities, every screen, accessibility
+- [Backend](docs/tools/backend.md) — signing in, abilities, every screen, settings, accessibility
 - [Themes](docs/tools/themes.md) — two kit themes, theme packages, view fallback, settings as CSS, prebuilt assets
 - [Contact](docs/tools/contact.md) — the headless contact form: endpoint, component and rules
 - [Legal pages](docs/tools/legal-pages.md) — privacy and terms, seeded as drafts, served once published
@@ -107,6 +108,7 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Build a theme](docs/recipes/build-a-theme.md) — a look as a Composer package
 - [Add a contact form](docs/recipes/add-a-contact-form.md) — the headless form on any page
 - [Publish your legal pages](docs/recipes/publish-your-legal-pages.md) — from seeded draft to served page
+- [Edit settings in the backend](docs/recipes/edit-settings-in-the-backend.md) — `laranail/settings` as the store
 
 ## Contributing and security
 
