@@ -88,6 +88,13 @@ final readonly class KitConfig
         return is_string($value) && $value !== '' ? $value : 'Laravel';
     }
 
+    public function defaultTheme(): string
+    {
+        $value = $this->config->get(self::KEY . '.themes.default');
+
+        return is_string($value) && $value !== '' ? $value : 'laranail/waitlist-kit:default';
+    }
+
     public function contactEnabled(): bool
     {
         return $this->config->get(self::KEY . '.contact.enabled') === true;

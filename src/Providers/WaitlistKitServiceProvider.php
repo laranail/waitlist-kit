@@ -13,8 +13,10 @@ use Simtabi\Laranail\Package\Tools\Package;
 use Illuminate\Contracts\Foundation\Application;
 use Simtabi\Laranail\WaitlistKit\Support\Tables;
 use Simtabi\Laranail\WaitlistKit\Support\MorphMap;
+use Simtabi\Laranail\WaitlistKit\Themes\KitThemes;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Simtabi\Laranail\WaitlistKit\Themes\ThemeRegistry;
 use Simtabi\Laranail\WaitlistKit\Commands\DoctorCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\ExportCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\ForgetCommand;
@@ -41,6 +43,7 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
             ->setPublishTagId('waitlist-kit')
             ->hasConfigFile('waitlist-kit')
             ->hasViews()
+            ->hasAssets()
             ->hasBladeComponentNamespace('Simtabi\\Laranail\\WaitlistKit\\View\\Components', 'laranail-waitlist-kit')
             ->hasTranslations()
             ->hasRoutesWhen('laranail.waitlist-kit.routes.enabled', 'web', true)
@@ -56,6 +59,16 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
         // The install command's package-tools base takes the Package in its constructor, which the container
         // cannot autowire.
         $this->app->bind(InstallCommand::class, fn (): InstallCommand => new InstallCommand($this->package));
+
+        // Installed themes: the kit's own here; a theme package adds its own from its provider.
+        $this->app->singleton(ThemeRegistry::class, static function (): ThemeRegistry {
+            $registry = new ThemeRegistry;
+            foreach (KitThemes::all() as $theme) {
+                $registry->register($theme);
+            }
+
+            return $registry;
+        });
 
         $this->app->bind(KitConfig::class, static fn (Application $app): KitConfig => new KitConfig($app->make(Repository::class)));
     }

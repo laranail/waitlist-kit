@@ -123,3 +123,30 @@ jobs:
 
       - name: Check for pending refactorings
         run: vendor/bin/rector process --dry-run --no-progress-bar
+
+  # The themes ship prebuilt so a site needs no Node; this rebuilds them and fails if the committed build is stale.
+  assets:
+    if: ${{ !github.event.pull_request.draft }}
+    name: Theme assets are built
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install and build
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: The committed build matches a fresh one
+        run: |
+          git status --porcelain -- resources/dist
+          test -z "$(git status --porcelain -- resources/dist)" || { echo "::error::resources/dist is stale: run npm run build and commit it"; exit 1; }

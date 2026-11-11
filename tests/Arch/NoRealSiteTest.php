@@ -9,7 +9,7 @@ declare(strict_types=1);
 const ALLOWED_HOSTS = [
     'localhost', '127.0.0.1', 'github.com', 'img.shields.io', 'opensource.simtabi.com', 'simtabi.com',
     'laravel.com', 'getcomposer.org', 'www.php.net', 'pestphp.com', 'keepachangelog.com', 'semver.org',
-    'www.contributor-covenant.org', 'api.brevo.com', 'developers.brevo.com', 'repo.packagist.org', 'ploi.io', 'symfony.com', 'www.w3.org',
+    'www.contributor-covenant.org', 'api.brevo.com', 'developers.brevo.com', 'alpinejs.dev', 'repo.packagist.org', 'ploi.io', 'symfony.com', 'www.w3.org',
 ];
 
 /** @return list<string> */
@@ -33,7 +33,7 @@ it('names no real site anywhere in the repository', function (): void {
     $files = [];
     foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)) as $file) {
         $path = $file->getPathname();
-        if ($file->isFile() && preg_match('#/(vendor|\.git|\.phpunit\.cache|build)/|composer\.(local\.)?lock$|composer\.local\.json$#', $path) !== 1) {
+        if ($file->isFile() && preg_match('#/(vendor|node_modules|\.git|\.phpunit\.cache|build)/|composer\.(local\.)?lock$|composer\.local\.json$|package-lock\.json$#', $path) !== 1) {
             $files[] = $path;
         }
     }

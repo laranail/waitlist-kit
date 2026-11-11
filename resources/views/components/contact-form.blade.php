@@ -16,7 +16,7 @@
                        maxlength="{{ $field === 'email' ? 254 : ($field === 'company' ? 160 : 120) }}"
                        autocomplete="{{ ['name' => 'name', 'email' => 'email', 'company' => 'organization'][$field] }}"
                        @error($field) aria-invalid="true" aria-describedby="contact-{{ $field }}-error" @enderror>
-                @error($field)<p data-part="error" id="contact-{{ $field }}-error">{{ $message }}</p>@enderror
+                <p data-part="error" data-for="{{ $field }}" id="contact-{{ $field }}-error" @unless ($errors->has($field)) hidden @endunless>{{ $errors->first($field) }}</p>
             </div>
         @endforeach
 
@@ -33,7 +33,7 @@
             <label data-part="label" for="contact-message">{{ __('laranail/waitlist-kit::contact.message') }}</label>
             <textarea data-part="input" id="contact-message" name="message" required minlength="10" maxlength="2000"
                       @error('message') aria-invalid="true" aria-describedby="contact-message-error" @enderror>{{ old('message') }}</textarea>
-            @error('message')<p data-part="error" id="contact-message-error">{{ $message }}</p>@enderror
+            <p data-part="error" data-for="message" id="contact-message-error" @unless ($errors->has('message')) hidden @endunless>{{ $errors->first('message') }}</p>
         </div>
 
         @if ($consent)
@@ -46,7 +46,7 @@
                         {{ __('laranail/waitlist-kit::contact.agree') }}
                     @endif
                 </label>
-                @error('agree')<p data-part="error">{{ $message }}</p>@enderror
+                <p data-part="error" data-for="agree" @unless ($errors->has('agree')) hidden @endunless>{{ $errors->first('agree') }}</p>
             </div>
         @endif
 
@@ -61,5 +61,6 @@
         @endif
 
         <button data-part="submit" type="submit">{{ __('laranail/waitlist-kit::contact.send') }}</button>
+        <p data-part="status" role="status" hidden></p>
     </form>
 @endif

@@ -49,6 +49,12 @@ return [
         'honeypot' => 'website',
     ],
 
+    'themes' => [
+        // The theme a campaign without its own uses: `laranail/waitlist-kit:default` (Tailwind 4),
+        // `laranail/waitlist-kit:plain` (plain CSS), or any installed theme package's name.
+        'default' => env('WAITLIST_KIT_THEME', 'laranail/waitlist-kit:default'),
+    ],
+
     'contact' => [
         // The contact form: an endpoint at POST /{routes.prefix}/contact and an unstyled Blade component
         // (<x-laranail-waitlist-kit::contact-form />) any page of the application can use.
