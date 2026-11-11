@@ -19,7 +19,7 @@ final class CampaignFactory extends Factory
 
     public function definition(): array
     {
-        $name = implode(' ', $this->faker->unique()->words(2));
+        $name = $this->faker->unique()->word() . ' ' . $this->faker->word();
 
         return [
             'name'    => Str::title($name),
