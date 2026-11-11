@@ -4,21 +4,13 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\WaitlistKit\Actions;
 
-use Throwable;
-use Psr\Log\LoggerInterface;
 use Illuminate\Support\DateFactory;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Database\Eloquent\Builder;
 use Simtabi\Laranail\WaitlistKit\Data\SignupData;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Data\SignupResult;
-use Simtabi\Laranail\WaitlistKit\Mail\ThankYouMail;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
-use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
-use Simtabi\Laranail\WaitlistKit\Models\Integration;
-use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Simtabi\Laranail\WaitlistKit\Enums\FunnelEventType;
-use Simtabi\Laranail\WaitlistKit\Jobs\MirrorSubscriber;
+use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
 use Simtabi\Laranail\WaitlistKit\Exceptions\CampaignNotOpen;
 
 /**
@@ -27,16 +19,17 @@ use Simtabi\Laranail\WaitlistKit\Exceptions\CampaignNotOpen;
  * The insert is `createOrFirst`, which runs in a savepoint: a repeat address hits the unique index, the savepoint rolls
  * back, and the existing row comes back. On PostgreSQL a failed insert outside a savepoint would abort the request's
  * whole transaction. Only a new subscriber is recorded in the funnel, thanked and sent to the integrations, and the
- * last two happen after the commit, so nothing is mailed or forwarded for a row that was rolled back.
+ * last two happen after the commit, so nothing is mailed or forwarded for a row that was rolled back. Without double
+ * opt-in the new subscriber also joins the list in the same transaction (AdmitToList): confirmed, positioned, coded.
+ * With it, they stay pending and are mailed a signed link (AskToConfirm); the welcome waits for ConfirmSubscriber.
  */
 final readonly class SubscribeToCampaign
 {
     public function __construct(
-        private KitConfig $config,
-        private MailFactory $mail,
-        private Dispatcher $bus,
         private DateFactory $date,
-        private LoggerInterface $log,
+        private AdmitToList $admit,
+        private WelcomeSubscriber $welcome,
+        private AskToConfirm $askToConfirm,
     ) {}
 
     public function handle(Campaign $campaign, SignupData $data): SignupResult
@@ -57,46 +50,25 @@ final readonly class SubscribeToCampaign
 
             if ($subscriber->wasRecentlyCreated) {
                 $subscriber->events()->create(['campaign_id' => $campaign->id, 'type' => FunnelEventType::Signup, 'occurred_at' => $this->date->now()]);
+
+                // Without double opt-in, signing up is the confirmation: the address joins the list at once.
+                if (! $campaign->conversion()->doubleOptIn) {
+                    $this->admit->handle($subscriber);
+                }
             }
 
             return new SignupResult($subscriber, created: $subscriber->wasRecentlyCreated);
         });
 
-        if ($result->created) {
-            $this->afterSignup($campaign, $result->subscriber);
+        $doubleOptIn = $campaign->conversion()->doubleOptIn;
+        if ($result->created && ! $doubleOptIn) {
+            $this->welcome->handle($campaign, $result->subscriber);
+        } elseif ($doubleOptIn && $result->subscriber->status === SubscriberStatus::Pending) {
+            // A new sign-up is asked to confirm; a repeat while still pending gets the link again, rate-limited.
+            $this->askToConfirm->handle($campaign, $result->subscriber);
         }
 
         return $result;
-    }
-
-    /**
-     * The mail and the integrations, once the sign-up is committed. Each is queued, but on the `sync` queue it runs
-     * here, so a failure is caught and logged by id, never shown to the visitor: the address is already kept.
-     */
-    private function afterSignup(Campaign $campaign, Subscriber $subscriber): void
-    {
-        if ($this->config->thanksNewSignups()) {
-            $this->quietly('thank-you mail', $subscriber, fn () => $this->mail->mailer()->to($subscriber->email)
-                ->locale($subscriber->locale)
-                ->queue(new ThankYouMail($this->config->siteName(), $campaign->name, $this->config->sender())));
-        }
-
-        foreach ($this->integrations($campaign) as $integration) {
-            $this->quietly('integration ' . $integration->driver, $subscriber, fn () => $this->bus->dispatch(new MirrorSubscriber($subscriber->id, $integration->id)));
-        }
-    }
-
-    private function quietly(string $what, Subscriber $subscriber, callable $send): void
-    {
-        try {
-            $send();
-        } catch (Throwable $e) {
-            $this->log->warning('laranail/waitlist-kit: a sign-up follow-up failed', [
-                'what'       => $what,
-                'subscriber' => $subscriber->id,
-                'reason'     => $e->getMessage(),
-            ]);
-        }
     }
 
     private function referrerId(Campaign $campaign, SignupData $data): ?string
@@ -111,19 +83,5 @@ final readonly class SubscribeToCampaign
             ->first();
 
         return $referrer?->id;
-    }
-
-    /** @return iterable<Integration> the campaign's enabled integrations, and the enabled ones every campaign uses */
-    private function integrations(Campaign $campaign): iterable
-    {
-        return Integration::query()
-            ->where('enabled', true)
-            ->where(static function (Builder $query) use ($campaign): void {
-                $query->whereNull('integrable_type')
-                    ->orWhere(static fn (Builder $owned) => $owned
-                        ->where('integrable_type', $campaign->getMorphClass())
-                        ->where('integrable_id', $campaign->id));
-            })
-            ->get();
     }
 }

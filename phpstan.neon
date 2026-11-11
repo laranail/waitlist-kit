@@ -11,14 +11,19 @@ parameters:
     # No baseline: a baseline is permission to be wrong.
     ignoreErrors:
         # Larastan cannot resolve a package-namespaced view (`laranail/waitlist-kit::...`) during analysis, so it reads
-        # each as an unverified string. The views exist: PageTest, LegalPagesTest, ContactTest and MailTest render them.
+        # each as an unverified string. The views exist: PageTest, LegalPagesTest, ContactTest, MailTest,
+        # DoubleOptInTest, StatusPageTest and ConversionFlowTest render them.
         -
             identifier: argument.type
             message: '#expects view-string#'
             paths:
                 - src/Http/Controllers/CampaignController.php
                 - src/Http/Controllers/PageController.php
+                - src/Http/Controllers/StatusController.php
+                - src/Http/Controllers/UnsubscribeController.php
                 - src/Mail/ThankYouMail.php
+                - src/Mail/ConfirmMail.php
+                - src/Mail/InviteMail.php
                 - src/Mail/EnquiryNotice.php
                 - src/View/Components/*.php
                 - src/Http/Controllers/Admin/*.php

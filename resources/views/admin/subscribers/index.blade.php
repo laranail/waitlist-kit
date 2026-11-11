@@ -8,6 +8,24 @@
 @endsection
 
 @section('content')
+    @can(\Simtabi\Laranail\WaitlistKit\Auth\Abilities::MANAGE)
+        <form method="post" action="{{ route('laranail-waitlist-kit.admin.subscribers.invite', $campaign) }}" class="card mb-3" aria-labelledby="invite-title">
+            @csrf
+            <div class="card-header"><h2 class="card-title" id="invite-title">{{ __('laranail/waitlist-kit::admin.invite_title') }}</h2></div>
+            <div class="card-body">
+                @if ($campaign->conversion()->inviteUrl === null)
+                    <p class="text-secondary mb-0">{{ __('laranail/waitlist-kit::admin.no_invite_url') }} <a href="{{ route('laranail-waitlist-kit.admin.campaigns.edit', $campaign) }}#conversion">{{ __('laranail/waitlist-kit::admin.conversion') }}</a></p>
+                @else
+                    <p class="text-secondary">{{ __('laranail/waitlist-kit::admin.invite_hint') }}</p>
+                    <div class="row g-2 align-items-end">
+                        @include('laranail/waitlist-kit::admin.partials.field', ['name' => 'count', 'type' => 'number', 'label' => __('laranail/waitlist-kit::admin.invite_count'), 'value' => 10, 'wrapperClass' => 'col-sm-auto'])
+                        <div class="col-sm-auto"><button type="submit" class="btn btn-primary">{{ __('laranail/waitlist-kit::admin.invite_button') }}</button></div>
+                    </div>
+                @endif
+            </div>
+        </form>
+    @endcan
+
     <div class="card mb-3">
         <div class="card-header">
             <form method="get" class="row g-2 align-items-end w-100" role="search" aria-label="{{ __('laranail/waitlist-kit::admin.filter') }}">

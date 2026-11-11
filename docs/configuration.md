@@ -62,6 +62,7 @@ Set both before the first migration: changing them later points the kit at table
 | Key | Variable | Default | Meaning |
 | --- | --- | --- | --- |
 | `settings.store` | `WAITLIST_KIT_SETTINGS_STORE` | `env` | `env` (this file and `.env` only; the backend's Settings screen is read-only) or `database` (`laranail/settings`; a value saved in the backend overrides the configuration) |
+| `conversion.token` | `WAITLIST_KIT_CONVERSION_TOKEN` | empty | The bearer token for `POST /{prefix}/api/conversions`; empty turns the endpoint off (404) |
 | `mail.from_address` | `WAITLIST_KIT_MAIL_FROM_ADDRESS` | empty | The sender of the kit's mail; empty uses the application's `mail.from` |
 | `mail.from_name` | `WAITLIST_KIT_MAIL_FROM_NAME` | empty | The sender's name, with `mail.from_address` |
 

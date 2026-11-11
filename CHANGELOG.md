@@ -56,6 +56,12 @@ All notable changes to this project are documented here. The format follows
 - `WaitlistKitAdminSeeder`: in `bundled` sign-in, `db:seed` creates the first administrator for
   `seeding.admin_email` when there is none, with a generated password printed once.
 
+- Conversion ([docs](docs/tools/conversion.md)): per-campaign settings (double opt-in, referral bump and cap,
+  invite URL); double opt-in with a signed 7-day link; a place and a referral code on joining; a status page with
+  the place and share links; referrals that move the referrer up, capped; invites in list order; a token-protected
+  conversion endpoint; a signed unsubscribe link with one-click headers in every mail; page views as events; and a
+  Funnel screen with steps, rates, sign-ups by day and top sources.
+
 ### Fixed
 
 - The block editor repeated control ids in every block's form, so labels and the error summary reached only the

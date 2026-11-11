@@ -18,7 +18,7 @@ final class CampaignRules
     public const string SLUG_PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
 
     /** Paths the kit's own routes use under the prefix, so no campaign can take them. */
-    public const array RESERVED_SLUGS = ['contact', 'pages'];
+    public const array RESERVED_SLUGS = ['contact', 'pages', 'api'];
 
     /**
      * The same fields for an existing campaign, plus its status, host and launch date; its own slug stays allowed.

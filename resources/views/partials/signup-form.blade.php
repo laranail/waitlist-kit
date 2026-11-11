@@ -1,11 +1,18 @@
 {{-- The sign-up form. Works without JavaScript; with the kit's script, wkForm posts it in place and shows the answer. --}}
-@if (session(\Simtabi\Laranail\WaitlistKit\Http\Controllers\SignupController::FLASH))
-    <p class="wk-status" data-scope="signup-form" data-part="status" data-state="sent" role="status">{{ __('laranail/waitlist-kit::page.sent') }}</p>
+@if (is_int($confirmedAt = session(\Simtabi\Laranail\WaitlistKit\Http\Controllers\ConfirmController::FLASH)))
+    {{-- Arrived from the confirmation link: say so, with the place they now hold. --}}
+    <p class="wk-status" data-scope="signup-form" data-part="status" data-state="confirmed" role="status" tabindex="-1" autofocus>{{ __('laranail/waitlist-kit::page.confirmed', ['position' => $confirmedAt]) }}</p>
+@elseif (session(\Simtabi\Laranail\WaitlistKit\Http\Controllers\SignupController::FLASH))
+    <p class="wk-status" data-scope="signup-form" data-part="status" data-state="sent" role="status">{{ \Simtabi\Laranail\WaitlistKit\Http\Controllers\SignupController::message($campaign) }}</p>
 @else
     <form class="wk-form" method="post" action="{{ route('laranail-waitlist-kit.campaign.signup', $campaign) }}" novalidate
           data-scope="signup-form" x-data="wkForm" x-on:submit="submit">
         @csrf
         <input type="hidden" name="locale" value="{{ $locale }}">
+        {{-- A referral link (?ref=code) carries the referrer into the sign-up; SignupRules checks its shape. --}}
+        @if (is_string($ref = request()->query('ref')) && preg_match('/^[a-z0-9]{1,32}$/', $ref) === 1)
+            <input type="hidden" name="ref" value="{{ $ref }}">
+        @endif
 
         <div class="wk-field" data-part="field" data-field="email" @error('email', 'signup') data-state="invalid" @enderror>
             <label class="wk-label" data-part="label" for="waitlist-email">{{ $label ?? __('laranail/waitlist-kit::page.email') }}</label>

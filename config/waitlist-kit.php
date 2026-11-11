@@ -32,6 +32,11 @@ return [
         'store' => env('WAITLIST_KIT_SETTINGS_STORE', 'env'),
     ],
 
+    'conversion' => [
+        // The bearer token the product sends to POST /{routes.prefix}/api/conversions. Empty: the endpoint is off (404).
+        'token' => env('WAITLIST_KIT_CONVERSION_TOKEN'),
+    ],
+
     'mail' => [
         // The sender of the kit's mail. Empty uses the application's mail.from.
         'from_address' => env('WAITLIST_KIT_MAIL_FROM_ADDRESS'),

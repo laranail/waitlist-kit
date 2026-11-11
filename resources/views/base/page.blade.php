@@ -10,5 +10,9 @@
         @endforeach
         <p class="wk-page-updated"><small>{{ __('laranail/waitlist-kit::legal.updated', ['date' => $page->updated_at?->toDateString()]) }}</small></p>
     </article>
+@endsection
+
+{{-- After <main>, as the page's contentinfo landmark, like the campaign page. --}}
+@section('footer')
     @include($theme->view('blocks.footer'), ['content' => [], 'block' => null])
 @endsection

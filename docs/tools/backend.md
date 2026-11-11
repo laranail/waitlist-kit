@@ -62,8 +62,9 @@ Gate::define('laranail-waitlist-kit.erase', fn (User $user) => $user->hasRole('o
 | Screen | Does |
 | --- | --- |
 | Dashboard | Each campaign's subscribers and sign-ups in the last 7 days; the configuration's problems |
-| Campaigns | Create (held to `campaigns.mode`), edit details and status, choose the theme and its settings, edit blocks per language, delete (`erase`, slug typed back) |
-| Subscribers | Search by address, filter by status, remove one, export CSV (`export`), erase an address (`erase`) |
+| Campaigns | Create (held to `campaigns.mode`), edit details and status, conversion settings (double opt-in, referrals, invite URL), choose the theme and its settings, edit blocks per language, delete (`erase`, slug typed back) |
+| Subscribers | Search by address, filter by status, invite the next N (`manage`), remove one, export CSV (`export`), erase an address (`erase`) |
+| Funnel | Per campaign: the last 30 days of events, the rates between them, sign-ups by day and the top sources |
 | Enquiries | Newest first, and one in full |
 | Pages | The privacy notice and terms: title per language, text blocks, publish |
 | Integrations | `app` and `brevo`, per campaign or for every campaign; a stored key is never shown back and an empty field keeps it |

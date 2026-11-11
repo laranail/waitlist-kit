@@ -86,6 +86,7 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Mail](docs/tools/mail.md) — the thank-you, once, in the sign-up's language
 - [Backend](docs/tools/backend.md) — signing in, abilities, every screen, settings, accessibility
 - [Themes](docs/tools/themes.md) — two kit themes, theme packages, view fallback, settings as CSS, prebuilt assets
+- [Conversion](docs/tools/conversion.md) — double opt-in, status page, referrals, invites, conversions, unsubscribe, funnel
 - [Contact](docs/tools/contact.md) — the headless contact form: endpoint, component and rules
 - [Legal pages](docs/tools/legal-pages.md) — privacy and terms, seeded as drafts, served once published
 - [Integrations](docs/tools/integrations.md) — the `app` and `brevo` drivers, queued and retried
@@ -108,6 +109,7 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Build a theme](docs/recipes/build-a-theme.md) — a look as a Composer package
 - [Add a contact form](docs/recipes/add-a-contact-form.md) — the headless form on any page
 - [Publish your legal pages](docs/recipes/publish-your-legal-pages.md) — from seeded draft to served page
+- [Invite people and report conversions](docs/recipes/invite-and-report-conversions.md) — batches, the invite URL and the endpoint
 - [Edit settings in the backend](docs/recipes/edit-settings-in-the-backend.md) — `laranail/settings` as the store
 
 ## Contributing and security

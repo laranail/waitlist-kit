@@ -38,6 +38,9 @@
     .wk-feature-title { @apply mb-1 text-base font-semibold; }
     .wk-feature-body { @apply text-wk-text/70; }
 
+    .wk-status-position { @apply text-3xl font-semibold; }
+    .wk-share-links { @apply flex list-none flex-wrap gap-4 p-0; }
+    .wk-share-links a { @apply text-wk-primary underline; }
     .wk-countdown { @apply text-center; }
     .wk-countdown-value { @apply text-4xl font-semibold tabular-nums; }
     /* Visually hidden, still read by assistive technology. */

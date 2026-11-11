@@ -22,7 +22,7 @@
  * - a tinted (`-lt`) badge's text is its tint at full strength, 2 to 4:1 on its own pale fill; darken the text
  *   to 55% of the tint, which keeps the hue and clears 4.5:1;
  * - an alert's text is its variant colour (info measured 2.83:1); body text with a tinted edge reads instead;
- * - a link in a table cell differs from the text beside it by colour alone (2.07:1), so it is underlined;
+ * - a link in a table cell or a sentence differs from the text beside it by colour alone (2.07:1), so it is underlined;
  * - the danger buttons, below.
  */
 .wka .badge.bg-green-lt { color: color-mix(in oklab, var(--tblr-green) 55%, #000) !important; }
@@ -60,7 +60,8 @@
 .wka .alert .icon {
     color: var(--tblr-alert-variant-color);
 }
-.wka .card-table a:not(.btn) {
+.wka .card-table a:not(.btn),
+.wka p a:not(.btn) {
     text-decoration: underline;
     text-underline-offset: 0.15em;
 }

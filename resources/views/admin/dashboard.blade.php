@@ -68,7 +68,7 @@
                             <th scope="row" class="fw-normal"><a href="{{ route('laranail-waitlist-kit.admin.campaigns.edit', $campaign) }}">{{ $campaign->name }}</a></th>
                             <td>@include('laranail/waitlist-kit::admin.partials.status', ['status' => $campaign->status])</td>
                             <td class="text-end"><a href="{{ route('laranail-waitlist-kit.admin.subscribers.index', $campaign) }}">{{ number_format($campaign->subscribers_count) }}</a></td>
-                            <td class="text-end">{{ number_format((int) ($week[$campaign->id] ?? 0)) }}</td>
+                            <td class="text-end"><a href="{{ route('laranail-waitlist-kit.admin.campaigns.funnel', $campaign) }}">{{ number_format((int) ($week[$campaign->id] ?? 0)) }}<span class="visually-hidden"> · {{ __('laranail/waitlist-kit::admin.funnel') }}</span></a></td>
                         </tr>
                     @endforeach
                     </tbody>
