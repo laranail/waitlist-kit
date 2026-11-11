@@ -27,6 +27,7 @@ php artisan db:seed --class="Simtabi\Laranail\WaitlistKit\Database\Seeders\Waitl
 | `Integration::factory()` | `forCampaign($campaign)` |
 | `Enquiry::factory()` | — |
 | `Page::factory()` | `published()`, `legal($slug)` |
+| `Admin::factory()` | — (password generated per run) |
 
 Subscriber factories use Faker's safe addresses (`example.com/.org/.net`), which no mailer delivers.
 

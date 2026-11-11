@@ -8,7 +8,7 @@ Three polymorphic relations, each stored as an alias so a renamed class never st
 | `eventable` | funnel events | What the step is about (the campaign, a subscriber or an enquiry) |
 | `integrable` | integrations | The campaign an integration serves, or nothing for every campaign |
 
-The provider merges `Simtabi\Laranail\WaitlistKit\Support\MorphMap::MAP` into the application's map: the kit's seven
+The provider merges `Simtabi\Laranail\WaitlistKit\Support\MorphMap::MAP` into the application's map: the kit's eight
 models under `laranail-waitlist-kit.*` (`laranail-waitlist-kit.campaign`, ...). It merges rather than replaces, and it
 does not call `Relation::enforceMorphMap()`: that is global, and would refuse every model of the application's own
 that the application has not mapped. `MorphMapTest` enforces the kit's side instead: every model mapped, aliases
