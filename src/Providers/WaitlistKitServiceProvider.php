@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Simtabi\Laranail\WaitlistKit\Settings\ConfigStore;
 use Simtabi\Laranail\WaitlistKit\Themes\ThemeRegistry;
 use Simtabi\Laranail\WaitlistKit\Commands\AdminCommand;
+use Simtabi\Laranail\WaitlistKit\Commands\EjectCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\DoctorCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\ExportCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\ForgetCommand;
@@ -69,7 +70,7 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
             ->hasTranslations()
             ->hasRoutesWhen('laranail.waitlist-kit.routes.enabled', 'web', true)
             ->hasRoutesWhen('laranail.waitlist-kit.admin.enabled', 'admin', true)
-            ->hasCommands([AdminCommand::class, DoctorCommand::class, ExportCommand::class, ForgetCommand::class, InstallCommand::class])
+            ->hasCommands([AdminCommand::class, DoctorCommand::class, EjectCommand::class, ExportCommand::class, ForgetCommand::class, InstallCommand::class])
             ->discoversMigrations()
             ->runsMigrations()
             ->registerSeeder(WaitlistKitSeeder::class);
