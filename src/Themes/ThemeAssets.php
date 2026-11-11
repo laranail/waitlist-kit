@@ -51,6 +51,27 @@ final readonly class ThemeAssets
         return $vite($entries, $buildDirectory);
     }
 
+    /**
+     * A classic, blocking `<script>` for one entry of a published build: for code that must run before the first paint
+     * (Vite's own tags are modules, which are deferred). Empty when the build is not published.
+     */
+    public function classicScript(string $buildDirectory, string $entry): Htmlable
+    {
+        if (! is_file($this->app->publicPath($buildDirectory . '/manifest.json'))) {
+            return new HtmlString('');
+        }
+
+        $vite = clone $this->vite;
+        $vite->useHotFile(sys_get_temp_dir() . '/laranail-waitlist-kit-never-hot');
+        $nonce = $this->nonce();
+
+        return new HtmlString(sprintf(
+            '<script src="%s"%s></script>',
+            e($vite->asset($entry, $buildDirectory)),
+            $nonce !== null ? ' nonce="' . e($nonce) . '"' : '',
+        ));
+    }
+
     public function nonce(): ?string
     {
         return $this->vite->cspNonce();

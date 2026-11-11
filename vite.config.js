@@ -39,6 +39,7 @@ export default defineConfig({
                 'resources/assets/css/themes/plain.css',
                 'resources/assets/css/admin.css',
                 'resources/assets/js/kit.js',
+                'resources/assets/js/admin-theme.js',
             ],
             output: {
                 entryFileNames: 'assets/js/[name]-[hash].js',

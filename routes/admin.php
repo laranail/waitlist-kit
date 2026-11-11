@@ -11,6 +11,7 @@ use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\EnquiryController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\CampaignController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\SettingsController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\DashboardController;
+use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\AppearanceController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\SubscriberController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin\IntegrationController;
 
@@ -34,6 +35,7 @@ Route::middleware($config['middleware'] ?? ['web'])
 
         Route::middleware(AuthenticateAdmin::class)->group(static function (): void {
             Route::get('/', [DashboardController::class, 'show'])->name('dashboard');
+            Route::post('appearance', [AppearanceController::class, 'update'])->name('appearance.update');
 
             Route::get('campaigns', [CampaignController::class, 'index'])->name('campaigns.index');
             Route::get('campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');

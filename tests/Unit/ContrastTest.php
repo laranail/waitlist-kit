@@ -81,11 +81,15 @@ it('keeps the backend on the Tabler release whose colours were measured, with it
         '/\.wka \.btn-danger,\s*\.wka \.btn-ghost-danger,\s*\.wka \.btn-outline-danger \{\s*--tblr-btn-variant: color-mix\(in oklab, var\(--tblr-danger\) 88%, #000\);/',
         '/\.wka \.card-table a:not\(\.btn\) \{\s*text-decoration: underline;/',
         '/\.wka a\.btn-primary,\s*\.wka a\.btn-danger \{\s*color: #fff;/',
+        // dark scheme, measured before: primary text 2.71-3.02, ghost danger below 4.5
+        '/\[data-bs-theme=dark\] \.wka \.badge\.bg-green-lt \{ color: color-mix\(in oklab, var\(--tblr-green\) 55%, #fff\)/',
+        '/\[data-bs-theme=dark\] \.wka \.btn-outline-primary:not\(:hover\):not\(:active\),[^{]*\.nav-pills \.nav-link\.active \{\s*color: color-mix\(in oklab, var\(--tblr-primary\) 45%, #fff\);/',
+        '/\[data-bs-theme=dark\] \.wka \.btn-ghost-danger:not\(:hover\):not\(:active\) \{\s*color: color-mix\(in oklab, var\(--tblr-danger\) 50%, #fff\);/',
     ];
     foreach ($corrections as $rule) {
         expect($admin)->toMatch($rule);
     }
-    expect($corrections)->toHaveCount(9);
+    expect($corrections)->toHaveCount(12);
 });
 
 it('keeps both public themes readable with their default colours', function (): void {

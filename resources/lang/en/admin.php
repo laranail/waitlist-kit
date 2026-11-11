@@ -7,6 +7,7 @@ return [
     'name'         => 'Waitlist',
     'skip'         => 'Skip to content',
     'nav'          => ['label' => 'Backend', 'dashboard' => 'Dashboard', 'campaigns' => 'Campaigns', 'enquiries' => 'Enquiries', 'pages' => 'Pages', 'integrations' => 'Integrations', 'settings' => 'Settings', 'toggle' => 'Show or hide the menu'],
+    'appearance'   => ['label' => 'Appearance', 'system' => 'Match the system', 'light' => 'Light', 'dark' => 'Dark'],
     'signed_in_as' => 'Signed in as', 'overview' => 'Overview', 'manage' => 'Manage', 'content' => 'Content',
     'stats'        => ['campaigns' => 'Campaigns', 'live' => 'Live now', 'subscribers' => 'Subscribers', 'week' => 'Sign-ups, last 7 days', 'enquiries' => 'Enquiries, last 7 days'],
     'empty'        => [

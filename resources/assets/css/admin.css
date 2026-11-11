@@ -30,12 +30,29 @@
 .wka .badge.bg-yellow-lt { color: color-mix(in oklab, var(--tblr-yellow) 50%, #000) !important; }
 .wka .badge.bg-red-lt { color: color-mix(in oklab, var(--tblr-red) 60%, #000) !important; }
 .wka .badge.bg-secondary-lt { color: color-mix(in oklab, var(--tblr-secondary) 60%, #000) !important; }
+/* On the dark scheme the same tints sit on a dark fill, so they are lightened instead. */
+[data-bs-theme=dark] .wka .badge.bg-green-lt { color: color-mix(in oklab, var(--tblr-green) 55%, #fff) !important; }
+[data-bs-theme=dark] .wka .badge.bg-azure-lt { color: color-mix(in oklab, var(--tblr-azure) 55%, #fff) !important; }
+[data-bs-theme=dark] .wka .badge.bg-yellow-lt { color: color-mix(in oklab, var(--tblr-yellow) 60%, #fff) !important; }
+[data-bs-theme=dark] .wka .badge.bg-red-lt { color: color-mix(in oklab, var(--tblr-red) 50%, #fff) !important; }
+[data-bs-theme=dark] .wka .badge.bg-secondary-lt { color: color-mix(in oklab, var(--tblr-secondary) 40%, #fff) !important; }
 /* Tabler's red is 4.47:1 against white, as a fill under white text and as the text of ghost and outline buttons. */
 .wka .btn-danger,
 .wka .btn-ghost-danger,
 .wka .btn-outline-danger {
     --tblr-btn-variant: color-mix(in oklab, var(--tblr-danger) 88%, #000);
     --tblr-btn-variant-darken: color-mix(in oklab, var(--tblr-danger) 76%, #000);
+}
+/* Dark scheme: text drawn in the primary or danger colour sits on a dark surface, so it is lightened at rest; hover
+ * and active states keep Tabler's fills, which carry white text. Measured 2.71-3.02:1 before. */
+[data-bs-theme=dark] .wka .btn-outline-primary:not(:hover):not(:active),
+[data-bs-theme=dark] .wka .btn-ghost-primary:not(:hover):not(:active),
+[data-bs-theme=dark] .wka .nav-pills .nav-link.active {
+    color: color-mix(in oklab, var(--tblr-primary) 45%, #fff);
+}
+[data-bs-theme=dark] .wka .btn-outline-danger:not(:hover):not(:active),
+[data-bs-theme=dark] .wka .btn-ghost-danger:not(:hover):not(:active) {
+    color: color-mix(in oklab, var(--tblr-danger) 50%, #fff);
 }
 .wka .alert {
     --tblr-alert-color: var(--tblr-body-color);

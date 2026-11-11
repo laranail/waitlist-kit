@@ -1,11 +1,12 @@
 {{-- The bundled sign-in page: Tabler's centred sign-in card. --}}
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="{{ $appearance->initialTheme() }}" data-wk-appearance="{{ $appearance->value }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>{{ __('laranail/waitlist-kit::admin.login') }} · {{ __('laranail/waitlist-kit::admin.name') }}</title>
+    {{ $appearanceScript }}
     {{ $adminAssets }}
 </head>
 <body class="wka d-flex flex-column">

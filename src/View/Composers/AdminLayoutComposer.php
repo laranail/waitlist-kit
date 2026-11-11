@@ -11,11 +11,15 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Simtabi\Laranail\WaitlistKit\Themes\KitThemes;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Simtabi\Laranail\WaitlistKit\Themes\ThemeAssets;
+use Simtabi\Laranail\WaitlistKit\Enums\AdminAppearance;
 
 /** Gives the backend's layout its stylesheet and script, its navigation with the current section, and who is signed in. */
 final readonly class AdminLayoutComposer
 {
     public const string STYLESHEET = 'resources/assets/css/admin.css';
+
+    /** Runs before the first paint to apply the `system` colour scheme; see AdminAppearance. */
+    public const string APPEARANCE_SCRIPT = 'resources/assets/js/admin-theme.js';
 
     public function __construct(
         private ThemeAssets $assets,
@@ -50,11 +54,15 @@ final readonly class AdminLayoutComposer
         $user = $this->auth->guard($this->config->adminGuard())->user();
 
         $view->with([
-            'adminAssets' => $this->assets->tagsFor(KitThemes::BUILD_DIRECTORY, [self::STYLESHEET, KitThemes::SCRIPT]),
-            'nonce'       => $this->assets->nonce(),
-            'nav'         => $nav,
-            'who'         => $this->emailOf($user),
-            'bundled'     => $this->config->adminGuard() === KitConfig::BUNDLED_GUARD,
+            'adminAssets'      => $this->assets->tagsFor(KitThemes::BUILD_DIRECTORY, [self::STYLESHEET, KitThemes::SCRIPT]),
+            'appearance'       => AdminAppearance::fromCookie($this->request->cookie(AdminAppearance::COOKIE)),
+            'appearanceScript' => $this->assets->classicScript(KitThemes::BUILD_DIRECTORY, self::APPEARANCE_SCRIPT),
+            'appearances'      => AdminAppearance::cases(),
+            'currentPath'      => $this->request->getRequestUri(),
+            'nonce'            => $this->assets->nonce(),
+            'nav'              => $nav,
+            'who'              => $this->emailOf($user),
+            'bundled'          => $this->config->adminGuard() === KitConfig::BUNDLED_GUARD,
         ]);
     }
 
