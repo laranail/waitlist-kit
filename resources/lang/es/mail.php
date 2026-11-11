@@ -12,4 +12,5 @@ return [
     'confirm_body'    => 'Confirma tu dirección para unirte a la lista de espera de :site:',
     'confirm_expires' => '{1} El enlace funciona durante 1 día.|[2,*] El enlace funciona durante :days días.',
     'confirm_ignore'  => 'Si no te registraste, ignora este correo y no volverás a saber de nosotros.',
+    'status'          => 'Mira tu lugar y comparte tu enlace: :url',
 ];

@@ -12,4 +12,5 @@ return [
     'confirm_body'    => 'Konfirmasi alamat Anda untuk bergabung dengan daftar tunggu :site:',
     'confirm_expires' => '{1} Tautan berlaku selama 1 hari.|[2,*] Tautan berlaku selama :days hari.',
     'confirm_ignore'  => 'Jika Anda tidak mendaftar, abaikan email ini dan Anda tidak akan mendengar kabar dari kami.',
+    'status'          => 'Lihat tempat Anda dan bagikan tautan Anda: :url',
 ];

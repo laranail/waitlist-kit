@@ -7,6 +7,7 @@ use Illuminate\Routing\Middleware\ValidateSignature;
 use Simtabi\Laranail\WaitlistKit\Http\Middleware\RejectHoneypot;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\PageController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\SignupController;
+use Simtabi\Laranail\WaitlistKit\Http\Controllers\StatusController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\ConfirmController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\ContactController;
 use Simtabi\Laranail\WaitlistKit\Http\Controllers\CampaignController;
@@ -39,6 +40,11 @@ Route::middleware($config['middleware'] ?? ['web'])
             ->middleware(ValidateSignature::class)
             ->scopeBindings()
             ->name('campaign.confirm');
+
+        // A subscriber's own page, keyed by their unguessable referral code; linked from the welcome mail only.
+        Route::get('{campaign:slug}/status/{code}', StatusController::class)
+            ->where('code', '[a-z0-9]{6,32}')
+            ->name('campaign.status');
 
         Route::post('{campaign:slug}', [SignupController::class, 'store'])
             ->middleware(['throttle:laranail-waitlist-kit.signups', RejectHoneypot::class . ':signup'])

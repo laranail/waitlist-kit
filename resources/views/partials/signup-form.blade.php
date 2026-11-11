@@ -9,6 +9,10 @@
           data-scope="signup-form" x-data="wkForm" x-on:submit="submit">
         @csrf
         <input type="hidden" name="locale" value="{{ $locale }}">
+        {{-- A referral link (?ref=code) carries the referrer into the sign-up; SignupRules checks its shape. --}}
+        @if (is_string($ref = request()->query('ref')) && preg_match('/^[a-z0-9]{1,32}$/', $ref) === 1)
+            <input type="hidden" name="ref" value="{{ $ref }}">
+        @endif
 
         <div class="wk-field" data-part="field" data-field="email" @error('email', 'signup') data-state="invalid" @enderror>
             <label class="wk-label" data-part="label" for="waitlist-email">{{ $label ?? __('laranail/waitlist-kit::page.email') }}</label>

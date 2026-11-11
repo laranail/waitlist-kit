@@ -12,4 +12,5 @@ return [
     'confirm_body'    => 'Conferma il tuo indirizzo per entrare nella lista d\'attesa di :site:',
     'confirm_expires' => '{1} Il link è valido per 1 giorno.|[2,*] Il link è valido per :days giorni.',
     'confirm_ignore'  => 'Se non ti sei iscritto, ignora questa email e non avrai più nostre notizie.',
+    'status'          => 'Guarda il tuo posto e condividi il tuo link: :url',
 ];

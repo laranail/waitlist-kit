@@ -22,10 +22,11 @@ final class SubscriberFactory extends Factory
         return [
             'campaign_id' => Campaign::factory(),
             // safeEmail: example.org/.com/.net only, so a seeded list can never mail a real inbox.
-            'email'         => $this->faker->unique()->safeEmail(),
-            'status'        => SubscriberStatus::Pending,
-            'locale'        => 'en',
-            'referral_code' => Str::upper(Str::random(8)),
+            'email'  => $this->faker->unique()->safeEmail(),
+            'status' => SubscriberStatus::Pending,
+            'locale' => 'en',
+            // Shaped like a real one (AdmitToList): lower-case, so the status route's pattern matches it.
+            'referral_code' => Str::lower(Str::random(10)),
         ];
     }
 

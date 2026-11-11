@@ -19,7 +19,8 @@ final class ThankYouMail extends Mailable implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public readonly string $site, public readonly string $campaign, public readonly ?Address $sender = null)
+    /** @param ?string $statusUrl the subscriber's status page, when they hold a place on the list */
+    public function __construct(public readonly string $site, public readonly string $campaign, public readonly ?Address $sender = null, public readonly ?string $statusUrl = null)
     {
         $this->afterCommit();
     }

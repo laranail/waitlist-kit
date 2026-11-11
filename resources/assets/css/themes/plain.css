@@ -29,6 +29,9 @@
 .wk-feature-title { font-size: 1rem; margin: 0 0 0.25rem; }
 .wk-feature-body { margin: 0; color: var(--wk-muted); }
 
+.wk-status-position { font-size: 1.75rem; font-weight: 600; margin: 0 0 0.5rem; }
+.wk-share-links { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 1rem; }
+.wk-share-links a { color: var(--wk-primary); }
 .wk-countdown-value { font-size: 2rem; font-variant-numeric: tabular-nums; margin: 0; }
 
 .wk-faq-item { border-top: 1px solid var(--wk-border); padding: 0.75rem 0; }

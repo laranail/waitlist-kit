@@ -12,4 +12,5 @@ return [
     'confirm_body'    => ':site bekleme listesine katılmak için adresinizi onaylayın:',
     'confirm_expires' => '{1} Bağlantı 1 gün geçerlidir.|[2,*] Bağlantı :days gün geçerlidir.',
     'confirm_ignore'  => 'Kaydolmadıysanız bu e-postayı yok sayın; bizden başka haber almayacaksınız.',
+    'status'          => 'Yerinizi görün ve bağlantınızı paylaşın: :url',
 ];
