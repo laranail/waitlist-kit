@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Simtabi\Laranail\WaitlistKit\Data\SignupData;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
+use Simtabi\Laranail\WaitlistKit\Services\CaptchaGuard;
 use Simtabi\Laranail\WaitlistKit\Validation\SignupRules;
 
 /**
@@ -32,13 +33,12 @@ final class SignupRequest extends FormRequest
     }
 
     /** @return array<string, list<mixed>> */
-    public function rules(KitConfig $config): array
+    public function rules(KitConfig $config, CaptchaGuard $captcha): array
     {
         $rules = SignupRules::rules();
 
-        if ($config->requiresCaptcha()) {
-            $rules['captcha'] = ['required', 'laranail_captcha'];
-        }
+        // Every provider laranail/captcha has, bound to this form's action (see CaptchaGuard).
+        $rules = [...$rules, ...$captcha->rules(CaptchaGuard::SIGNUP)];
 
         return $rules;
     }
