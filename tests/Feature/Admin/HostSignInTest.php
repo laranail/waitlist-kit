@@ -10,19 +10,19 @@ use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Simtabi\Laranail\WaitlistKit\Providers\WaitlistKitServiceProvider;
 
 it('sends a guest to the application\'s login, or refuses when it has none', function (): void {
-    $this->get('/waitlist-admin')->assertForbidden();
+    $this->get('/admin/waitlist')->assertForbidden();
 
     Route::get('login', fn (): string => 'login')->name('login');
     app('router')->getRoutes()->refreshNameLookups();
 
-    $this->get('/waitlist-admin')->assertRedirect('/login');
+    $this->get('/admin/waitlist')->assertRedirect('/login');
 });
 
 it('admits only the addresses in admin.emails by default', function (): void {
     config()->set('laranail.waitlist-kit.admin.emails', ['owner@example.org']);
 
-    $this->actingAs(new GenericUser(['id' => 2, 'email' => 'someone@example.org']), 'web')->get('/waitlist-admin')->assertForbidden();
-    $this->actingAs(new GenericUser(['id' => 1, 'email' => 'Owner@Example.org']), 'web')->get('/waitlist-admin')->assertOk();
+    $this->actingAs(new GenericUser(['id' => 2, 'email' => 'someone@example.org']), 'web')->get('/admin/waitlist')->assertForbidden();
+    $this->actingAs(new GenericUser(['id' => 1, 'email' => 'Owner@Example.org']), 'web')->get('/admin/waitlist')->assertOk();
 });
 
 it('keeps an application\'s own ability definitions', function (): void {
@@ -30,7 +30,7 @@ it('keeps an application\'s own ability definitions', function (): void {
 
     Gate::define(Abilities::VIEW, fn ($user): bool => $user->email === 'role@example.org');
 
-    $this->actingAs(new GenericUser(['id' => 3, 'email' => 'role@example.org']), 'web')->get('/waitlist-admin')->assertOk();
+    $this->actingAs(new GenericUser(['id' => 3, 'email' => 'role@example.org']), 'web')->get('/admin/waitlist')->assertOk();
 });
 
 it('does not overwrite an ability the application defined before the kit booted', function (): void {
@@ -45,6 +45,6 @@ it('does not overwrite an ability the application defined before the kit booted'
 });
 
 it('answers 404 for the bundled login in host mode', function (): void {
-    $this->get('/waitlist-admin/login')->assertNotFound();
-    $this->post('/waitlist-admin/login', ['email' => 'owner@example.org', 'password' => bin2hex(random_bytes(8))])->assertNotFound();
+    $this->get('/admin/waitlist/login')->assertNotFound();
+    $this->post('/admin/waitlist/login', ['email' => 'owner@example.org', 'password' => bin2hex(random_bytes(8))])->assertNotFound();
 });

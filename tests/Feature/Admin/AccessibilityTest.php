@@ -89,20 +89,20 @@ it('gives every backend screen its structure', function (string $mode): void {
     $integration = Integration::factory()->create();
 
     $screens = [
-        '/waitlist-admin',
-        '/waitlist-admin/campaigns',
-        '/waitlist-admin/campaigns/create',
-        "/waitlist-admin/campaigns/{$campaign->id}/edit",
-        "/waitlist-admin/campaigns/{$campaign->id}/subscribers",
-        "/waitlist-admin/campaigns/{$campaign->id}/funnel",
-        '/waitlist-admin/enquiries',
-        "/waitlist-admin/enquiries/{$enquiry->id}",
-        '/waitlist-admin/pages',
-        "/waitlist-admin/pages/{$page->id}/edit",
-        '/waitlist-admin/integrations',
-        '/waitlist-admin/integrations/create',
-        "/waitlist-admin/integrations/{$integration->id}/edit",
-        '/waitlist-admin/settings',
+        '/admin/waitlist',
+        '/admin/waitlist/campaigns',
+        '/admin/waitlist/campaigns/create',
+        "/admin/waitlist/campaigns/{$campaign->id}/edit",
+        "/admin/waitlist/campaigns/{$campaign->id}/subscribers",
+        "/admin/waitlist/campaigns/{$campaign->id}/funnel",
+        '/admin/waitlist/enquiries',
+        "/admin/waitlist/enquiries/{$enquiry->id}",
+        '/admin/waitlist/pages',
+        "/admin/waitlist/pages/{$page->id}/edit",
+        '/admin/waitlist/integrations',
+        '/admin/waitlist/integrations/create',
+        "/admin/waitlist/integrations/{$integration->id}/edit",
+        '/admin/waitlist/settings',
     ];
 
     foreach ($screens as $url) {
@@ -118,7 +118,7 @@ it('gives every backend screen its structure', function (string $mode): void {
             ->toContain('owner@example.org')
             // One banner (the sidebar); the page title is inside <main>.
             ->and(substr_count($html, '<header'))->toBe(1)
-            ->and($html)->toMatch('#<main id="content" tabindex="-1">\s*<div class="page-header#');
+            ->and($html)->toMatch('#<main id="content" tabindex="-1" x-data="wkLive"[^>]*>\s*<div class="page-header#');
     }
     expect($screens)->toHaveCount(14);
 })->with(['host', 'bundled']);
@@ -126,8 +126,8 @@ it('gives every backend screen its structure', function (string $mode): void {
 it('summarises errors in an alert that links to each field', function (): void {
     signInAdmin('host');
 
-    $html = (string) $this->followingRedirects()->from('/waitlist-admin/campaigns/create')
-        ->post('/waitlist-admin/campaigns', ['name' => '', 'slug' => 'Bad Slug', 'type' => 'waitlist', 'locales' => 'en'])
+    $html = (string) $this->followingRedirects()->from('/admin/waitlist/campaigns/create')
+        ->post('/admin/waitlist/campaigns', ['name' => '', 'slug' => 'Bad Slug', 'type' => 'waitlist', 'locales' => 'en'])
         ->getContent();
 
     expect($html)->toContain('role="alert" aria-labelledby="wka-errors-title" tabindex="-1" autofocus')
@@ -156,15 +156,16 @@ it('keeps a rejected block edit to the block it came from', function (): void {
     $second = $page->blocks()->create(['type' => 'text', 'content' => ['en' => ['heading' => 'How long we keep it']]]);
     $tooLong = str_repeat('x', 161);
 
-    $html = (string) $this->followingRedirects()->from("/waitlist-admin/pages/{$page->id}/edit")
-        ->put("/waitlist-admin/blocks/{$second->id}", ['type' => 'text', 'locale' => 'en', 'block' => $second->id, 'heading' => $tooLong, 'paragraphs' => ''])
+    $html = (string) $this->followingRedirects()->from("/admin/waitlist/pages/{$page->id}/edit")
+        ->put("/admin/waitlist/blocks/{$second->id}", ['type' => 'text', 'locale' => 'en', 'block' => $second->id, 'heading' => $tooLong, 'paragraphs' => ''])
         ->assertOk()->getContent();
 
     // The summary links to the rejected block's field, which exists, and only that block shows the error and the input.
     expect(referenceProblems($html))->toBe([])
         ->and($html)->toContain('href="#b-' . $second->id . '-heading"')
-        ->toContain('id="b-' . $second->id . '-heading-error"')
-        ->not->toContain('id="b-' . $first->id . '-heading-error"')
+        ->toMatch('#id="b-' . $second->id . '-heading-error" data-part="error" data-for="heading"\s*>[^<]+</p>#')
+        // Every field keeps an (empty, hidden) error element for live validation; only the rejected block fills its own.
+        ->toMatch('#id="b-' . $first->id . '-heading-error" data-part="error" data-for="heading"\s+hidden\s*></p>#')
         ->not->toContain('id="f-heading-error"')
         ->and(substr_count($html, 'value="' . $tooLong . '"'))->toBe(1)
         ->and($html)->toContain('value="What we keep"');
@@ -174,7 +175,7 @@ it('names the add-block form apart from the page form', function (): void {
     signInAdmin('host');
     $campaign = Campaign::factory()->create();
 
-    $html = (string) $this->get("/waitlist-admin/campaigns/{$campaign->id}/edit")->assertOk()->getContent();
+    $html = (string) $this->get("/admin/waitlist/campaigns/{$campaign->id}/edit")->assertOk()->getContent();
 
     expect($html)->toContain('id="add-block-type"')
         ->toContain('name="_form" value="add-block"')

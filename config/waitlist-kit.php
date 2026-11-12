@@ -115,7 +115,7 @@ return [
         'enabled' => (bool) env('WAITLIST_KIT_ADMIN', true),
 
         // It lives at /{prefix}.
-        'prefix' => env('WAITLIST_KIT_ADMIN_PREFIX', 'waitlist-admin'),
+        'prefix' => env('WAITLIST_KIT_ADMIN_PREFIX', 'admin/waitlist'),
 
         'middleware' => ['web'],
 

@@ -126,9 +126,9 @@ it('saves page and search settings per language from the campaign screen', funct
     $campaign = pageCampaign(settings: ['keep' => 'me', 'seo' => ['title' => ['en' => 'English title']]], locales: ['en', 'es']);
     signInAdmin('host');
 
-    $this->put("/waitlist-admin/campaigns/{$campaign->id}/seo", ['locale' => 'es', 'title' => 'Título', 'description' => 'Descripción', 'image' => 'https://cdn.example.com/og.png', 'index' => '1', 'launch_url' => 'https://app.example.com/'])
+    $this->put("/admin/waitlist/campaigns/{$campaign->id}/seo", ['locale' => 'es', 'title' => 'Título', 'description' => 'Descripción', 'image' => 'https://cdn.example.com/og.png', 'index' => '1', 'launch_url' => 'https://app.example.com/'])
         ->assertRedirect();
-    $this->put("/waitlist-admin/campaigns/{$campaign->id}/seo", ['locale' => 'es', 'index' => '1', 'image' => 'http://insecure.example.com/og.png'])
+    $this->put("/admin/waitlist/campaigns/{$campaign->id}/seo", ['locale' => 'es', 'index' => '1', 'image' => 'http://insecure.example.com/og.png'])
         ->assertSessionHasErrors('image');
 
     $campaign->refresh();
@@ -136,5 +136,5 @@ it('saves page and search settings per language from the campaign screen', funct
         ->and($campaign->seo()->titles)->toBe(['en' => 'English title', 'es' => 'Título'])
         ->and($campaign->seo()->index)->toBeTrue()
         ->and($campaign->launchUrl())->toBe('https://app.example.com/');
-    $this->get("/waitlist-admin/campaigns/{$campaign->id}/edit?locale=es")->assertOk()->assertSee('value="Título"', false);
+    $this->get("/admin/waitlist/campaigns/{$campaign->id}/edit?locale=es")->assertOk()->assertSee('value="Título"', false);
 });

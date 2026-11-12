@@ -15,8 +15,8 @@ final class BundledSignInTest extends TestCase
 {
     public function test_a_guest_goes_to_the_bundled_login(): void
     {
-        $this->get('/waitlist-admin')->assertRedirect('/waitlist-admin/login');
-        $this->get('/waitlist-admin/login')->assertOk()->assertSee('name="password"', false);
+        $this->get('/admin/waitlist')->assertRedirect('/admin/waitlist/login');
+        $this->get('/admin/waitlist/login')->assertOk()->assertSee('name="password"', false);
     }
 
     public function test_an_administrator_signs_in_and_out(): void
@@ -24,11 +24,11 @@ final class BundledSignInTest extends TestCase
         $password = bin2hex(random_bytes(12));
         Admin::factory()->create(['email' => 'owner@example.org', 'password' => $password]);
 
-        $this->post('/waitlist-admin/login', ['email' => 'Owner@example.org', 'password' => $password])->assertRedirect('/waitlist-admin');
+        $this->post('/admin/waitlist/login', ['email' => 'Owner@example.org', 'password' => $password])->assertRedirect('/admin/waitlist');
         $this->assertAuthenticated(KitConfig::BUNDLED_GUARD);
-        $this->get('/waitlist-admin')->assertOk();
+        $this->get('/admin/waitlist')->assertOk();
 
-        $this->post('/waitlist-admin/logout')->assertRedirect('/waitlist-admin/login');
+        $this->post('/admin/waitlist/logout')->assertRedirect('/admin/waitlist/login');
         $this->assertGuest(KitConfig::BUNDLED_GUARD);
     }
 
@@ -36,8 +36,8 @@ final class BundledSignInTest extends TestCase
     {
         Admin::factory()->create(['email' => 'owner@example.org']);
 
-        $wrong = $this->from('/waitlist-admin/login')->post('/waitlist-admin/login', ['email' => 'owner@example.org', 'password' => bin2hex(random_bytes(8))]);
-        $unknown = $this->from('/waitlist-admin/login')->post('/waitlist-admin/login', ['email' => 'nobody@example.org', 'password' => bin2hex(random_bytes(8))]);
+        $wrong = $this->from('/admin/waitlist/login')->post('/admin/waitlist/login', ['email' => 'owner@example.org', 'password' => bin2hex(random_bytes(8))]);
+        $unknown = $this->from('/admin/waitlist/login')->post('/admin/waitlist/login', ['email' => 'nobody@example.org', 'password' => bin2hex(random_bytes(8))]);
 
         $wrong->assertSessionHasErrors(['email' => 'Those details do not match an administrator.']);
         $unknown->assertSessionHasErrors(['email' => 'Those details do not match an administrator.']);
@@ -47,16 +47,16 @@ final class BundledSignInTest extends TestCase
     public function test_sign_in_is_throttled(): void
     {
         for ($i = 0; $i < 5; $i++) {
-            $this->post('/waitlist-admin/login', ['email' => 'owner@example.org', 'password' => bin2hex(random_bytes(8))]);
+            $this->post('/admin/waitlist/login', ['email' => 'owner@example.org', 'password' => bin2hex(random_bytes(8))]);
         }
 
-        $this->post('/waitlist-admin/login', ['email' => 'owner@example.org', 'password' => bin2hex(random_bytes(8))])->assertTooManyRequests();
+        $this->post('/admin/waitlist/login', ['email' => 'owner@example.org', 'password' => bin2hex(random_bytes(8))])->assertTooManyRequests();
     }
 
     public function test_an_application_user_cannot_use_the_bundled_backend(): void
     {
         $this->actingAs(new GenericUser(['id' => 1, 'email' => 'owner@example.org']), 'web')
-            ->get('/waitlist-admin')->assertRedirect('/waitlist-admin/login');
+            ->get('/admin/waitlist')->assertRedirect('/admin/waitlist/login');
     }
 
     public function test_the_command_creates_an_administrator_with_a_prompted_password(): void

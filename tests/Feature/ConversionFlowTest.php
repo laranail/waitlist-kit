@@ -77,9 +77,9 @@ it('invites the next confirmed subscribers in list order, never twice, and never
     Subscriber::factory()->create(['campaign_id' => $campaign->id, 'status' => SubscriberStatus::Pending, 'position' => null]);
     signInAdmin('host');
 
-    $this->post("/waitlist-admin/campaigns/{$campaign->id}/invites", ['count' => 2])->assertSessionHas('status', 'Invited 2 subscribers.');
-    $this->post("/waitlist-admin/campaigns/{$campaign->id}/invites", ['count' => 10])->assertSessionHas('status', 'Invited 1 subscriber.');
-    $this->post("/waitlist-admin/campaigns/{$campaign->id}/invites", ['count' => 10])->assertSessionHas('status', 'Nobody was left to invite.');
+    $this->post("/admin/waitlist/campaigns/{$campaign->id}/invites", ['count' => 2])->assertSessionHas('status', 'Invited 2 subscribers.');
+    $this->post("/admin/waitlist/campaigns/{$campaign->id}/invites", ['count' => 10])->assertSessionHas('status', 'Invited 1 subscriber.');
+    $this->post("/admin/waitlist/campaigns/{$campaign->id}/invites", ['count' => 10])->assertSessionHas('status', 'Nobody was left to invite.');
 
     expect(Subscriber::query()->where('status', SubscriberStatus::Invited)->orderBy('position')->pluck('email')->all())
         ->toBe(['p1@example.com', 'p3@example.com', 'p4@example.com'])
@@ -94,11 +94,11 @@ it('refuses to invite without an invite URL, or without the manage ability', fun
     [$campaign] = listOf(1, inviteUrl: null);
     signInAdmin('host');
 
-    $this->post("/waitlist-admin/campaigns/{$campaign->id}/invites", ['count' => 1])->assertSessionHasErrors('count');
-    $this->post("/waitlist-admin/campaigns/{$campaign->id}/invites", ['count' => 0])->assertSessionHasErrors('count');
+    $this->post("/admin/waitlist/campaigns/{$campaign->id}/invites", ['count' => 1])->assertSessionHasErrors('count');
+    $this->post("/admin/waitlist/campaigns/{$campaign->id}/invites", ['count' => 0])->assertSessionHasErrors('count');
 
     Gate::define('laranail-waitlist-kit.manage', fn (): bool => false);
-    $this->post("/waitlist-admin/campaigns/{$campaign->id}/invites", ['count' => 1])->assertForbidden();
+    $this->post("/admin/waitlist/campaigns/{$campaign->id}/invites", ['count' => 1])->assertForbidden();
     Mail::assertNotQueued(InviteMail::class);
 });
 
@@ -130,14 +130,14 @@ it('saves a campaign\'s conversion settings from its screen, keeping its other s
     $campaign->update(['settings' => ['keep' => 'me']]);
     signInAdmin('host');
 
-    $this->put("/waitlist-admin/campaigns/{$campaign->id}/conversion", ['double_opt_in' => '1', 'referrals' => '0', 'referral_bump' => 3, 'referral_cap' => 7, 'invite_url' => 'https://app.example.com/join'])
+    $this->put("/admin/waitlist/campaigns/{$campaign->id}/conversion", ['double_opt_in' => '1', 'referrals' => '0', 'referral_bump' => 3, 'referral_cap' => 7, 'invite_url' => 'https://app.example.com/join'])
         ->assertRedirect();
-    $this->put("/waitlist-admin/campaigns/{$campaign->id}/conversion", ['double_opt_in' => '1', 'referrals' => '1', 'referral_bump' => 3, 'referral_cap' => 7, 'invite_url' => 'http://insecure.example.com'])
+    $this->put("/admin/waitlist/campaigns/{$campaign->id}/conversion", ['double_opt_in' => '1', 'referrals' => '1', 'referral_bump' => 3, 'referral_cap' => 7, 'invite_url' => 'http://insecure.example.com'])
         ->assertSessionHasErrors('invite_url');
 
     expect($campaign->refresh()->settings['keep'])->toBe('me')
         ->and($campaign->conversion()->toArray())->toBe(['double_opt_in' => true, 'referrals' => false, 'referral_bump' => 3, 'referral_cap' => 7, 'invite_url' => 'https://app.example.com/join']);
-    $this->get("/waitlist-admin/campaigns/{$campaign->id}/edit")->assertOk()->assertSee('id="conversion"', false);
+    $this->get("/admin/waitlist/campaigns/{$campaign->id}/edit")->assertOk()->assertSee('id="conversion"', false);
 });
 
 it('renders the invitation in the subscriber\'s language, with the link and the way out', function (): void {

@@ -78,7 +78,7 @@ it('shows the funnel screen with the seeded numbers', function (): void {
     $campaign = seededCampaign();
     signInAdmin('host');
 
-    $html = (string) $this->get("/waitlist-admin/campaigns/{$campaign->id}/funnel")->assertOk()->getContent();
+    $html = (string) $this->get("/admin/waitlist/campaigns/{$campaign->id}/funnel")->assertOk()->getContent();
 
     expect($html)->toContain('<p class="h1 mb-0">40</p>')->toContain('<p class="h1 mb-0">12</p>')
         ->toContain('30.0%')->toContain('75.0%')->toContain('40.0%')
