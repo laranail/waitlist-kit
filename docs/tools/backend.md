@@ -1,6 +1,6 @@
 # Backend
 
-A Blade + Alpine.js backend at `/{admin.prefix}` (default `/waitlist-admin`) that runs the kit: campaigns and their
+A Blade + Alpine.js backend at `/{admin.prefix}` (default `/admin/waitlist`) that runs the kit: campaigns and their
 page blocks and theme, subscribers, enquiries, the kit's pages and the integrations.
 
 ## Look and assets
@@ -9,7 +9,15 @@ The backend is built on [Tabler](https://tabler.io) (`@tabler/core` 1.7.1, MIT):
 cards, tables, empty states, badges, alerts and form controls, with Tabler Icons drawn inline. Tabler's CSS is
 compiled into the kit's own `admin` stylesheet and published with the other assets, so a site loads nothing from a
 CDN and needs no Node. Tabler's Bootstrap JavaScript is not shipped: the sidebar toggle on small screens and the
-removal confirmations are Alpine components on the CSP build.
+removal confirmations are Alpine components on the CSP build, and every form validates its fields as they change
+(`wkLive`, through Laravel Precognition; see [Themes](themes.md#live-validation)). Saving is an ordinary post.
+
+## Routes
+
+Every backend route is at `/{admin.prefix}` and named `laranail-waitlist-kit.admin.*`, grouped by what it acts on:
+`campaigns.*` (with `campaigns.blocks.store` and `subscribers.*` under `/campaigns/{campaign}`), `blocks.*`,
+`enquiries.*`, `pages.*`, `settings.*` and `integrations.*`. `php artisan route:list --name=laranail-waitlist-kit.admin`
+lists them.
 
 ## Appearance
 
@@ -30,7 +38,7 @@ as inline SVG images.
 | `auth.mode` | Who signs in | How |
 | --- | --- | --- |
 | `host` (default) | The application's users, on `auth.guard` | A guest goes to the application's `login` route (403 when it has none) |
-| `bundled` | The kit's own administrators (`Admin`, guard `laranail-waitlist-kit`) | `/waitlist-admin/login`, throttled to five tries a minute per address; created with `laranail::waitlist-kit.admin`, or the first one by `db:seed` |
+| `bundled` | The kit's own administrators (`Admin`, guard `laranail-waitlist-kit`) | `/admin/waitlist/login`, throttled to five tries a minute per address; created with `laranail::waitlist-kit.admin`, or the first one by `db:seed` |
 
 The bundled login answers wrong passwords and unknown addresses the same way, regenerates the session on sign-in and
 invalidates it on sign-out. Its routes exist in both modes and answer 404 in `host`, so the route list never
