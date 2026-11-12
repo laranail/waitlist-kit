@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-12
+
 ### Added
 
 - A REST API at `/waitlist/api/v1` (`api.*`): public campaign, sign-up, status, enquiry and captcha endpoints, and
