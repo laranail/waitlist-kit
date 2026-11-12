@@ -6,6 +6,7 @@ namespace Simtabi\Laranail\WaitlistKit\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Simtabi\Laranail\WaitlistKit\Actions\SubmitEnquiry;
 use Simtabi\Laranail\WaitlistKit\Http\Requests\ContactRequest;
@@ -38,7 +39,7 @@ final readonly class ContactController
             throw new NotFoundHttpException;
         }
 
-        $submit->handle($request->toData());
+        $submit->handle($request->toData(), Actor::from($request->user()));
 
         return self::accepted($request->expectsJson(), $request->returnPath());
     }

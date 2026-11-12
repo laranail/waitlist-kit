@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\WaitlistKit\Actions;
 
 use Illuminate\Support\DateFactory;
+use Illuminate\Contracts\Events\Dispatcher;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Data\SignupData;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Data\SignupResult;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Enums\FunnelEventType;
 use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
+use Simtabi\Laranail\WaitlistKit\Events\SubscriberSignedUp;
+use Simtabi\Laranail\WaitlistKit\Events\SubscriberConfirmed;
 use Simtabi\Laranail\WaitlistKit\Exceptions\CampaignNotOpen;
 
 /**
@@ -30,10 +34,12 @@ final readonly class SubscribeToCampaign
         private AdmitToList $admit,
         private WelcomeSubscriber $welcome,
         private AskToConfirm $askToConfirm,
+        private Dispatcher $events,
     ) {}
 
-    public function handle(Campaign $campaign, SignupData $data): SignupResult
+    public function handle(Campaign $campaign, SignupData $data, ?Actor $actor = null): SignupResult
     {
+        $actor ??= Actor::system();
         if (! $campaign->acceptsSignups()) {
             throw CampaignNotOpen::for($campaign->slug);
         }
@@ -61,6 +67,13 @@ final readonly class SubscribeToCampaign
         });
 
         $doubleOptIn = $campaign->conversion()->doubleOptIn;
+        if ($result->created) {
+            $this->events->dispatch(new SubscriberSignedUp($campaign, $result->subscriber, $actor));
+            if (! $doubleOptIn) {
+                $this->events->dispatch(new SubscriberConfirmed($campaign, $result->subscriber, $actor));
+            }
+        }
+
         if ($result->created && ! $doubleOptIn) {
             $this->welcome->handle($campaign, $result->subscriber);
         } elseif ($doubleOptIn && $result->subscriber->status === SubscriberStatus::Pending) {

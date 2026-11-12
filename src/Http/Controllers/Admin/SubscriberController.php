@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Auth\Abilities;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
@@ -76,7 +77,7 @@ final readonly class SubscriberController
 
     public function forget(ForgetRequest $request, ForgetSubscriber $forget): RedirectResponse
     {
-        $erased = $forget->handle($request->string('email')->toString());
+        $erased = $forget->handle($request->string('email')->toString(), Actor::from($request->user()));
 
         return redirect()->back()->with('status', __('laranail/waitlist-kit::admin.erased', $erased));
     }
@@ -84,7 +85,7 @@ final readonly class SubscriberController
     public function invite(InviteRequest $request, Campaign $campaign, InviteSubscribers $invite): RedirectResponse
     {
         try {
-            $count = $invite->handle($campaign, $request->integer('count'));
+            $count = $invite->handle($campaign, $request->integer('count'), Actor::from($request->user()));
         } catch (NoInviteUrl) {
             return redirect()->route('laranail-waitlist-kit.admin.subscribers.index', $campaign)
                 ->withErrors(['count' => __('laranail/waitlist-kit::admin.no_invite_url')]);

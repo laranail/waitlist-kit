@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\WaitlistKit\Actions;
 
+use Illuminate\Contracts\Events\Dispatcher;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignType;
 use Simtabi\Laranail\WaitlistKit\Enums\CampaignStatus;
+use Simtabi\Laranail\WaitlistKit\Events\CampaignCreated;
 use Simtabi\Laranail\WaitlistKit\Validation\CampaignRules;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Simtabi\Laranail\WaitlistKit\Exceptions\CampaignLimitReached;
@@ -19,10 +22,10 @@ use Simtabi\Laranail\WaitlistKit\Exceptions\CampaignLimitReached;
  */
 final readonly class CreateCampaign
 {
-    public function __construct(private KitConfig $config, private ValidationFactory $validator) {}
+    public function __construct(private KitConfig $config, private ValidationFactory $validator, private Dispatcher $events) {}
 
     /** @param  list<string>  $locales */
-    public function handle(string $name, string $slug, CampaignType $type, array $locales = ['en']): Campaign
+    public function handle(string $name, string $slug, CampaignType $type, array $locales = ['en'], ?Actor $actor = null): Campaign
     {
         $this->validator->make(
             ['name' => $name, 'slug' => $slug, 'type' => $type->value, 'locales' => $locales],
@@ -35,12 +38,16 @@ final readonly class CreateCampaign
             throw CampaignLimitReached::at($limit);
         }
 
-        return Campaign::query()->create([
+        $campaign = Campaign::query()->create([
             'name'    => $name,
             'slug'    => $slug,
             'type'    => $type,
             'status'  => CampaignStatus::Draft,
             'locales' => $locales,
         ]);
+
+        $this->events->dispatch(new CampaignCreated($campaign, $actor ?? Actor::system()));
+
+        return $campaign;
     }
 }

@@ -6,6 +6,7 @@ namespace Simtabi\Laranail\WaitlistKit\Models;
 
 use Override;
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Simtabi\Laranail\WaitlistKit\Database\Factories\AdminFactory;
@@ -26,9 +27,10 @@ final class Admin extends Model implements AuthenticatableContract, Authorizable
 {
     use Authenticatable;
     use Authorizable;
-
     /** @use HasFactory<AdminFactory> */
     use HasFactory;
+
+    use Notifiable;
 
     #[Override]
     protected $fillable = ['name', 'email', 'password'];

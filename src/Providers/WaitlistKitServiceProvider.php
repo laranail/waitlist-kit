@@ -8,20 +8,26 @@ use Override;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Support\Facades\RateLimiter;
 use Simtabi\Laranail\Package\Tools\Package;
+use Simtabi\Laranail\WaitlistKit\Models\Page;
 use Simtabi\Laranail\WaitlistKit\Models\Admin;
 use Illuminate\Contracts\Foundation\Application;
 use Simtabi\Laranail\WaitlistKit\Auth\Abilities;
+use Simtabi\Laranail\WaitlistKit\Models\Enquiry;
 use Simtabi\Laranail\WaitlistKit\Support\Tables;
 use Simtabi\Laranail\Settings\Contracts\Settings;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Support\MorphMap;
 use Simtabi\Laranail\WaitlistKit\Themes\KitThemes;
+use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Simtabi\Laranail\WaitlistKit\Models\Integration;
+use Simtabi\Laranail\WaitlistKit\Policies\PagePolicy;
 use Simtabi\Laranail\WaitlistKit\Settings\ConfigStore;
 use Simtabi\Laranail\WaitlistKit\Themes\ThemeRegistry;
 use Simtabi\Laranail\WaitlistKit\Commands\AdminCommand;
@@ -29,9 +35,21 @@ use Simtabi\Laranail\WaitlistKit\Commands\EjectCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\DoctorCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\ExportCommand;
 use Simtabi\Laranail\WaitlistKit\Commands\ForgetCommand;
+use Simtabi\Laranail\WaitlistKit\Events\EnquiryReceived;
+use Simtabi\Laranail\WaitlistKit\Policies\EnquiryPolicy;
 use Simtabi\Laranail\WaitlistKit\Settings\SettingsStore;
 use Simtabi\Laranail\WaitlistKit\Commands\InstallCommand;
+use Simtabi\Laranail\WaitlistKit\Policies\CampaignPolicy;
+use Simtabi\Laranail\WaitlistKit\Events\SubscriberSignedUp;
+use Simtabi\Laranail\WaitlistKit\Listeners\SendSignupAlert;
+use Simtabi\Laranail\WaitlistKit\Policies\SubscriberPolicy;
+use Simtabi\Laranail\WaitlistKit\Events\SubscriberConfirmed;
+use Simtabi\Laranail\WaitlistKit\Listeners\SendEnquiryAlert;
+use Simtabi\Laranail\WaitlistKit\Policies\IntegrationPolicy;
+use Simtabi\Laranail\WaitlistKit\Listeners\SendMilestoneAlert;
+use Simtabi\Laranail\WaitlistKit\Listeners\CheckListMilestones;
 use Simtabi\Laranail\WaitlistKit\Settings\LaranailSettingsStore;
+use Simtabi\Laranail\WaitlistKit\Events\CampaignMilestoneReached;
 use Simtabi\Laranail\Package\Tools\Providers\PackageServiceProvider;
 use Simtabi\Laranail\WaitlistKit\Database\Seeders\WaitlistKitSeeder;
 use Simtabi\Laranail\WaitlistKit\View\Composers\AdminLayoutComposer;
@@ -52,6 +70,23 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
     public const string ACCESS_LIMITER = 'laranail-waitlist-kit.access';
 
     public const int ACCESS_PER_MINUTE = 10;
+
+    /** The kit's policies, each registered only when the application has none of its own for the model. */
+    public const array POLICIES = [
+        Campaign::class    => CampaignPolicy::class,
+        Subscriber::class  => SubscriberPolicy::class,
+        Enquiry::class     => EnquiryPolicy::class,
+        Integration::class => IntegrationPolicy::class,
+        Page::class        => PagePolicy::class,
+    ];
+
+    /** The kit's own listeners. Each checks its own switch (alerts.*) when it runs, so config changes need no reboot. */
+    public const array LISTENERS = [
+        SubscriberConfirmed::class      => [CheckListMilestones::class],
+        SubscriberSignedUp::class       => [SendSignupAlert::class],
+        EnquiryReceived::class          => [SendEnquiryAlert::class],
+        CampaignMilestoneReached::class => [SendMilestoneAlert::class],
+    ];
 
     /** Live-validation requests per form per visitor per minute; they validate and store nothing. */
     public const int PRECOGNITION_PER_MINUTE = 60;
@@ -126,6 +161,8 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
         $app = $this->app;
 
         $this->defineAbilities();
+        $this->registerPolicies();
+        $this->registerListeners();
 
         View::composer(['laranail/waitlist-kit::admin.layout', 'laranail/waitlist-kit::admin.login'], AdminLayoutComposer::class);
 
@@ -184,6 +221,29 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
 
                 return $email !== null && in_array($email, $app->make(KitConfig::class)->adminEmails(), true);
             });
+        }
+    }
+
+    /**
+     * The kit's policies, mapping model actions to the four abilities. An application's own policy for a model wins:
+     * one registered with Gate::policy() is seen here and kept, so this never replaces it.
+     */
+    private function registerPolicies(): void
+    {
+        $policies = Gate::policies();
+        foreach (self::POLICIES as $model => $policy) {
+            if (! isset($policies[$model])) {
+                Gate::policy($model, $policy);
+            }
+        }
+    }
+
+    private function registerListeners(): void
+    {
+        foreach (self::LISTENERS as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                Event::listen($event, $listener);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ namespace Simtabi\Laranail\WaitlistKit\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
@@ -37,7 +38,8 @@ final readonly class ConversionController
         $subscriber = Subscriber::query()->where('campaign_id', $campaign->id)->where('referral_code', $request->string('invite')->toString())->first()
             ?? throw new NotFoundHttpException;
 
-        $convert->handle($subscriber);
+        // The product, authenticated by its token: the application acting for itself.
+        $convert->handle($subscriber, Actor::system());
 
         return new JsonResponse(null, 204);
     }

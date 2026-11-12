@@ -7,13 +7,16 @@ namespace Simtabi\Laranail\WaitlistKit\Actions;
 use Throwable;
 use Psr\Log\LoggerInterface;
 use Illuminate\Support\DateFactory;
+use Illuminate\Contracts\Events\Dispatcher;
 use Simtabi\Laranail\WaitlistKit\Models\Page;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Models\Enquiry;
 use Simtabi\Laranail\WaitlistKit\Data\ContactData;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Simtabi\Laranail\WaitlistKit\Mail\EnquiryNotice;
 use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Simtabi\Laranail\WaitlistKit\Enums\FunnelEventType;
+use Simtabi\Laranail\WaitlistKit\Events\EnquiryReceived;
 
 /**
  * Keeps an enquiry (every one: an enquiry is a message, not a list entry) and, after the commit, mails it to the
@@ -27,9 +30,10 @@ final readonly class SubmitEnquiry
         private MailFactory $mail,
         private DateFactory $date,
         private LoggerInterface $log,
+        private Dispatcher $events,
     ) {}
 
-    public function handle(ContactData $data): Enquiry
+    public function handle(ContactData $data, ?Actor $actor = null): Enquiry
     {
         $enquiry = (new Enquiry)->getConnection()->transaction(function () use ($data): Enquiry {
             $now = $this->date->now();
@@ -63,6 +67,8 @@ final readonly class SubmitEnquiry
                 $this->log->warning('laranail/waitlist-kit: an enquiry notice failed', ['enquiry' => $enquiry->id, 'reason' => $e->getMessage()]);
             }
         }
+
+        $this->events->dispatch(new EnquiryReceived($enquiry, $actor ?? Actor::system()));
 
         return $enquiry;
     }

@@ -234,6 +234,71 @@ final readonly class KitConfig
         return $this->string('auth.guard');
     }
 
+    public function apiEnabled(): bool
+    {
+        return $this->value('api.enabled') === true;
+    }
+
+    public function apiPrefix(): string
+    {
+        $value = $this->value('api.prefix');
+
+        return is_string($value) && $value !== '' ? trim($value, '/') : 'api/v1';
+    }
+
+    public function apiGuard(): string
+    {
+        $value = $this->value('api.guard');
+
+        return is_string($value) && $value !== '' ? $value : 'sanctum';
+    }
+
+    public function apiPerMinute(): int
+    {
+        $value = $this->value('api.per_minute');
+
+        return is_int($value) && $value > 0 ? $value : 60;
+    }
+
+    public function apiChecksTokenAbilities(): bool
+    {
+        return $this->value('api.token_abilities') !== false;
+    }
+
+    public function alertsEnabled(): bool
+    {
+        return $this->value('alerts.enabled') === true;
+    }
+
+    /** @return list<string> */
+    public function alertRecipients(): array
+    {
+        $value = $this->value('alerts.to');
+
+        return is_array($value) ? array_values(array_filter($value, static fn (mixed $email): bool => is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL) !== false)) : [];
+    }
+
+    public function alertsAdmins(): bool
+    {
+        return $this->value('alerts.admins') === true;
+    }
+
+    /** Whether this kind of alert is on (`signup`, `enquiry`, `milestone`), and alerts are. */
+    public function alertsOn(string $kind): bool
+    {
+        return $this->alertsEnabled() && $this->value('alerts.on.' . $kind) === true;
+    }
+
+    /** @return list<int> list sizes that count as milestones, ascending */
+    public function milestones(): array
+    {
+        $value = $this->value('alerts.milestones');
+        $sizes = is_array($value) ? array_values(array_unique(array_filter($value, static fn (mixed $size): bool => is_int($size) && $size > 0))) : [];
+        sort($sizes);
+
+        return $sizes;
+    }
+
     /**
      * Everything wrong with the configuration, in words, for the doctor.
      *

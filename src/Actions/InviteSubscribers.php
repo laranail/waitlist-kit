@@ -7,6 +7,8 @@ namespace Simtabi\Laranail\WaitlistKit\Actions;
 use Throwable;
 use Psr\Log\LoggerInterface;
 use Illuminate\Support\DateFactory;
+use Illuminate\Contracts\Events\Dispatcher;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Mail\InviteMail;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
@@ -16,6 +18,7 @@ use Illuminate\Contracts\Mail\Factory as MailFactory;
 use Simtabi\Laranail\WaitlistKit\Enums\FunnelEventType;
 use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
 use Simtabi\Laranail\WaitlistKit\Exceptions\NoInviteUrl;
+use Simtabi\Laranail\WaitlistKit\Events\SubscribersInvited;
 
 /**
  * Invites the next $count confirmed subscribers, in list order: each becomes invited, gets an invite event, and is
@@ -32,10 +35,11 @@ final readonly class InviteSubscribers
         private MailLinks $links,
         private DateFactory $date,
         private LoggerInterface $log,
+        private Dispatcher $events,
     ) {}
 
     /** How many were invited. */
-    public function handle(Campaign $campaign, int $count): int
+    public function handle(Campaign $campaign, int $count, ?Actor $actor = null): int
     {
         $inviteUrl = $campaign->conversion()->inviteUrl ?? throw NoInviteUrl::for($campaign->slug);
         $count = max(0, min($count, self::MAX_BATCH));
@@ -66,6 +70,10 @@ final readonly class InviteSubscribers
             } catch (Throwable $e) {
                 $this->log->warning('laranail/waitlist-kit: an invitation mail failed', ['subscriber' => $subscriber->id, 'reason' => $e->getMessage()]);
             }
+        }
+
+        if ($invited->isNotEmpty()) {
+            $this->events->dispatch(new SubscribersInvited($campaign, $invited, $actor ?? Actor::system()));
         }
 
         return $invited->count();
