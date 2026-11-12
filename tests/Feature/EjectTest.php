@@ -55,7 +55,7 @@ it('copies the views, controllers and routes into the application and turns the 
     expect(file_get_contents($paths['routes']))
         ->toContain('use ' . EjectCommand::APP_NAMESPACE . '\\CampaignController;')
         ->not->toContain(EjectCommand::PACKAGE_NAMESPACE)
-        ->and(file_get_contents($paths['config']))->toContain(EjectCommand::ROUTES_OFF)->not->toContain(EjectCommand::ROUTES_ON)
+        ->and(file_get_contents($paths['config']))->toContain(EjectCommand::ROUTES_OFF)->not->toContain(EjectCommand::ROUTES_ON)->not->toContain(EjectCommand::ROUTES_ON_HEADLESS_AWARE)
         ->and(substr_count((string) file_get_contents($paths['web']), EjectCommand::REQUIRE_LINE))->toBe(1)
         ->and(is_file($paths['views'] . '/waitlist-kit/base/campaign.blade.php'))->toBeTrue();
 });
@@ -98,4 +98,15 @@ it('serves the campaign page through the ejected controller', function (): void 
     expect(Route::getRoutes()->getByName('laranail-waitlist-kit.campaign.show')?->getActionName())
         ->toBe(EjectCommand::APP_NAMESPACE . '\\CampaignController@show');
     $this->get('/waitlist/launch')->assertOk()->assertSee('Northwind');
+});
+
+it('turns the routes off in a config published before headless mode', function (): void {
+    $paths = ejectedPaths();
+    (new Filesystem)->ensureDirectoryExists(dirname($paths['config']));
+    $current = (string) file_get_contents(dirname(__DIR__, 2) . '/config/waitlist-kit.php');
+    file_put_contents($paths['config'], str_replace(EjectCommand::ROUTES_ON_HEADLESS_AWARE, EjectCommand::ROUTES_ON, $current));
+
+    $this->artisan('laranail::waitlist-kit.eject')->assertSuccessful();
+
+    expect(file_get_contents($paths['config']))->toContain(EjectCommand::ROUTES_OFF)->not->toContain(EjectCommand::ROUTES_ON);
 });
