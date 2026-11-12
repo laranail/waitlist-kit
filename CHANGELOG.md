@@ -8,6 +8,18 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- A REST API at `/waitlist/api/v1` (`api.*`): public campaign, sign-up, status, enquiry and captcha endpoints, and
+  `manage/*` for campaigns, subscribers, invites, conversions, exports, erasure and enquiries, behind `api.guard`
+  (Sanctum by default), with per-token abilities (`ApiAbilities`), its own rate limit, and JSON answers throughout.
+- Headless mode (`WAITLIST_KIT_HEADLESS`): pages and backend off, API on; each part keeps its own switch.
+- `WaitlistKit` (and a facade): fluent builders for campaigns, sign-ups, subscriber queries, invites and enquiries,
+  each ending in an action; `->as($user)` acts as that user.
+- `Actor` (a user, a guest or the system), the `Authorizer` service, and policies for campaigns, subscribers,
+  enquiries, integrations and pages, each registered only when the application has none.
+- 12 events, dispatched after commit with the actor; listeners for list milestones and alerts; `SignupAlert`,
+  `EnquiryAlert` and `MilestoneAlert` notifications through `AlertDispatcher` (`alerts.*`, off by default).
+- `CaptchaGuard`: every laranail/captcha provider, a token under `captcha` or the provider's own field, and an action
+  per form. The doctor reports a missing API guard, a mis-prefixed API and alerts nobody receives.
 - Live validation: the sign-up and contact forms and every backend form check each field as it changes, through
   Laravel Precognition, with the server's own rules and messages. Live checks have their own rate limit, so typing
   never uses up sign-ups or enquiries; the bundled sign-in form has none.
@@ -98,6 +110,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- Actions take an optional trailing `?Actor` and dispatch events; their behaviour is otherwise unchanged.
+- The captcha rule no longer has a separate `required` in front of it, which refused a token posted under the
+  provider's own field name; laranail/captcha's rule is implicit and still refuses a post with no token.
+- Deleting a campaign through the policy needs `erase`, as in the backend.
 - The backend moves to `/admin/waitlist` (was `/waitlist-admin`); `WAITLIST_KIT_ADMIN_PREFIX` keeps the old path.
 - Routes are declared in named groups (campaign, unsubscribe, campaigns, blocks, enquiries, pages, settings,
   integrations); every path, name and middleware is unchanged.

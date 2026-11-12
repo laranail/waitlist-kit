@@ -55,7 +55,30 @@ Set both before the first migration: changing them later points the kit at table
 
 | Key | Variable | Default | Meaning |
 | --- | --- | --- | --- |
-| `security.captcha` | `WAITLIST_KIT_CAPTCHA` | `false` | Require `laranail/captcha`'s challenge on the form; the doctor fails if the package is missing |
+| `security.captcha` | `WAITLIST_KIT_CAPTCHA` | `false` | Require `laranail/captcha`'s challenge (any provider, `CAPTCHA_PROVIDER`) on the sign-up and contact forms and their API endpoints; the doctor fails if the package is missing |
+
+## Headless and API
+
+| Key | Env | Default | Does |
+| --- | --- | --- | --- |
+| — | `WAITLIST_KIT_HEADLESS` | `false` | Defaults `routes.enabled` and `admin.enabled` to off and `api.enabled` to on |
+| `api.enabled` | `WAITLIST_KIT_API` | headless | The [REST API](tools/api.md) |
+| `api.prefix` | `WAITLIST_KIT_API_PREFIX` | `api/v1` | Under `routes.prefix`; must start with `api` |
+| `api.guard` | `WAITLIST_KIT_API_GUARD` | `sanctum` | The guard `manage/*` authenticates with |
+| `api.per_minute` | `WAITLIST_KIT_API_PER_MINUTE` | `60` | Per user on `manage/*`, per visitor on public reads |
+| `api.token_abilities` | `WAITLIST_KIT_API_TOKEN_ABILITIES` | `true` | Also require a Sanctum token's `waitlist:*` ability |
+
+## Alerts
+
+| Key | Env | Default | Does |
+| --- | --- | --- | --- |
+| `alerts.enabled` | `WAITLIST_KIT_ALERTS` | `false` | Send [alerts](tools/events.md) at all |
+| `alerts.to` | `WAITLIST_KIT_ALERTS_TO` | none | Addresses alerted by mail, comma-separated |
+| `alerts.admins` | `WAITLIST_KIT_ALERTS_ADMINS` | `false` | Also alert the kit's administrators (bundled sign-in) |
+| `alerts.on.signup` | `WAITLIST_KIT_ALERT_SIGNUPS` | `false` | Alert on every new sign-up |
+| `alerts.on.enquiry` | `WAITLIST_KIT_ALERT_ENQUIRIES` | `true` | Alert on contact enquiries |
+| `alerts.on.milestone` | `WAITLIST_KIT_ALERT_MILESTONES` | `true` | Alert when a list passes a milestone |
+| `alerts.milestones` | — | `100, 500, 1000, 5000, 10000` | List sizes that raise `CampaignMilestoneReached` |
 
 ## Settings and mail
 
