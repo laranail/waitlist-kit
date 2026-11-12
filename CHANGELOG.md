@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- Live validation: the sign-up and contact forms and every backend form check each field as it changes, through
+  Laravel Precognition, with the server's own rules and messages. Live checks have their own rate limit, so typing
+  never uses up sign-ups or enquiries; the bundled sign-in form has none.
+- The early-access form posts in place too, and is answered as JSON (`422`, or `{"redirect"}`).
+- Forms are marked `aria-busy` while they send; both themes dim the button meanwhile.
 - `laranail::waitlist-kit.eject`: copies the public views, controllers and routes into the application, which then
   owns them, and turns the kit's own public routes off in the published config.
 - The foundation: a service provider built on `laranail/package-tools`, config at `laranail.waitlist-kit`, and
@@ -92,6 +97,10 @@ All notable changes to this project are documented here. The format follows
   email field too. Their errors are now in `$errors->signup` and `$errors->contact`.
 
 ### Changed
-### Changed
 
+- The backend moves to `/admin/waitlist` (was `/waitlist-admin`); `WAITLIST_KIT_ADMIN_PREFIX` keeps the old path.
+- Routes are declared in named groups (campaign, unsubscribe, campaigns, blocks, enquiries, pages, settings,
+  integrations); every path, name and middleware is unchanged.
+- The default theme's contact and early-access forms span their section, aligned with its heading; in both themes the
+  footer's rule matches the content width, FAQ questions carry a +/− marker on the right, and buttons have a hover state.
 - The five migrations are one migration. Nothing was released, so no install has run the old ones.

@@ -20,7 +20,7 @@ WAITLIST_KIT_SEED_ADMIN_EMAIL=owner@example.org
 php artisan db:seed
 ```
 
-It prints a generated password once; change it with the command above. Sign in at `/waitlist-admin/login`. See
+It prints a generated password once; change it with the command above. Sign in at `/admin/waitlist/login`. See
 [Backend](../tools/backend.md#signing-in).
 
 ---

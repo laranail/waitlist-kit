@@ -6,7 +6,7 @@
     <p class="wk-status" data-scope="signup-form" data-part="status" data-state="sent" role="status">{{ \Simtabi\Laranail\WaitlistKit\Http\Controllers\SignupController::message($campaign) }}</p>
 @else
     <form class="wk-form" method="post" action="{{ route('laranail-waitlist-kit.campaign.signup', $campaign) }}" novalidate
-          data-scope="signup-form" x-data="wkForm" x-on:submit="submit">
+          data-scope="signup-form" x-data="wkForm" x-on:submit="submit" x-on:focusout="left" x-on:input="edited" x-on:change="edited">
         @csrf
         <input type="hidden" name="locale" value="{{ $locale }}">
         {{-- A referral link (?ref=code) carries the referrer into the sign-up; SignupRules checks its shape. --}}

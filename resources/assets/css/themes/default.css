@@ -47,7 +47,11 @@
     .wk-sr { @apply sr-only; }
 
     .wk-faq-item { @apply border-t border-wk-text/10 py-3; }
-    .wk-faq-question { @apply cursor-pointer font-semibold; }
+    /* The disclosure marker is the theme's own (+ / −), on the right, so questions line up with the text above. */
+    .wk-faq-question { @apply flex cursor-pointer list-none items-center justify-between gap-4 font-semibold; }
+    .wk-faq-question::-webkit-details-marker { display: none; }
+    .wk-faq-question::after { @apply shrink-0 text-xl leading-none text-wk-text/60; content: "+"; }
+    .wk-faq-item[open] > .wk-faq-question::after { content: "\2212"; }
     .wk-faq-answer { @apply mt-2 text-wk-text/70; }
 
     .wk-quote { @apply m-0 border-l-4 border-wk-primary pl-4; }
@@ -55,10 +59,13 @@
     .wk-quote-author { @apply mt-2 text-sm text-wk-text/60; }
 
     /* The footer sits after <main> (its own contentinfo landmark), so it takes main's width itself. */
-    .wk-footer { @apply mx-auto max-w-2xl border-t border-wk-text/10 px-4 pt-6 pb-16 text-sm text-wk-text/60; }
+    /* main is max-w-2xl with px-4, so its content is 40rem wide: the footer's rule spans exactly that. */
+    .wk-footer { @apply mx-auto w-[calc(100%-2rem)] max-w-[40rem] border-t border-wk-text/10 pt-6 pb-16 text-sm text-wk-text/60; }
     .wk-legal-links { @apply flex list-none flex-wrap gap-4 p-0; }
 
-    .wk-form, [data-scope="contact-form"] { @apply mx-auto grid w-full max-w-md gap-4; }
+    /* Forms span their section, so they line up with its heading; the sign-up form sits centred under the hero. */
+    .wk-form, [data-scope="contact-form"] { @apply grid w-full gap-4; }
+    .wk-signup .wk-form, .wk-signup > .wk-status { @apply mx-auto max-w-md; }
     .wk-field, [data-scope="contact-form"] [data-part="field"] { @apply grid gap-1.5; }
     .wk-label, [data-scope="contact-form"] [data-part="label"] { @apply text-sm font-semibold; }
     /* The consent checkbox sits beside its label, with any error on the line below. */
@@ -71,8 +78,10 @@
     [data-state="invalid"] .wk-input, [data-state="invalid"] [data-part="input"] { @apply border-red-700; }
     .wk-error, [data-part="error"] { @apply m-0 text-sm text-red-700; }
     .wk-button, [data-scope="contact-form"] [data-part="submit"] {
-        @apply cursor-pointer rounded-lg bg-wk-primary px-5 py-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wk-primary;
+        @apply cursor-pointer rounded-lg bg-wk-primary px-5 py-3 font-semibold text-white transition hover:brightness-110 active:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wk-primary motion-reduce:transition-none;
     }
+    /* While a form is sending (aria-busy, set by the script) its button says so without losing focus. */
+    [aria-busy="true"] .wk-button, [aria-busy="true"] [data-part="submit"] { @apply cursor-progress opacity-70; }
     .wk-status, [data-part="status"] { @apply m-0 font-semibold; }
     .wk-consent { @apply m-0 text-sm text-wk-text/60; }
     .wk-consent a, .wk-footer a, [data-scope="contact-form"] a { @apply text-wk-primary underline; }

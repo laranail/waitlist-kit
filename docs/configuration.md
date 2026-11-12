@@ -86,7 +86,7 @@ again. `database` without `laranail/settings` installed is reported by the docto
 | Key | Variable | Default | Meaning |
 | --- | --- | --- | --- |
 | `admin.enabled` | `WAITLIST_KIT_ADMIN` | `true` | Register the backend's routes |
-| `admin.prefix` | `WAITLIST_KIT_ADMIN_PREFIX` | `waitlist-admin` | The backend lives at `/{prefix}` |
+| `admin.prefix` | `WAITLIST_KIT_ADMIN_PREFIX` | `admin/waitlist` | The backend lives at `/{prefix}` (it was `waitlist-admin` before 0.1; set this to keep the old path) |
 | `admin.middleware` | — | `['web']` | The group in front of the backend |
 | `admin.emails` | `WAITLIST_KIT_ADMIN_EMAILS` | empty | In `host` sign-in, who the kit's default abilities let in |
 

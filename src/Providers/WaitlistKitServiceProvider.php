@@ -53,6 +53,9 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
 
     public const int ACCESS_PER_MINUTE = 10;
 
+    /** Live-validation requests per form per visitor per minute; they validate and store nothing. */
+    public const int PRECOGNITION_PER_MINUTE = 60;
+
     public const string LOGIN_LIMITER = 'laranail-waitlist-kit.admin-login';
 
     /** laranail/settings' contract, bound only when that package is installed. */
@@ -135,8 +138,13 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
             // The raw slug: Laravel's middleware priority runs throttling before route-model binding.
             $slug = $request->route()?->originalParameter('campaign');
 
-            return Limit::perMinute($app->make(KitConfig::class)->signupsPerMinute())
-                ->by((is_string($slug) ? $slug : '') . '|' . $request->ip());
+            $key = (is_string($slug) ? $slug : '') . '|' . $request->ip();
+
+            // Live validation (Precognition) asks on every changed field, and never stores anything: its own, wider
+            // bucket, so typing an address cannot use up the visitor's sign-ups.
+            return $request->isAttemptingPrecognition()
+                ? Limit::perMinute(self::PRECOGNITION_PER_MINUTE)->by('precognition|' . $key)
+                : Limit::perMinute($app->make(KitConfig::class)->signupsPerMinute())->by($key);
         });
 
         // Five sign-in attempts per address per minute, so the bundled login cannot be guessed at speed.
@@ -148,7 +156,9 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
 
             return Limit::perMinute(self::ACCESS_PER_MINUTE)->by($slug . '|' . $request->ip());
         });
-        RateLimiter::for(self::ENQUIRY_LIMITER, static fn (Request $request): Limit => Limit::perMinute($app->make(KitConfig::class)->enquiriesPerMinute())->by((string) $request->ip()));
+        RateLimiter::for(self::ENQUIRY_LIMITER, static fn (Request $request): Limit => $request->isAttemptingPrecognition()
+            ? Limit::perMinute(self::PRECOGNITION_PER_MINUTE)->by('precognition|' . $request->ip())
+            : Limit::perMinute($app->make(KitConfig::class)->enquiriesPerMinute())->by((string) $request->ip()));
     }
 
     /**

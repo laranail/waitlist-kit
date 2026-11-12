@@ -70,7 +70,8 @@
 
     <div class="page-wrapper">
         {{-- The title sits inside <main>, so the skip link lands on it and every part of the page is in a landmark. --}}
-        <main id="content" tabindex="-1">
+        {{-- wkLive: every form in the page checks its fields as they change (live validation through Precognition). --}}
+        <main id="content" tabindex="-1" x-data="wkLive" x-on:focusout="left" x-on:input="edited" x-on:change="edited">
             <div class="page-header d-print-none">
                 <div class="container-xl">
                     <div class="row g-2 align-items-center">

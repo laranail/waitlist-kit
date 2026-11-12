@@ -37,5 +37,6 @@
         @endif
     @endif
     @isset($hint)<p class="form-hint mt-1 mb-0" id="{{ $id }}-hint">{{ $hint }}</p>@endisset
-    @if ($error !== '')<p class="invalid-feedback d-block mb-0" id="{{ $id }}-error">{{ $error }}</p>@endif
+    {{-- Always in the page, so live validation has a place to write; hidden while there is no error. --}}
+    <p class="invalid-feedback mb-0{{ $error !== '' ? ' d-block' : '' }}" id="{{ $id }}-error" data-part="error" data-for="{{ $name }}" @if ($error === '') hidden @endif>{{ $error }}</p>
 </div>

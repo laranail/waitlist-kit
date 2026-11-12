@@ -45,9 +45,27 @@ assets are not published renders unstyled rather than failing, and the doctor re
 
 ## Alpine.js
 
-The kit's script uses Alpine's CSP build (no `unsafe-eval`): `wkForm` posts the sign-up and contact forms in place
-and shows the answer in their `status` and `error` parts; `wkCountdown` counts down to the campaign's launch. Both
-forms work without it.
+The kit's script uses Alpine's CSP build (no `unsafe-eval`): `wkForm` posts the sign-up, contact and early-access
+forms in place (AJAX) and shows the answer in their `status` and `error` parts, marking the form `aria-busy` while it
+sends; `wkCountdown` counts down to the campaign's launch. Every form works without it.
+
+## Live validation
+
+The sign-up and contact forms, and every form in the backend, check a field as soon as it is left after a change, and
+re-check it while an error shows, so the error goes as soon as it is fixed. The check is
+[Laravel Precognition](https://laravel.com/docs/precognition): the form posts to its own route with
+`Precognition: true` and `Precognition-Validate-Only: <field>`, the route's FormRequest validates that field alone, and
+the answer is `204` or `422` with the server's own message. Nothing is stored or sent, and the rules exist once, on
+the server.
+
+| Where | Limit |
+| --- | --- |
+| Sign-up | 60 checks a minute per campaign and visitor, apart from the sign-up limit, so typing never uses it up |
+| Contact | 60 checks a minute per visitor, apart from the enquiry limit |
+| Backend | Signed-in administrators only; the sign-in form has none, since each check would spend a sign-in attempt |
+
+A theme styles a live error the same way as a submitted one: the field's `data-state="invalid"`, the input's
+`aria-invalid`, and its `data-part="error"` element.
 
 ---
 

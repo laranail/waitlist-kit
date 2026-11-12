@@ -35,11 +35,11 @@ final class SettingsDatabaseTest extends TestCase
         Mail::fake();
         config()->set('laranail.waitlist-kit.contact.to', 'config@example.org');
 
-        $this->put('/waitlist-admin/settings', $this->form([
+        $this->put('/admin/waitlist/settings', $this->form([
             'mail'    => ['from_address' => 'hello@example.org', 'from_name' => 'Northwind'],
             'contact' => ['to' => 'inbox@example.org', 'topics' => 'press, demo', 'company' => 'off'],
             'themes'  => ['default' => KitThemes::PLAIN],
-        ]))->assertRedirect('/waitlist-admin/settings');
+        ]))->assertRedirect('/admin/waitlist/settings');
 
         $config = app(KitConfig::class);
         $this->assertSame('inbox@example.org', $config->contactInbox());
@@ -59,17 +59,17 @@ final class SettingsDatabaseTest extends TestCase
         $this->signIn();
         config()->set('laranail.waitlist-kit.contact.to', 'config@example.org');
 
-        $this->put('/waitlist-admin/settings', $this->form(['contact' => ['to' => 'inbox@example.org']]));
+        $this->put('/admin/waitlist/settings', $this->form(['contact' => ['to' => 'inbox@example.org']]));
         $this->assertSame('inbox@example.org', app(KitConfig::class)->contactInbox());
 
-        $this->put('/waitlist-admin/settings', $this->form(['contact' => ['to' => '']]));
+        $this->put('/admin/waitlist/settings', $this->form(['contact' => ['to' => '']]));
         $this->assertSame('config@example.org', app(KitConfig::class)->contactInbox());
     }
 
     public function test_a_saved_rate_limit_applies_to_the_next_sign_up(): void
     {
         $this->signIn();
-        $this->put('/waitlist-admin/settings', $this->form(['signups' => ['per_minute' => '1']]));
+        $this->put('/admin/waitlist/settings', $this->form(['signups' => ['per_minute' => '1']]));
         Campaign::factory()->live()->create(['slug' => 'launch']);
         Mail::fake();
 
@@ -81,7 +81,7 @@ final class SettingsDatabaseTest extends TestCase
     {
         $this->signIn();
 
-        $this->put('/waitlist-admin/settings', $this->form([
+        $this->put('/admin/waitlist/settings', $this->form([
             'mail'    => ['from_address' => 'not-an-address'],
             'signups' => ['per_minute' => '0'],
             'contact' => ['topics' => 'Sales Team!', 'company' => 'sometimes'],
@@ -94,8 +94,8 @@ final class SettingsDatabaseTest extends TestCase
         $this->signIn();
         Gate::define(Abilities::MANAGE, fn (): bool => false);
 
-        $this->get('/waitlist-admin/settings')->assertOk();
-        $this->put('/waitlist-admin/settings', $this->form())->assertForbidden();
+        $this->get('/admin/waitlist/settings')->assertOk();
+        $this->put('/admin/waitlist/settings', $this->form())->assertForbidden();
     }
 
     /** @return list<class-string> */

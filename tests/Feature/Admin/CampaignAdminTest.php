@@ -15,14 +15,14 @@ dataset('modes', ['host', 'bundled']);
 it('creates, edits and makes a campaign live', function (string $mode): void {
     signInAdmin($mode);
 
-    $this->post('/waitlist-admin/campaigns', ['name' => 'Launch', 'slug' => 'launch', 'type' => 'waitlist', 'locales' => 'en, es'])
+    $this->post('/admin/waitlist/campaigns', ['name' => 'Launch', 'slug' => 'launch', 'type' => 'waitlist', 'locales' => 'en, es'])
         ->assertRedirect();
     $campaign = Campaign::query()->sole();
     expect($campaign->locales)->toBe(['en', 'es']);
 
-    $this->get("/waitlist-admin/campaigns/{$campaign->id}/edit")->assertOk()->assertSee('Launch');
+    $this->get("/admin/waitlist/campaigns/{$campaign->id}/edit")->assertOk()->assertSee('Launch');
 
-    $this->put("/waitlist-admin/campaigns/{$campaign->id}", [
+    $this->put("/admin/waitlist/campaigns/{$campaign->id}", [
         'name' => 'Launch list', 'slug' => 'launch', 'type' => 'waitlist', 'status' => 'live', 'locales' => 'en', 'launches_at' => '2027-03-01T09:00',
     ])->assertRedirect();
 
@@ -36,8 +36,8 @@ it('creates, edits and makes a campaign live', function (string $mode): void {
 it('refuses a campaign that breaks the rules, and names every field', function (string $mode): void {
     signInAdmin($mode);
 
-    $this->from('/waitlist-admin/campaigns/create')
-        ->post('/waitlist-admin/campaigns', ['name' => '', 'slug' => 'Has Spaces', 'type' => 'party', 'locales' => 'english'])
+    $this->from('/admin/waitlist/campaigns/create')
+        ->post('/admin/waitlist/campaigns', ['name' => '', 'slug' => 'Has Spaces', 'type' => 'party', 'locales' => 'english'])
         ->assertSessionHasErrors(['name', 'slug', 'type', 'locales.0']);
     expect(Campaign::query()->count())->toBe(0);
 })->with('modes');
@@ -46,34 +46,34 @@ it('sets the theme and its settings, refusing an unsafe value', function (string
     signInAdmin($mode);
     $campaign = Campaign::factory()->create();
 
-    $this->put("/waitlist-admin/campaigns/{$campaign->id}/theme", ['theme' => KitThemes::PLAIN, 'settings' => ['primary' => '#0f766e', 'show-powered-by' => '1', 'footer' => 'Hi']])
+    $this->put("/admin/waitlist/campaigns/{$campaign->id}/theme", ['theme' => KitThemes::PLAIN, 'settings' => ['primary' => '#0f766e', 'show-powered-by' => '1', 'footer' => 'Hi']])
         ->assertRedirect();
     expect($campaign->fresh()?->theme)->toBe(KitThemes::PLAIN)
         ->and($campaign->fresh()?->theme_settings)->toMatchArray(['primary' => '#0f766e', 'show-powered-by' => '1', 'footer' => 'Hi']);
 
-    $this->put("/waitlist-admin/campaigns/{$campaign->id}/theme", ['theme' => KitThemes::PLAIN, 'settings' => ['primary' => 'red;}body{x']])
+    $this->put("/admin/waitlist/campaigns/{$campaign->id}/theme", ['theme' => KitThemes::PLAIN, 'settings' => ['primary' => 'red;}body{x']])
         ->assertSessionHasErrors('settings.primary');
-    $this->put("/waitlist-admin/campaigns/{$campaign->id}/theme", ['theme' => 'gone/theme'])->assertSessionHasErrors('theme');
+    $this->put("/admin/waitlist/campaigns/{$campaign->id}/theme", ['theme' => 'gone/theme'])->assertSessionHasErrors('theme');
 })->with('modes');
 
 it('adds, edits one language of, moves and removes blocks', function (string $mode): void {
     signInAdmin($mode);
     $campaign = Campaign::factory()->create(['locales' => ['en', 'es']]);
 
-    $this->post("/waitlist-admin/campaigns/{$campaign->id}/blocks", ['type' => 'hero', 'locale' => 'en', 'title' => 'Hello'])->assertRedirect();
-    $this->post("/waitlist-admin/campaigns/{$campaign->id}/blocks", ['type' => 'faq', 'locale' => 'en', 'items' => "When? | Soon\nWhere? | Here"])->assertRedirect();
+    $this->post("/admin/waitlist/campaigns/{$campaign->id}/blocks", ['type' => 'hero', 'locale' => 'en', 'title' => 'Hello'])->assertRedirect();
+    $this->post("/admin/waitlist/campaigns/{$campaign->id}/blocks", ['type' => 'faq', 'locale' => 'en', 'items' => "When? | Soon\nWhere? | Here"])->assertRedirect();
     [$hero, $faq] = $campaign->blocks()->get()->all();
 
     // toEqual, not toBe: MySQL's JSON type stores object keys in its own order.
     expect($faq->content['en']['items'])->toEqual([['question' => 'When?', 'answer' => 'Soon'], ['question' => 'Where?', 'answer' => 'Here']]);
 
-    $this->put("/waitlist-admin/blocks/{$hero->id}", ['type' => 'hero', 'locale' => 'es', 'title' => 'Hola'])->assertRedirect();
+    $this->put("/admin/waitlist/blocks/{$hero->id}", ['type' => 'hero', 'locale' => 'es', 'title' => 'Hola'])->assertRedirect();
     expect($hero->fresh()?->content)->toBe(['en' => ['title' => 'Hello'], 'es' => ['title' => 'Hola']]);
 
-    $this->post("/waitlist-admin/blocks/{$faq->id}/move", ['direction' => 'up'])->assertRedirect();
+    $this->post("/admin/waitlist/blocks/{$faq->id}/move", ['direction' => 'up'])->assertRedirect();
     expect($campaign->blocks()->pluck('type')->all())->toBe(['faq', 'hero']);
 
-    $this->delete("/waitlist-admin/blocks/{$hero->id}")->assertRedirect();
+    $this->delete("/admin/waitlist/blocks/{$hero->id}")->assertRedirect();
     expect(Block::query()->count())->toBe(1);
 })->with('modes');
 
@@ -83,10 +83,10 @@ it('deletes a campaign only with erase and its slug typed back', function (strin
     Subscriber::factory()->count(2)->create(['campaign_id' => $campaign->id]);
     $campaign->blocks()->create(['type' => 'hero']);
 
-    $this->delete("/waitlist-admin/campaigns/{$campaign->id}", ['confirm' => 'wrong'])->assertSessionHasErrors('confirm');
+    $this->delete("/admin/waitlist/campaigns/{$campaign->id}", ['confirm' => 'wrong'])->assertSessionHasErrors('confirm');
     expect(Campaign::query()->count())->toBe(1);
 
-    $this->delete("/waitlist-admin/campaigns/{$campaign->id}", ['confirm' => 'launch'])->assertRedirect('/waitlist-admin/campaigns');
+    $this->delete("/admin/waitlist/campaigns/{$campaign->id}", ['confirm' => 'launch'])->assertRedirect('/admin/waitlist/campaigns');
     expect(Campaign::query()->count())->toBe(0)
         ->and(Subscriber::withTrashed()->count())->toBe(0)
         ->and(Block::query()->count())->toBe(0);
@@ -98,11 +98,11 @@ it('lets someone with view but not manage look, never change', function (): void
     Gate::define(Abilities::ERASE, fn (): bool => false);
     $campaign = Campaign::factory()->create();
 
-    $this->get('/waitlist-admin/campaigns')->assertOk()->assertDontSee('New campaign');
-    $this->post('/waitlist-admin/campaigns', ['name' => 'X', 'slug' => 'x', 'type' => 'waitlist', 'locales' => 'en'])->assertForbidden();
-    $this->post("/waitlist-admin/campaigns/{$campaign->id}/blocks", ['type' => 'hero', 'locale' => 'en'])->assertForbidden();
-    $this->delete("/waitlist-admin/campaigns/{$campaign->id}", ['confirm' => $campaign->slug])->assertForbidden();
-    $this->get("/waitlist-admin/campaigns/{$campaign->id}/edit")->assertOk()->assertDontSee('Delete this campaign');
+    $this->get('/admin/waitlist/campaigns')->assertOk()->assertDontSee('New campaign');
+    $this->post('/admin/waitlist/campaigns', ['name' => 'X', 'slug' => 'x', 'type' => 'waitlist', 'locales' => 'en'])->assertForbidden();
+    $this->post("/admin/waitlist/campaigns/{$campaign->id}/blocks", ['type' => 'hero', 'locale' => 'en'])->assertForbidden();
+    $this->delete("/admin/waitlist/campaigns/{$campaign->id}", ['confirm' => $campaign->slug])->assertForbidden();
+    $this->get("/admin/waitlist/campaigns/{$campaign->id}/edit")->assertOk()->assertDontSee('Delete this campaign');
 });
 
 it('stops offering a new campaign at the install\'s limit', function (): void {
@@ -110,5 +110,5 @@ it('stops offering a new campaign at the install\'s limit', function (): void {
     config()->set('laranail.waitlist-kit.campaigns.mode', 'single');
     Campaign::factory()->create();
 
-    $this->get('/waitlist-admin/campaigns')->assertDontSee('New campaign')->assertSee('This install runs one campaign.');
+    $this->get('/admin/waitlist/campaigns')->assertDontSee('New campaign')->assertSee('This install runs one campaign.');
 });
