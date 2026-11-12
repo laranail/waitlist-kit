@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\WaitlistKit\Actions;
 
+use Illuminate\Contracts\Events\Dispatcher;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Models\Enquiry;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Models\FunnelEvent;
+use Simtabi\Laranail\WaitlistKit\Events\SubscriberForgotten;
 
 /**
  * Erases an address for good: every subscriber row with it (soft-deleted ones included), every enquiry it sent, and
@@ -14,8 +17,10 @@ use Simtabi\Laranail\WaitlistKit\Models\FunnelEvent;
  */
 final readonly class ForgetSubscriber
 {
+    public function __construct(private Dispatcher $events) {}
+
     /** @return array{subscribers: int, enquiries: int} how many records went */
-    public function handle(string $email): array
+    public function handle(string $email, ?Actor $actor = null): array
     {
         $email = mb_strtolower(trim($email));
         $subscribers = Subscriber::query()->withTrashed()->where('email', $email)->get();
@@ -31,6 +36,8 @@ final readonly class ForgetSubscriber
             $subscribers->each(static fn (Subscriber $subscriber): ?bool => $subscriber->forceDelete());
             Enquiry::query()->whereKey($enquiryIds)->delete();
         });
+
+        $this->events->dispatch(new SubscriberForgotten($email, count($ids), count($enquiryIds), $actor ?? Actor::system()));
 
         return ['subscribers' => count($ids), 'enquiries' => count($enquiryIds)];
     }

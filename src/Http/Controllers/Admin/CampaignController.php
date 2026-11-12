@@ -7,6 +7,7 @@ namespace Simtabi\Laranail\WaitlistKit\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Enums\BlockType;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
@@ -51,7 +52,7 @@ final readonly class CampaignController
     {
         /** @var array{name: string, slug: string, type: string, locales: list<string>} $data */
         $data = $request->validated();
-        $campaign = $create->handle($data['name'], $data['slug'], CampaignType::from($data['type']), $data['locales']);
+        $campaign = $create->handle($data['name'], $data['slug'], CampaignType::from($data['type']), $data['locales'], Actor::from($request->user()));
 
         return redirect()->route('laranail-waitlist-kit.admin.campaigns.edit', $campaign)->with('status', __('laranail/waitlist-kit::admin.saved'));
     }
@@ -76,7 +77,7 @@ final readonly class CampaignController
     {
         /** @var array{name: string, slug: string, type: string, status: string, locales: list<string>, host?: ?string, launches_at?: ?string} $data */
         $data = $request->validated();
-        $update->handle($campaign, $data);
+        $update->handle($campaign, $data, Actor::from($request->user()));
 
         return redirect()->route('laranail-waitlist-kit.admin.campaigns.edit', $campaign)->with('status', __('laranail/waitlist-kit::admin.saved'));
     }
@@ -117,7 +118,7 @@ final readonly class CampaignController
 
     public function destroy(DeleteCampaignRequest $request, Campaign $campaign, DeleteCampaign $delete): RedirectResponse
     {
-        $delete->handle($campaign);
+        $delete->handle($campaign, Actor::from($request->user()));
 
         return redirect()->route('laranail-waitlist-kit.admin.campaigns.index')->with('status', __('laranail/waitlist-kit::admin.deleted'));
     }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Simtabi\Laranail\WaitlistKit\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Actions\ConfirmSubscriber;
@@ -17,9 +19,9 @@ final readonly class ConfirmController
 {
     public const string FLASH = 'laranail/waitlist-kit.confirmed';
 
-    public function __invoke(Campaign $campaign, Subscriber $subscriber, ConfirmSubscriber $confirm): RedirectResponse
+    public function __invoke(Request $request, Campaign $campaign, Subscriber $subscriber, ConfirmSubscriber $confirm): RedirectResponse
     {
-        $confirm->handle($campaign, $subscriber);
+        $confirm->handle($campaign, $subscriber, Actor::from($request->user()));
 
         $response = redirect()->route('laranail-waitlist-kit.campaign.show', $campaign)->with(self::FLASH, $subscriber->position);
         $response->headers->set('Cache-Control', 'no-store');

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Simtabi\Laranail\WaitlistKit\Models\Model;
+use Simtabi\Laranail\WaitlistKit\Notifications\Alert;
 use Simtabi\Laranail\WaitlistKit\Http\Requests\Admin\AdminRequest;
 
 /**
@@ -31,7 +32,7 @@ arch('every class is final or abstract, and strict')
     ->expect('Simtabi\Laranail\WaitlistKit')
     ->classes()
     ->toBeFinal()
-    ->ignoring([Model::class, AdminRequest::class]);
+    ->ignoring([Model::class, AdminRequest::class, Alert::class]);
 
 arch('every file declares strict types')
     ->expect('Simtabi\Laranail\WaitlistKit')

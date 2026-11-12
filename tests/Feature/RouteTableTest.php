@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Route as Router;
+use Simtabi\Laranail\WaitlistKit\Http\Middleware\AuthenticateApi;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 
 /** The kit's routes as "METHOD uri name", HEAD folded into GET. */
@@ -27,7 +28,8 @@ function kitRouteTable(): array
 it('serves every public route at /waitlist and every backend route at /admin/waitlist, all named', function (): void {
     $table = kitRouteTable();
 
-    expect($table)->toHaveCount(49);
+    // The public pages and the backend (49), and the API (21, below).
+    expect($table)->toHaveCount(70);
     foreach ($table as $row) {
         [, $uri] = explode(' ', $row);
         $admin = str_contains($row, ' laranail-waitlist-kit.admin.');
@@ -56,7 +58,26 @@ it('answers live validation on the sign-up, the contact form and the backend exc
         ->map(fn (Route $route): string => (string) $route->getName());
 
     expect($precognitive->reject(fn (string $name): bool => str_starts_with($name, 'laranail-waitlist-kit.admin.'))->sort()->values()->all())
-        ->toBe(['laranail-waitlist-kit.campaign.signup', 'laranail-waitlist-kit.contact.store'])
+        ->toBe([
+            'laranail-waitlist-kit.api.campaigns.subscribers.store',
+            'laranail-waitlist-kit.api.enquiries.store',
+            'laranail-waitlist-kit.campaign.signup',
+            'laranail-waitlist-kit.contact.store',
+        ])
         ->and($precognitive->filter(fn (string $name): bool => str_starts_with($name, 'laranail-waitlist-kit.admin.'))->count())->toBe(37)
         ->and($precognitive->all())->not->toContain('laranail-waitlist-kit.admin.login.store');
+});
+
+it('serves the API at /waitlist/api/v1, its manage endpoints behind the API guard', function (): void {
+    $api = array_values(array_filter(kitRouteTable(), static fn (string $row): bool => str_contains($row, ' laranail-waitlist-kit.api.')));
+
+    expect($api)->toHaveCount(21);
+    foreach ($api as $row) {
+        [, $uri, $name] = explode(' ', $row);
+        expect($uri)->toStartWith('waitlist/api/v1/', $row);
+        $manage = str_starts_with($name, 'laranail-waitlist-kit.api.manage.');
+        expect(str_starts_with($uri, 'waitlist/api/v1/manage/'))->toBe($manage, $row);
+        $middleware = Router::getRoutes()->getByName($name)?->gatherMiddleware() ?? [];
+        expect(in_array(AuthenticateApi::class, $middleware, true))->toBe($manage, $row);
+    }
 });

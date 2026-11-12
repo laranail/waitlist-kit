@@ -10,6 +10,7 @@ use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Data\ContactData;
 use Simtabi\Laranail\WaitlistKit\Support\KitConfig;
 use Simtabi\Laranail\WaitlistKit\Support\ReturnPath;
+use Simtabi\Laranail\WaitlistKit\Services\CaptchaGuard;
 use Simtabi\Laranail\WaitlistKit\Validation\ContactRules;
 
 /**
@@ -31,13 +32,12 @@ final class ContactRequest extends FormRequest
     }
 
     /** @return array<string, list<mixed>> */
-    public function rules(KitConfig $config): array
+    public function rules(KitConfig $config, CaptchaGuard $captcha): array
     {
         $rules = ContactRules::rules($config);
 
-        if ($config->requiresCaptcha()) {
-            $rules['captcha'] = ['required', 'laranail_captcha'];
-        }
+        // Every provider laranail/captcha has, bound to this form's action (see CaptchaGuard).
+        $rules = [...$rules, ...$captcha->rules(CaptchaGuard::CONTACT)];
 
         return $rules;
     }

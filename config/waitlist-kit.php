@@ -44,8 +44,9 @@ return [
     ],
 
     'routes' => [
-        // Register the public pages and the sign-up endpoint. Off for an application that routes them itself.
-        'enabled' => (bool) env('WAITLIST_KIT_ROUTES', true),
+        // Register the public pages and the sign-up endpoint. Off for an application that routes them itself, and by
+        // default in headless mode (WAITLIST_KIT_HEADLESS), where the API and the builders replace them.
+        'enabled' => (bool) env('WAITLIST_KIT_ROUTES', ! env('WAITLIST_KIT_HEADLESS', false)),
 
         // Pages live at /{prefix}/{campaign slug}. An empty prefix puts them at the root.
         'prefix' => env('WAITLIST_KIT_ROUTE_PREFIX', 'waitlist'),
@@ -94,8 +95,51 @@ return [
     ],
 
     'security' => [
-        // Require laranail/captcha's challenge (Turnstile and others) on the sign-up form. Needs that package.
+        // Require laranail/captcha's challenge on the sign-up and contact forms and their API endpoints. Needs that
+        // package; the provider (Turnstile, hCaptcha, reCAPTCHA v2, v2 invisible, v3 or Enterprise, Friendly Captcha,
+        // Arkose, ALTCHA or Math) is laranail/captcha's own setting, CAPTCHA_PROVIDER.
         'captcha' => (bool) env('WAITLIST_KIT_CAPTCHA', false),
+    ],
+
+    'api' => [
+        // The REST API at /{routes.prefix}/{api.prefix}: public sign-up, status and contact endpoints, and the
+        // `manage/*` endpoints behind api.guard. On by default only in headless mode.
+        'enabled' => (bool) env('WAITLIST_KIT_API', (bool) env('WAITLIST_KIT_HEADLESS', false)),
+
+        // Under routes.prefix, so it starts with the reserved slug `api`.
+        'prefix' => env('WAITLIST_KIT_API_PREFIX', 'api/v1'),
+
+        // The guard the `manage/*` endpoints authenticate with: `sanctum` (laravel/sanctum) by default, or any guard
+        // in config/auth.php. Every request is then checked against the kit's policies.
+        'guard' => env('WAITLIST_KIT_API_GUARD', 'sanctum'),
+
+        // Requests a minute: per signed-in user on `manage/*`, per visitor on the public endpoints' reads.
+        'per_minute' => (int) env('WAITLIST_KIT_API_PER_MINUTE', 60),
+
+        // With a Sanctum token, also require the token's ability (waitlist:read, waitlist:write, waitlist:export,
+        // waitlist:erase), so a token can be narrower than its user. A session request has no token and is unaffected.
+        'token_abilities' => (bool) env('WAITLIST_KIT_API_TOKEN_ABILITIES', true),
+    ],
+
+    'alerts' => [
+        // Tell the team about sign-ups, enquiries and list milestones, as notifications. Off by default.
+        'enabled' => (bool) env('WAITLIST_KIT_ALERTS', false),
+
+        // Addresses alerted by mail (comma-separated in the env).
+        'to' => array_values(array_filter(array_map(trim(...), explode(',', (string) env('WAITLIST_KIT_ALERTS_TO', ''))))),
+
+        // In bundled sign-in, also alert the kit's own administrators.
+        'admins' => (bool) env('WAITLIST_KIT_ALERTS_ADMINS', false),
+
+        // Which events alert.
+        'on' => [
+            'signup'    => (bool) env('WAITLIST_KIT_ALERT_SIGNUPS', false),
+            'enquiry'   => (bool) env('WAITLIST_KIT_ALERT_ENQUIRIES', true),
+            'milestone' => (bool) env('WAITLIST_KIT_ALERT_MILESTONES', true),
+        ],
+
+        // List sizes that raise CampaignMilestoneReached (and an alert, when on), each once per campaign.
+        'milestones' => [100, 500, 1000, 5000, 10000],
     ],
 
     'seeding' => [
@@ -111,8 +155,9 @@ return [
     ],
 
     'admin' => [
-        // The backend: campaigns, page blocks, themes, subscribers, enquiries, pages and integrations.
-        'enabled' => (bool) env('WAITLIST_KIT_ADMIN', true),
+        // The backend: campaigns, page blocks, themes, subscribers, enquiries, pages and integrations. Off by default
+        // in headless mode.
+        'enabled' => (bool) env('WAITLIST_KIT_ADMIN', ! env('WAITLIST_KIT_HEADLESS', false)),
 
         // It lives at /{prefix}.
         'prefix' => env('WAITLIST_KIT_ADMIN_PREFIX', 'admin/waitlist'),

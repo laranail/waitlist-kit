@@ -95,12 +95,16 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Seeders and factories](docs/tools/seeders-and-factories.md) — the starter and demo seeders, a factory per model
 - [Campaign limits](docs/tools/campaign-limits.md) — `single`, `limited`, `multi`, and `CreateCampaign`
 - [Commands](docs/tools/commands.md) — `install`, `doctor`, `eject`, `export`, `forget`
+- [Builders](docs/tools/builders.md) — the kit from code: fluent builders, acting as a user
+- [REST API](docs/tools/api.md) — public and manage endpoints, Sanctum, token abilities, limits
+- [Authorization](docs/tools/authorization.md) — abilities, policies and the actor
+- [Events, listeners and alerts](docs/tools/events.md) — 12 events, the kit's listeners, alert notifications
 
 ### Recipes
 
 - [Use a separate database](docs/recipes/use-a-separate-database.md) — the kit's tables on their own connection
 - [Check an install in a deploy](docs/recipes/check-an-install-in-a-deploy.md) — the doctor as a gate
-- [Require a captcha](docs/recipes/require-a-captcha.md) — Turnstile on every sign-up
+- [Require a captcha](docs/recipes/require-a-captcha.md) — any provider, on every form and endpoint
 - [Mirror sign-ups to Brevo](docs/recipes/mirror-to-brevo.md) — a contact list kept in step
 - [Export subscribers and erase an address](docs/recipes/export-and-erase.md) — CSV and erasure requests
 - [Try it with demo data](docs/recipes/try-it-with-demo-data.md) — a filled local install
@@ -112,6 +116,9 @@ Hosted at [opensource.simtabi.com/documentation/laranail/waitlist-kit](https://o
 - [Publish your legal pages](docs/recipes/publish-your-legal-pages.md) — from seeded draft to served page
 - [Invite people and report conversions](docs/recipes/invite-and-report-conversions.md) — batches, the invite URL and the endpoint
 - [Edit settings in the backend](docs/recipes/edit-settings-in-the-backend.md) — `laranail/settings` as the store
+- [Build a headless front end](docs/recipes/build-a-headless-front-end.md) — the API and builders without the pages
+- [Manage with API tokens](docs/recipes/manage-with-api-tokens.md) — Sanctum tokens with narrow abilities
+- [Get alerts](docs/recipes/get-alerts.md) — sign-ups, enquiries and milestones by mail
 
 ## Contributing and security
 

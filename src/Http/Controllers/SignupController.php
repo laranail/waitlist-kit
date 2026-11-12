@@ -7,6 +7,7 @@ namespace Simtabi\Laranail\WaitlistKit\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Actions\SubscribeToCampaign;
 use Simtabi\Laranail\WaitlistKit\Http\Requests\SignupRequest;
@@ -45,7 +46,7 @@ final readonly class SignupController
             throw new NotFoundHttpException;
         }
 
-        $subscribe->handle($campaign, $request->toData());
+        $subscribe->handle($campaign, $request->toData(), Actor::from($request->user()));
 
         return self::accepted($request, $campaign);
     }

@@ -6,6 +6,7 @@ namespace Simtabi\Laranail\WaitlistKit\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Illuminate\Contracts\Foundation\Application;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
@@ -28,7 +29,7 @@ final readonly class UnsubscribeController
 
     public function store(Request $request, Campaign $campaign, Subscriber $subscriber, Unsubscribe $unsubscribe): Response
     {
-        $unsubscribe->handle($subscriber);
+        $unsubscribe->handle($subscriber, Actor::from($request->user()));
 
         return $this->page($campaign, $subscriber, done: true, action: $request->fullUrl());
     }

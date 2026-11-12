@@ -28,6 +28,12 @@ final class EjectCommand extends Command
     /** The published config's route switch, before and after; replaced exactly once or the eject stops. */
     public const string ROUTES_ON = "env('WAITLIST_KIT_ROUTES', true)";
 
+    /** The same switch as config published since headless mode (off by default when WAITLIST_KIT_HEADLESS is set). */
+    public const string ROUTES_ON_HEADLESS_AWARE = "env('WAITLIST_KIT_ROUTES', ! env('WAITLIST_KIT_HEADLESS', false))";
+
+    /** Every form of the switch an install may have published, newest first. */
+    public const array ROUTES_ON_FORMS = [self::ROUTES_ON_HEADLESS_AWARE, self::ROUTES_ON];
+
     public const string ROUTES_OFF = "env('WAITLIST_KIT_ROUTES', false)";
 
     public const string REQUIRE_LINE = "require __DIR__ . '/waitlist-kit.php';";
@@ -61,12 +67,15 @@ final class EjectCommand extends Command
             $this->callSilently('vendor:publish', ['--tag' => 'laranail::waitlist-kit-config']);
         }
         $contents = $files->get($config);
-        if (substr_count($contents, self::ROUTES_ON) !== 1 && ! str_contains($contents, self::ROUTES_OFF)) {
-            $this->services->display()->error(sprintf('%s no longer contains %s; set routes.enabled to false there yourself, then run with --force.', $config, self::ROUTES_ON));
+        $found = array_values(array_filter(self::ROUTES_ON_FORMS, static fn (string $form): bool => substr_count($contents, $form) === 1));
+        if ($found === [] && ! str_contains($contents, self::ROUTES_OFF)) {
+            $this->services->display()->error(sprintf('%s no longer contains %s; set routes.enabled to false there yourself, then run with --force.', $config, self::ROUTES_ON_HEADLESS_AWARE));
 
             return self::FAILURE;
         }
-        $files->put($config, str_replace(self::ROUTES_ON, self::ROUTES_OFF, $contents));
+        if ($found !== []) {
+            $files->put($config, str_replace($found[0], self::ROUTES_OFF, $contents));
+        }
         $this->services->display()->success("Turned the kit's public routes off in {$config} (WAITLIST_KIT_ROUTES)");
 
         $this->callSilently('vendor:publish', array_filter(['--tag' => 'laranail::waitlist-kit-views', '--force' => $force]));

@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\WaitlistKit\Actions;
 
 use Illuminate\Support\DateFactory;
+use Illuminate\Contracts\Events\Dispatcher;
+use Simtabi\Laranail\WaitlistKit\Support\Actor;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
 use Simtabi\Laranail\WaitlistKit\Models\Subscriber;
 use Simtabi\Laranail\WaitlistKit\Models\FunnelEvent;
 use Simtabi\Laranail\WaitlistKit\Enums\FunnelEventType;
 use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
+use Simtabi\Laranail\WaitlistKit\Events\ReferralCredited;
 
 /**
  * Credits a referrer when someone they referred joins the list: the referrer moves up the campaign's bump, never past
@@ -21,7 +24,7 @@ use Simtabi\Laranail\WaitlistKit\Enums\SubscriberStatus;
  */
 final readonly class CreditReferral
 {
-    public function __construct(private DateFactory $date) {}
+    public function __construct(private DateFactory $date, private Dispatcher $events) {}
 
     /** Whether the referrer was credited. */
     public function handle(Campaign $campaign, Subscriber $referred): bool
@@ -66,6 +69,9 @@ final readonly class CreditReferral
             'data'        => ['referred' => $referred->id, 'from' => $from, 'to' => $to],
             'occurred_at' => $this->date->now(),
         ]);
+
+        // After the commit: this runs inside AdmitToList's transaction.
+        $this->events->dispatch(new ReferralCredited($campaign, $referrer, $referred, Actor::system()));
 
         return true;
     }
