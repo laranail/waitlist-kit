@@ -2,7 +2,8 @@
 @php($accessError = $errors->getBag('access')->first('code'))
 <section class="wk-block wk-access" data-block="access" aria-labelledby="wk-access-title">
     <h2 class="wk-heading" id="wk-access-title">{{ __('laranail/waitlist-kit::page.access_title') }}</h2>
-    <form class="wk-form" method="post" action="{{ route('laranail-waitlist-kit.campaign.access', $campaign) }}" novalidate data-scope="access-form">
+    <form class="wk-form" method="post" action="{{ route('laranail-waitlist-kit.campaign.access', $campaign) }}" novalidate data-scope="access-form"
+          x-data="wkForm" x-on:submit="submit">
         @csrf
         <div class="wk-field" data-part="field" data-field="code" @if ($accessError !== '') data-state="invalid" @endif>
             <label class="wk-label" data-part="label" for="access-code">{{ __('laranail/waitlist-kit::page.access_label') }}</label>
