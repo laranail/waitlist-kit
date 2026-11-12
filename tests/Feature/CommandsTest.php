@@ -110,3 +110,38 @@ it('forgets an address on every campaign, with its funnel events', function (): 
 
     $this->artisan('laranail::waitlist-kit.forget', ['email' => 'not-an-address'])->assertFailed();
 });
+
+it('reports an API whose guard is missing, a mis-prefixed API, and alerts nobody receives', function (string $key, mixed $value, string $message): void {
+    config()->set('laranail.waitlist-kit.' . $key, $value);
+
+    $this->artisan('laranail::waitlist-kit.doctor')->expectsOutputToContain($message)->assertFailed();
+})->with([
+    'api guard'   => ['api.guard', 'nowhere', 'its guard "nowhere" is not in config/auth.php'],
+    'api prefix'  => ['api.prefix', 'v1', 'api.prefix "v1" does not start with "api"'],
+    'no audience' => ['alerts', ['enabled' => true, 'to' => [], 'admins' => false], 'nobody receives them'],
+]);
+
+it('turns the pages and the backend off and the API on in headless mode', function (bool $headless): void {
+    $saved = [$_ENV['WAITLIST_KIT_HEADLESS'] ?? null, $_SERVER['WAITLIST_KIT_HEADLESS'] ?? null];
+    $_ENV['WAITLIST_KIT_HEADLESS'] = $_SERVER['WAITLIST_KIT_HEADLESS'] = $headless ? 'true' : 'false';
+
+    try {
+        $config = require dirname(__DIR__, 2) . '/config/waitlist-kit.php';
+    } finally {
+        [$env, $server] = $saved;
+        if ($env === null) {
+            unset($_ENV['WAITLIST_KIT_HEADLESS']);
+        } else {
+            $_ENV['WAITLIST_KIT_HEADLESS'] = $env;
+        }
+        if ($server === null) {
+            unset($_SERVER['WAITLIST_KIT_HEADLESS']);
+        } else {
+            $_SERVER['WAITLIST_KIT_HEADLESS'] = $server;
+        }
+    }
+
+    expect($config['routes']['enabled'])->toBe(! $headless)
+        ->and($config['admin']['enabled'])->toBe(! $headless)
+        ->and($config['api']['enabled'])->toBe($headless);
+})->with([true, false]);

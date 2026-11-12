@@ -8,6 +8,7 @@ use Override;
 use Throwable;
 use RuntimeException;
 use Illuminate\Database\Connection;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Simtabi\Laranail\WaitlistKit\Support\Tables;
 use Simtabi\Laranail\WaitlistKit\Models\Campaign;
@@ -42,7 +43,7 @@ final class DoctorCommand extends Command
     #[Override]
     protected $description = 'Check the waitlist-kit configuration, database connection and tables.';
 
-    public function handle(KitConfig $config, ConnectionResolverInterface $connections, Application $app, ThemeRegistry $themes, ThemeAssets $assets): int
+    public function handle(KitConfig $config, ConnectionResolverInterface $connections, Application $app, ThemeRegistry $themes, ThemeAssets $assets, Repository $appConfig): int
     {
         $this->services->display()->header('laranail/waitlist-kit');
 
@@ -66,6 +67,18 @@ final class DoctorCommand extends Command
 
         if ($config->requiresCaptcha() && ! $app->providerIsLoaded(self::CAPTCHA_PROVIDER)) {
             $problems[] = 'security.captcha is on, but laranail/captcha is not installed: every sign-up would fail validation.';
+        }
+
+        if ($config->apiEnabled() && ! is_array($appConfig->get('auth.guards.' . $config->apiGuard()))) {
+            $problems[] = sprintf('api.enabled is on, but its guard "%s" is not in config/auth.php: the manage endpoints answer 503. Install laravel/sanctum, or set WAITLIST_KIT_API_GUARD.', $config->apiGuard());
+        }
+
+        if ($config->apiEnabled() && ! str_starts_with($config->apiPrefix() . '/', 'api/')) {
+            $problems[] = sprintf('api.prefix "%s" does not start with "api": a campaign could take its first segment as a slug.', $config->apiPrefix());
+        }
+
+        if ($config->alertsEnabled() && $config->alertRecipients() === [] && ! $config->alertsAdmins()) {
+            $problems[] = 'alerts.enabled is on, but nobody receives them: set WAITLIST_KIT_ALERTS_TO, or WAITLIST_KIT_ALERTS_ADMINS in bundled sign-in.';
         }
 
         try {
@@ -98,6 +111,7 @@ final class DoctorCommand extends Command
             'Sign-in'   => $this->describe(static fn (): string => $config->authMode()->value),
             'Theme'     => $config->defaultTheme(),
             'Tables'    => Tables::name('*'),
+            'API'       => $config->apiEnabled() ? '/' . trim($config->routePrefix() . '/' . $config->apiPrefix(), '/') . ' (' . $config->apiGuard() . ')' : 'off',
         ]);
 
         foreach ($problems as $problem) {

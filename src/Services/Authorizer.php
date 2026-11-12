@@ -17,12 +17,6 @@ final readonly class Authorizer
 {
     public function __construct(private Gate $gate) {}
 
-    /** @param  mixed  $arguments  the policy's model (or class), or the ability's arguments */
-    public function allows(Actor $actor, string $ability, mixed $arguments = []): bool
-    {
-        return $actor->isSystem() || $this->gate->forUser($actor->user)->allows($ability, $arguments);
-    }
-
     /**
      * @param mixed $arguments the policy's model (or class), or the ability's arguments
      *

@@ -37,12 +37,13 @@ final class CampaignBuilder
 
     private ?string $slug = null;
 
-    private ?CampaignType $type = null;
+    /** Kept as given until validated, so a bad value is a validation error, not a ValueError. */
+    private ?string $type = null;
 
     /** @var list<string>|null */
     private ?array $locales = null;
 
-    private ?CampaignStatus $status = null;
+    private ?string $status = null;
 
     /**
      * Set only when asked for, so save() can tell "clear it" (null) from "leave it".
@@ -83,7 +84,7 @@ final class CampaignBuilder
 
     public function type(CampaignType|string $type): self
     {
-        $this->type = $type instanceof CampaignType ? $type : CampaignType::from($type);
+        $this->type = $type instanceof CampaignType ? $type->value : $type;
 
         return $this;
     }
@@ -97,7 +98,7 @@ final class CampaignBuilder
 
     public function status(CampaignStatus|string $status): self
     {
-        $this->status = $status instanceof CampaignStatus ? $status : CampaignStatus::from($status);
+        $this->status = $status instanceof CampaignStatus ? $status->value : $status;
 
         return $this;
     }
@@ -144,13 +145,15 @@ final class CampaignBuilder
         }
         $this->authorizer->authorize($this->actor(), 'create', Campaign::class);
 
-        $campaign = $this->create->handle(
-            $this->name ?? '',
-            $this->slug ?? '',
-            $this->type ?? CampaignType::Waitlist,
-            $this->locales ?? ['en'],
-            $this->actor(),
-        );
+        $fields = [
+            'name'    => $this->name ?? '',
+            'slug'    => $this->slug ?? '',
+            'type'    => $this->type ?? CampaignType::Waitlist->value,
+            'locales' => $this->locales ?? ['en'],
+        ];
+        $this->validator->make($fields, CampaignRules::create())->validate();
+
+        $campaign = $this->create->handle($fields['name'], $fields['slug'], CampaignType::from($fields['type']), $fields['locales'], $this->actor());
 
         // CreateCampaign makes a draft; a status, host or launch date given here is saved straight after.
         $rest = $this->changes(withIdentity: false);
@@ -202,9 +205,9 @@ final class CampaignBuilder
         $changes = array_filter([
             'name'    => $withIdentity ? $this->name : null,
             'slug'    => $withIdentity ? $this->slug : null,
-            'type'    => $withIdentity ? $this->type?->value : null,
+            'type'    => $withIdentity ? $this->type : null,
             'locales' => $withIdentity ? $this->locales : null,
-            'status'  => $this->status?->value,
+            'status'  => $this->status,
         ], static fn (mixed $value): bool => $value !== null);
 
         return array_merge($changes, $this->optional);

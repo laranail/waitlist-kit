@@ -79,18 +79,19 @@
         }
     ],
     "require-dev": {
+        "fakerphp/faker": "^1.24",
+        "laranail/captcha": "^0.1",
+        "laranail/settings": "^0.1",
         "larastan/larastan": "^3.0",
         "laravel/pint": "^1.30",
+        "laravel/sanctum": "^4.2",
         "orchestra/testbench": "^11.0",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-arch": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0",
         "phpstan/phpstan": "^2.0",
         "rector/rector": "^2.5.8",
-        "roave/security-advisories": "dev-latest",
-        "fakerphp/faker": "^1.24",
-        "laranail/captcha": "^0.1",
-        "laranail/settings": "^0.1"
+        "roave/security-advisories": "dev-latest"
     },
     "autoload": {
         "psr-4": {
@@ -144,6 +145,7 @@
     "suggest": {
         "fakerphp/faker": "Needed by the factories and the demo seeder (a development dependency).",
         "laranail/captcha": "Server-side captcha (Turnstile and others) on the sign-up form, with security.captcha on.",
-        "laranail/settings": "Edit the kit's settings in the backend (settings.store = database)."
+        "laranail/settings": "Edit the kit's settings in the backend (settings.store = database).",
+        "laravel/sanctum": "Token authentication for the REST API (api.guard = sanctum, the default), with per-token abilities."
     }
 }

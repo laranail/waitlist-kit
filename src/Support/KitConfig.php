@@ -234,6 +234,14 @@ final readonly class KitConfig
         return $this->string('auth.guard');
     }
 
+    /** The public pages' path prefix (routes.prefix), `waitlist` by default; empty puts them at the root. */
+    public function routePrefix(): string
+    {
+        $value = $this->value('routes.prefix');
+
+        return is_string($value) ? trim($value, '/') : 'waitlist';
+    }
+
     public function apiEnabled(): bool
     {
         return $this->value('api.enabled') === true;

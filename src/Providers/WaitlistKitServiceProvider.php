@@ -91,6 +91,8 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
     /** Live-validation requests per form per visitor per minute; they validate and store nothing. */
     public const int PRECOGNITION_PER_MINUTE = 60;
 
+    public const string API_LIMITER = 'laranail-waitlist-kit.api';
+
     public const string LOGIN_LIMITER = 'laranail-waitlist-kit.admin-login';
 
     /** laranail/settings' contract, bound only when that package is installed. */
@@ -106,6 +108,8 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
             ->hasAssets()
             ->hasBladeComponentNamespace('Simtabi\\Laranail\\WaitlistKit\\View\\Components', 'laranail-waitlist-kit')
             ->hasTranslations()
+            // The API first: its fixed paths must be matched before the public pages' {campaign} slug.
+            ->hasRoutesWhen('laranail.waitlist-kit.api.enabled', 'api', false)
             ->hasRoutesWhen('laranail.waitlist-kit.routes.enabled', 'web', true)
             ->hasRoutesWhen('laranail.waitlist-kit.admin.enabled', 'admin', true)
             ->hasCommands([AdminCommand::class, DoctorCommand::class, EjectCommand::class, ExportCommand::class, ForgetCommand::class, InstallCommand::class])
@@ -192,6 +196,13 @@ final class WaitlistKitServiceProvider extends PackageServiceProvider
             $slug = $slug instanceof Campaign ? $slug->slug : (is_string($slug) ? $slug : '');
 
             return Limit::perMinute(self::ACCESS_PER_MINUTE)->by($slug . '|' . $request->ip());
+        });
+        // The API: per signed-in user on manage/*, per visitor on the public reads.
+        RateLimiter::for(self::API_LIMITER, static function (Request $request) use ($app): Limit {
+            $user = $request->user();
+            $key = is_object($user) && method_exists($user, 'getAuthIdentifier') ? 'user|' . (is_scalar($id = $user->getAuthIdentifier()) ? (string) $id : '') : 'ip|' . $request->ip();
+
+            return Limit::perMinute($app->make(KitConfig::class)->apiPerMinute())->by($key);
         });
         RateLimiter::for(self::ENQUIRY_LIMITER, static fn (Request $request): Limit => $request->isAttemptingPrecognition()
             ? Limit::perMinute(self::PRECOGNITION_PER_MINUTE)->by('precognition|' . $request->ip())

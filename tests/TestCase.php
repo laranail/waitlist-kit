@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Simtabi\Laranail\WaitlistKit\Tests;
 
 use Illuminate\Filesystem\Filesystem;
+use Laravel\Sanctum\SanctumServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Simtabi\Laranail\Captcha\Providers\CaptchaServiceProvider;
@@ -31,7 +32,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         // package-tools' own provider is discovered in a real application; Testbench does not discover it.
-        return [PackageToolsServiceProvider::class, CaptchaServiceProvider::class, WaitlistKitServiceProvider::class];
+        return [PackageToolsServiceProvider::class, CaptchaServiceProvider::class, SanctumServiceProvider::class, WaitlistKitServiceProvider::class];
     }
 
     protected function defineEnvironment($app): void
@@ -40,6 +41,10 @@ abstract class TestCase extends Orchestra
 
         // Generated, never committed: the encrypted integration settings need a real key to round-trip.
         $config->set('app.key', 'base64:' . base64_encode(random_bytes(32)));
+
+        // The API is off by default (on in headless mode); the suite runs with it on, so every route is checked
+        // against the public pages' and the backend's.
+        $config->set('laranail.waitlist-kit.api.enabled', true);
 
         $config->set('database.default', 'testing');
         $config->set('database.connections.testing', $this->connection());
