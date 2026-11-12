@@ -9,7 +9,7 @@
     ]
   },
   "resources/assets/css/themes/default.css": {
-    "file": "assets/css/default-CgKg83t3.css",
+    "file": "assets/css/default-DrSoUpMT.css",
     "src": "resources/assets/css/themes/default.css",
     "isEntry": true,
     "name": "default",
@@ -18,7 +18,7 @@
     ]
   },
   "resources/assets/css/themes/plain.css": {
-    "file": "assets/css/plain-DRK_FTKO.css",
+    "file": "assets/css/plain-DBgNzoUY.css",
     "src": "resources/assets/css/themes/plain.css",
     "isEntry": true,
     "name": "plain",
@@ -33,7 +33,7 @@
     "isEntry": true
   },
   "resources/assets/js/kit.js": {
-    "file": "assets/js/kit-BHA3rutb.js",
+    "file": "assets/js/kit-DpRn_75Q.js",
     "name": "kit",
     "src": "resources/assets/js/kit.js",
     "isEntry": true
