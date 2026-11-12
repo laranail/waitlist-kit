@@ -27,6 +27,7 @@ final class Admin extends Model implements AuthenticatableContract, Authorizable
 {
     use Authenticatable;
     use Authorizable;
+
     /** @use HasFactory<AdminFactory> */
     use HasFactory;
 
