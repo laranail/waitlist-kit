@@ -115,7 +115,8 @@ final class SettingsDatabaseTest extends TestCase
     {
         // Once per database: on MySQL and PostgreSQL the tables outlive RefreshDatabase's per-test transaction (MySQL
         // commits DDL), so creating them for every test fails on the second; SQLite in memory starts empty each time.
-        if (! Schema::hasTable('settings_categories')) {
+        // laranail/settings prefixes its tables (`laranail_` by default), so ask for the configured name.
+        if (! Schema::hasTable(config('laranail.settings.tables.prefix') . config('laranail.settings.tables.categories'))) {
             (require dirname(__DIR__, 3) . '/vendor/laranail/settings/database/migrations/create_laranail_settings_tables.php')->up();
         }
     }
