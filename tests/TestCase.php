@@ -51,7 +51,8 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * SQLite in memory, or the MySQL or PostgreSQL service CI's migrations job starts (WAITLIST_KIT_TEST_DRIVER).
+     * SQLite in memory, or the MySQL or PostgreSQL service CI's migrations job starts (WAITLIST_KIT_TEST_DRIVER),
+     * or a dbpantry run database (composer test-db sets WAITLIST_KIT_TEST_HOST, _DATABASE and _USERNAME too).
      *
      * @return array<string, mixed>
      */
@@ -65,10 +66,10 @@ abstract class TestCase extends Orchestra
 
         return [
             'driver'   => $driver,
-            'host'     => '127.0.0.1',
+            'host'     => getenv('WAITLIST_KIT_TEST_HOST') ?: '127.0.0.1',
             'port'     => (string) getenv('WAITLIST_KIT_TEST_PORT'),
-            'database' => 'waitlist',
-            'username' => $driver === 'pgsql' ? 'postgres' : 'root',
+            'database' => getenv('WAITLIST_KIT_TEST_DATABASE') ?: 'waitlist',
+            'username' => getenv('WAITLIST_KIT_TEST_USERNAME') ?: ($driver === 'pgsql' ? 'postgres' : 'root'),
             'password' => (string) getenv('WAITLIST_KIT_TEST_PASSWORD'),
             'charset'  => $driver === 'pgsql' ? 'utf8' : 'utf8mb4',
             'prefix'   => '',

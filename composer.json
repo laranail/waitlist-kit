@@ -40,7 +40,7 @@
         "illuminate/database": "^13.0",
         "illuminate/support": "^13.0",
         "laranail/console": "^0.1.8",
-        "laranail/package-tools": "^0.1.12"
+        "laranail/package-tools": "^0.1.15"
     },
     "repositories": [
         {
@@ -122,7 +122,8 @@
             "@lint",
             "@test"
         ],
-        "format": "@pint-fix"
+        "format": "@pint-fix",
+        "test-db": "laranail-test-db"
     },
     "extra": {
         "branch-alias": {
@@ -132,6 +133,34 @@
             "providers": [
                 "Simtabi\\Laranail\\WaitlistKit\\Providers\\WaitlistKitServiceProvider"
             ]
+        },
+        "laranail": {
+            "test-db": {
+                "connections": [
+                    "mysql",
+                    "pgsql"
+                ],
+                "group": null,
+                "args": [
+                    "tests/Feature/SchemaTest.php",
+                    "tests/Feature/ModelsTest.php",
+                    "tests/Feature/MorphMapTest.php",
+                    "tests/Feature/SignupTest.php",
+                    "tests/Feature/CommandsTest.php",
+                    "tests/Feature/ContactTest.php",
+                    "tests/Feature/LegalPagesTest.php",
+                    "tests/Feature/Admin"
+                ],
+                "project": "waitlist",
+                "env": {
+                    "WAITLIST_KIT_TEST_DRIVER": "{connection}",
+                    "WAITLIST_KIT_TEST_HOST": "{host}",
+                    "WAITLIST_KIT_TEST_PORT": "{port}",
+                    "WAITLIST_KIT_TEST_DATABASE": "{database}",
+                    "WAITLIST_KIT_TEST_USERNAME": "{user}",
+                    "WAITLIST_KIT_TEST_PASSWORD": "{password}"
+                }
+            }
         }
     },
     "config": {
