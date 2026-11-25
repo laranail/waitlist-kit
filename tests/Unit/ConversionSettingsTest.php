@@ -29,5 +29,5 @@ it('cannot be built out of range', function (int $bump, int $cap): void {
 it('takes only an absolute https invite URL', function (): void {
     expect(fn (): ConversionSettings => new ConversionSettings(inviteUrl: 'http://app.example.com'))->toThrow(InvalidArgumentException::class)
         ->and(fn (): ConversionSettings => new ConversionSettings(inviteUrl: '/join'))->toThrow(InvalidArgumentException::class)
-        ->and((new ConversionSettings(inviteUrl: 'https://app.example.com/join'))->inviteUrl)->toBe('https://app.example.com/join');
+        ->and(new ConversionSettings(inviteUrl: 'https://app.example.com/join')->inviteUrl)->toBe('https://app.example.com/join');
 });
