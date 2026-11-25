@@ -23,6 +23,15 @@ composer ci     # pint --test, phpstan (max), rector --dry-run, pest
 
 `composer pint-fix` and `composer rector-fix` apply the mechanical fixes.
 
+The schema, model, signup, command, contact, legal and admin tests also run on MySQL and PostgreSQL:
+
+```bash
+composer test-db   # vendor/bin/laranail-test-db: dbpantry's fixture, one database per run
+```
+
+It needs a dbpantry checkout (`DBPANTRY_DIR`, or `simtabi/packages/dbpantry` above this package) with
+`MDB_PUBLISH=direct`. CI runs the same files against its own MySQL 8.4 and PostgreSQL 17 services.
+
 ## Conventions
 
 - PHP `^8.5`, Laravel `^13`. `declare(strict_types=1)` and `final` in every class.
